@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <include file="db/changelogs/schema-22112017.sql"/>
+    <include file="db/changelogs/data-22112017.sql"/>
+    <include file="db/changelogs/area-data-28112017.sql"/>
+    <include file="db/changelogs/gym-data-23112017.sql"/>
+</databaseChangeLog>

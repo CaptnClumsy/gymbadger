@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GymBadger</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="css/bootstrap-multiselect.css"/>
+    <link rel="stylesheet" href="css/badgerstyle.css" rel="stylesheet"/>
+
+  </head>
+  <body>
+
+    <nav class="navbar navbar-expand-md navbar-static-top navbar-dark bg-primary badger-navbar">
+      <a class="navbar-brand" href="#">
+        <img src="/images/badger.png" width="48" height="48" class="d-inline-block" alt="">
+        <span class="badger-navbar-title">GymBadger</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse badger-list-row" id="navbarNavDropdown">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item nav-link">
+            <select id="filterButton" class="badger-filtericon-hidden" multiple="multiple">
+            </select>
+          </li>
+          <li class="nav-item nav-link">
+            <form class="form-inline">
+              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+              <button id="searchButton" class="btn btn-primary my-2 my-sm-0" type="submit">Search</button>
+            </form>
+          </li>
+          <li class="nav-item nav-link">
+            <button class="btn btn-primary my-2 my-sm-0" type="submit">Sign In</button>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container-fluid badger-container">
+      <div id="map"></div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+    <script src="js/bootstrap-multiselect.js" type="text/javascript"></script>
+    
+    <script>
+      var map;
+      var areaData;
+      var gymData;
+      var currentInfoWindow;
+      var currentMarker;
+      var currentProps;
+      
+      function initMap() {
+    	// Get defaults
+    	$.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: "api/defaults/",
+            success: function (data) {
+            	map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: data.zoom,
+                    center: { lat: data.lat, lng: data.lng }
+                });
+            },
+            error: function (result) {
+            	alert("Failed to query default data from server");
+            },
+            complete: function (res) {
+            	initAreas();
+            	initMarkers();
+            }
+    	});
+      }
+      
+      function initAreas() {
+    	  $("#searchButton").click(function() {
+              map.setCenter({ lat: gymData[0].lat, lng: gymData[0].lng});
+              google.maps.event.trigger(gymData[0].marker, 'click');
+          });
+    	  // Get all the possible gym areas
+    	  $.ajax({
+              type: "GET",
+              contentType: "application/json; charset=utf-8",
+              url: "api/areas/",
+              success: function (data) {
+            	  for (var i = 0; i < data.length; i++) {
+            		  $('#filterButton').append($('<option>', {
+            			  value: data[i].id,
+            			  text: data[i].name
+            		  }));
+            	  }
+              },
+              error: function (result) {
+              	alert("Failed to query area data from server");
+              },
+              complete: function (res) {
+                $("#filterButton").multiselect({
+                  buttonClass: 'btn btn-primary',
+                  includeSelectAllOption: true,
+                  nonSelectedText: 'No areas',
+                  allSelectedText: 'All areas',
+                  maxHeight: 200,
+                  optionClass: function(element) {
+                      return 'badger-filter-option';
+                  }
+                });
+              }
+      	});
+      }
+
+      function initMarkers() {
+    	// Get all the gym positions and create markers for them
+      	$.ajax({
+            type: "GET",
+              contentType: "application/json; charset=utf-8",
+              url: "api/gyms/",
+              success: function (data) {
+            	  gymData = data;
+                  for (var i = 0; i < gymData.length; i++) {
+                	  // Add the marker
+                      var marker = new google.maps.Marker({
+                    	title: gymData[i].name,
+                        position: { lat: gymData[i].lat, lng: gymData[i].lng },
+                        icon: customIcon(gymData[i].status),
+                        map: map
+                      });
+                	  gymData[i].marker = marker;
+                      // Add a callback to create an info window for each marker if clicked
+                      (function (marker, i) {
+                        google.maps.event.addListener(marker, 'click', function () {
+                        	var content = "<div class=\"badger-info\"><div class=\"badger-info-title\">" + 
+                        	  "<div class=\"dropdown\">" +
+                        	    "<button class=\"btn btn-default badger-small-button\" type=\"button\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
+                        	    "<span class=\"badger-badge-container\"><span id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(data[i].status) + "\"></span></span>" +
+                         	    "</button>" +
+                        	    "<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">" +
+                        	      "<a id=\"select-gold\" class=\""+ getDropdownBadgeClass(gymData[i].status, "GOLD") + "\" href=\"#\">Gold</a>" +
+                        	      "<a id=\"select-silver\" class=\""+ getDropdownBadgeClass(gymData[i].status, "SILVER") + "\" href=\"#\">Silver</a>" +
+                        	      "<a id=\"select-bronze\" class=\""+ getDropdownBadgeClass(gymData[i].status, "BRONZE") + "\" href=\"#\">Bronze</a>" +
+                        	      "<a id=\"select-basic\" class=\""+ getDropdownBadgeClass(gymData[i].status, "BASIC") + "\" href=\"#\">Basic</a>" +
+                        	      "<a id=\"select-none\" class=\""+ getDropdownBadgeClass(gymData[i].status, "NONE") + "\" href=\"#\">None</a>" +
+                        	    "</div>" +
+                        	    "<span class=\"badger-info-title-text\">" + gymData[i].name + "</span>" +
+                        	  "</div>" +
+                        	"</div>" +
+                    		"<div>" + 
+                    		  "<span class=\"badge badge-primary\">" + gymData[i].area.name + "</span>" +
+                    		  getParkStatus(gymData[i].park) + "</div>" + 
+                    		"<div>Last visited:</div>"
+                    		"</div>";
+                    		currentMarker = marker;
+                    		currentProps = gymData[i];
+                    		currentInfoWindow = new google.maps.InfoWindow({ maxWidth: 350 });
+                    		// Call us back when the info window has opened
+                            google.maps.event.addListener(currentInfoWindow, 'domready', function() {
+                            	$('.badger-dropdownitem').click(function() {
+                                    selectBadge(currentMarker, currentProps, getStatusFromId(this.id));
+                                });
+                            });
+                    		currentInfoWindow.setContent(content);
+                    		currentInfoWindow.open(map, currentMarker);
+                            
+                        });
+                      })(marker, i);
+                  } 
+              },
+              error: function (result) {
+              	alert("Failed to query gym data from server");
+              }
+      	});
+      }
+
+      function selectBadge(marker, props, status) {
+    	  var oldStatus = props.status;
+    	  props.status=status;
+    	  $.ajax({
+            type: "PUT",
+            contentType: "application/json; charset=utf-8",
+            url: "api/gyms/"+props.id,
+            data: JSON.stringify(props, ["id", "name", "lat", "lng", "status"]),
+            success: function (data) {
+              marker.setIcon(customIcon(props.status));
+              $("#infoBadge").removeClass(getBadgeClass(oldStatus));
+              $("#infoBadge").addClass(getBadgeClass(props.status));
+            },
+            error: function (result) {
+              alert("Failed to update gym data");
+            }
+    	  });
+      }
+
+      function getBadgeColor (status) {
+    	  if (status==="BASIC") {
+    		  return '#b3ffb3';
+    	  }
+    	  if (status==="BRONZE") {
+    		  return '#ffb366';
+    	  }
+    	  if (status==="SILVER") {
+    		  return '#e0e0d1';
+    	  }
+    	  if (status==="GOLD") {
+    		  return '#ffff00';
+    	  }
+    	  return '#b3daff';
+      }
+
+      function customIcon (status) {
+    	  var ret = {
+    		path: 'M 0,0 C -2,-20 -10,-22 -10,-30 A 10,10 0 1,1 10,-30 C 10,-22 2,-20 0,0 z M -2,-30 a 2,2 0 1,1 4,0 2,2 0 1,1 -4,0',
+    		fillColor: getBadgeColor(status),
+      	    fillOpacity: 1,
+      	    strokeColor: '#000',
+      	    strokeWeight: 2,
+      	    scale: 1
+    	  };
+    	  return ret;
+      }
+      
+      function getBadgeClass (status) {
+    	  if (status==="BASIC") {
+    		  return 'badger-badge-basic';
+    	  }
+    	  else if (status==="BRONZE") {
+    		  return 'badger-badge-bronze';
+    	  }
+    	  else if (status==="SILVER") {
+    		  return 'badger-badge-silver';
+    	  }
+    	  else if (status==="GOLD") {
+    		  return 'badger-badge-gold';
+    	  }
+    	  return 'badger-badge-none';
+      }
+      
+      function getStatusFromId (id) {
+    	  if (id==="select-basic")
+    		  return "BASIC";
+    	  if (id==="select-bronze")
+    		  return "BRONZE";
+    	  if (id==="select-silver")
+    		  return "SILVER";
+    	  if (id==="select-gold")
+    		  return "GOLD";
+    	  return "NONE";
+      }
+      
+      function getDropdownBadgeClass (currentStatus, targetStatus) {
+          var classes = "dropdown-item badger-dropdownitem";
+    	  if (currentStatus===targetStatus) {
+    		  classes+=" badger-dropdownitem-checked";
+    	  }
+    	  return classes;
+      }
+      
+      function getParkStatus (park) {
+    	  if (park) {
+    		  return "<span class=\"badge badge-success badger-small-lm\">park</span>";
+    	  }
+    	  return "";
+      }
+
+    </script>
+    <script async defer
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9OSRLuuH3o7YhJ6bRUVtD9TxhlSDqSDU&callback=initMap">
+    </script>
+  </body>
+</html>
