@@ -109,7 +109,14 @@
                   optionClass: function(element) {
                       return 'badger-filter-option';
                   }
+                  //,
+                  //onInitialized: function (select, container) {
+                  //  $("#filterButton").multiselect('selectAll', false);
+                  // $("#filterButton").multiselect('updateButtonText');
+                  //}
                 });
+                $("#filterButton").multiselect('selectAll', false);
+          	    $("#filterButton").multiselect('updateButtonText');
               }
       	});
       }
@@ -152,7 +159,9 @@
                     		"<div>" + 
                     		  "<span class=\"badge badge-primary\">" + gymData[i].area.name + "</span>" +
                     		  getParkStatus(gymData[i].park) + "</div>" + 
-                    		"<div>Last visited:</div>"
+                    		"<div>Last raided:</div>" +
+                    		"<div><div>Comments</div><div><textarea id=\"comments\" cols=\"40\" rows=\"5\"></textarea>" +
+                            "</div></div>" +
                     		"</div>";
                     		currentMarker = marker;
                     		currentProps = gymData[i];
