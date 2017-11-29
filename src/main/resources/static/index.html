@@ -108,12 +108,32 @@
                   maxHeight: 200,
                   optionClass: function(element) {
                       return 'badger-filter-option';
+                  },
+                  onDeselectAll : function() {
+                	  // Hide all the gyms, user has deselected all areas
+                	  for (var i = 0; i < gymData.length; i++) {
+                		  gymData[i].marker.setVisible(false);
+                	  }
+                  },
+                  onSelectAll : function() {
+                	  // Ensure every single gym is shown, user has selected all areas
+                	  for (var i = 0; i < gymData.length; i++) {
+                		  gymData[i].marker.setVisible(true);
+                	  }
+                  },
+                  onChange: function(option, checked, select) {
+                	  var id = $(option).val();
+                	  // Find all the gyms in the area and either show or hide them
+                      for (var i = 0; i < gymData.length; i++) {
+                    	  if (parseInt(id, 10)===gymData[i].area.id) {
+                    		  if (checked) {
+                    			  gymData[i].marker.setVisible(true);
+                    		  } else {
+                    			  gymData[i].marker.setVisible(false);
+                    		  }
+                    	  }
+                      }
                   }
-                  //,
-                  //onInitialized: function (select, container) {
-                  //  $("#filterButton").multiselect('selectAll', false);
-                  // $("#filterButton").multiselect('updateButtonText');
-                  //}
                 });
                 $("#filterButton").multiselect('selectAll', false);
           	    $("#filterButton").multiselect('updateButtonText');
