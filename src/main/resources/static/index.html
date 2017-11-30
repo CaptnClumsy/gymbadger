@@ -51,9 +51,9 @@
       var map;
       var areaData;
       var gymData;
-      var currentInfoWindow;
-      var currentMarker;
-      var currentProps;
+      var currentInfoWindow = null;
+      var currentMarker = null;
+      var currentProps = null;
       
       function initMap() {
     	// Get defaults
@@ -195,6 +195,9 @@
                     		"</div>";
                     		currentMarker = marker;
                     		currentProps = gymData[i];
+                    		if (currentInfoWindow != null) {
+                    		    currentInfoWindow.close();
+                    		}
                     		currentInfoWindow = new google.maps.InfoWindow({ maxWidth: 350 });
                     		// Call us back when the info window has opened
                             google.maps.event.addListener(currentInfoWindow, 'domready', function() {
