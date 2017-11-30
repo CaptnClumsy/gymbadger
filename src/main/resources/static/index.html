@@ -7,6 +7,7 @@
     
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="css/bootstrap-multiselect.css"/>
+    <link rel="stylesheet" href="css/select2.min.css">
     <link rel="stylesheet" href="css/badgerstyle.css" rel="stylesheet"/>
 
   </head>
@@ -27,10 +28,7 @@
             </select>
           </li>
           <li class="nav-item nav-link">
-            <form class="form-inline">
-              <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-              <button id="searchButton" class="btn btn-primary my-2 my-sm-0" type="submit">Search</button>
-            </form>
+            <select id="search" name="search" class="form-control"><option></option></select>
           </li>
           <li class="nav-item nav-link">
             <button class="btn btn-primary my-2 my-sm-0" type="submit">Sign In</button>
@@ -47,6 +45,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
     <script src="js/bootstrap-multiselect.js" type="text/javascript"></script>
+    <script src="js/select2.full.min.js" type="text/javascript"></script>
     
     <script>
       var map;
@@ -79,10 +78,6 @@
       }
       
       function initAreas() {
-    	  $("#searchButton").click(function() {
-              map.setCenter({ lat: gymData[0].lat, lng: gymData[0].lng});
-              google.maps.event.trigger(gymData[0].marker, 'click');
-          });
     	  // Get all the possible gym areas
     	  $.ajax({
               type: "GET",
@@ -141,6 +136,21 @@
       	});
       }
 
+      function initSearch() {
+    	  var searchData = $.map(gymData, function (obj) {
+    		  obj.text = obj.name;
+    		  return obj;
+          });
+    	  $("#search").select2({
+    		  placeholder: "Search",
+    		  data: searchData
+    	  });
+    	  $("#search").on("select2:select", function(e) {
+    	      map.setCenter({ lat: e.params.data.lat, lng: e.params.data.lng});
+    	      google.maps.event.trigger(e.params.data.marker, 'click');
+          });
+      }
+      
       function initMarkers() {
     	// Get all the gym positions and create markers for them
       	$.ajax({
@@ -198,6 +208,9 @@
                         });
                       })(marker, i);
                   } 
+              },
+              complete: function (result) {
+            	  initSearch();  
               },
               error: function (result) {
               	alert("Failed to query gym data from server");

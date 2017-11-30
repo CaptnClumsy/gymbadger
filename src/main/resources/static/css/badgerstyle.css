@@ -118,3 +118,11 @@
 .badger-small-lm {
 	margin-left: 4px;
 }
+.badger-navbar .select2-selection {
+	height: 32px;
+	margin-top: 6px;
+} 
+.badger-navbar .select2-selection__arrow {
+	height: 32px;
+	margin-top: 6px;
+} 
