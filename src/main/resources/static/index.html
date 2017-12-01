@@ -244,6 +244,7 @@
       function initSearch() {
     	  $("#search").select2({
     		  placeholder: "Search",
+    		  width: '100%',
     		  data: getSearchData()
     	  });
     	  $("#search").on("select2:select", function(e) {
@@ -258,6 +259,7 @@
     	  $("#search").html("<option></option>");
     	  $("#search").select2({
     		  placeholder: "Search",
+    		  width: '100%',
     		  data: getSearchData()
     	  });
     	  $('#search').change();
