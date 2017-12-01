@@ -49,8 +49,8 @@
     
     <script>
       var map;
-      var areaData;
       var gymData;
+      var selectedAreaIds = [];
       var currentInfoWindow = null;
       var currentMarker = null;
       var currentProps = null;
@@ -84,11 +84,13 @@
               contentType: "application/json; charset=utf-8",
               url: "api/areas/",
               success: function (data) {
+            	  selectedAreaIds.length=0;
             	  for (var i = 0; i < data.length; i++) {
             		  $('#filterButton').append($('<option>', {
             			  value: data[i].id,
             			  text: data[i].name
             		  }));
+            		  selectedAreaIds.push(data[i].id);
             	  }
               },
               error: function (result) {
@@ -105,19 +107,40 @@
                       return 'badger-filter-option';
                   },
                   onDeselectAll : function() {
-                	  // Hide all the gyms, user has deselected all areas
+                	  // Deselect all the areas
+                	  selectedAreaIds.length=0;
+                	  resetSearch();
+                	  // Hide all the gym markers
                 	  for (var i = 0; i < gymData.length; i++) {
                 		  gymData[i].marker.setVisible(false);
                 	  }
                   },
-                  onSelectAll : function() {
-                	  // Ensure every single gym is shown, user has selected all areas
+                  onSelectAll : function() {  
+                	  // Make sure all areas are selected and all gyms available for search
+                	  selectedAreaIds.length=0;
+                	  var areas = $('#filterButton option');
+                      $(areas).each(function(index, area){
+                          selectedAreaIds.push(parseInt(area.value,10));
+                      });
+                      resetSearch();
+                  
+                      // Ensure every single gym marker is shown
                 	  for (var i = 0; i < gymData.length; i++) {
                 		  gymData[i].marker.setVisible(true);
                 	  }
+                	  
                   },
                   onChange: function(option, checked, select) {
                 	  var id = $(option).val();
+                	  
+                	  // Update the list of selected area ids
+                	  selectedAreaIds.length=0;
+                	  var areas = $('#filterButton option:selected');
+                      $(areas).each(function(index, area){
+                          selectedAreaIds.push(parseInt(area.value,10));
+                      });
+                      resetSearch();
+                      
                 	  // Find all the gyms in the area and either show or hide them
                       for (var i = 0; i < gymData.length; i++) {
                     	  if (parseInt(id, 10)===gymData[i].area.id) {
@@ -134,21 +157,6 @@
           	    $("#filterButton").multiselect('updateButtonText');
               }
       	});
-      }
-
-      function initSearch() {
-    	  var searchData = $.map(gymData, function (obj) {
-    		  obj.text = obj.name;
-    		  return obj;
-          });
-    	  $("#search").select2({
-    		  placeholder: "Search",
-    		  data: searchData
-    	  });
-    	  $("#search").on("select2:select", function(e) {
-    	      map.setCenter({ lat: e.params.data.lat, lng: e.params.data.lng});
-    	      google.maps.event.trigger(e.params.data.marker, 'click');
-          });
       }
       
       function initMarkers() {
@@ -195,9 +203,7 @@
                     		"</div>";
                     		currentMarker = marker;
                     		currentProps = gymData[i];
-                    		if (currentInfoWindow != null) {
-                    		    currentInfoWindow.close();
-                    		}
+                    		closeAnyInfoWindows();
                     		currentInfoWindow = new google.maps.InfoWindow({ maxWidth: 350 });
                     		// Call us back when the info window has opened
                             google.maps.event.addListener(currentInfoWindow, 'domready', function() {
@@ -221,6 +227,42 @@
       	});
       }
 
+      function getSearchData() {
+    	  var searchData = $.map(gymData, function (obj) {
+    		  // Only include the gyms in the list of filtered areas
+    		  for (var i = 0; i < selectedAreaIds.length; i++) {
+    		      if (selectedAreaIds[i]===obj.area.id) {
+    		          obj.text = obj.name;
+    		          return obj;
+    		      }
+    		  }
+    		  return null;
+          });
+    	  return searchData;
+      }
+
+      function initSearch() {
+    	  $("#search").select2({
+    		  placeholder: "Search",
+    		  data: getSearchData()
+    	  });
+    	  $("#search").on("select2:select", function(e) {
+    	      map.setCenter({ lat: e.params.data.lat, lng: e.params.data.lng});
+    	      google.maps.event.trigger(e.params.data.marker, 'click');
+          });
+      }
+
+      function resetSearch() {
+    	  closeAnyInfoWindows();
+    	  $("#search option").remove(); 
+    	  $("#search").html("<option></option>");
+    	  $("#search").select2({
+    		  placeholder: "Search",
+    		  data: getSearchData()
+    	  });
+    	  $('#search').change();
+      }
+
       function selectBadge(marker, props, status) {
     	  var oldStatus = props.status;
     	  props.status=status;
@@ -238,6 +280,13 @@
               alert("Failed to update gym data");
             }
     	  });
+      }
+
+      function closeAnyInfoWindows() {
+          if (currentInfoWindow != null) {
+		      currentInfoWindow.close();
+		      currentInfoWindow = null;
+		  }
       }
 
       function getBadgeColor (status) {

@@ -125,4 +125,7 @@
 .badger-navbar .select2-selection__arrow {
 	height: 32px;
 	margin-top: 6px;
+}
+.badger-navbar .select2-container {
+	min-width: 150px;
 } 
