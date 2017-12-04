@@ -12,6 +12,7 @@ import com.clumsy.gymbadger.data.GymSummaryDao;
 import com.clumsy.gymbadger.entities.GymBadgeStatus;
 import com.clumsy.gymbadger.entities.GymEntity;
 import com.clumsy.gymbadger.entities.GymPropsEntity;
+import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.repos.GymPropsRepo;
 import com.clumsy.gymbadger.repos.GymRepo;
 import com.google.common.collect.Lists;
@@ -105,24 +106,35 @@ public class GymService {
 
 	}
 
-	public GymSummaryDao updateGym(final Long userId, final Long gymId, final GymBadgeStatus status) throws GymNotFoundException {
+	public GymSummaryDao updateGym(final UserEntity user, final Long gymId,
+			final GymBadgeStatus status, final Boolean isPark) throws GymNotFoundException {
 		final GymEntity gym = getGym(gymId);
 		if (gym==null) {
 			throw new GymNotFoundException("Unable to query gym for update");
 		}
+		// Admin users can update the park status of a gym
+		if (user.getAdmin()) {
+			if (gym.getPark() != isPark) {
+				gym.setPark(isPark);
+				gymRepo.save(gym);
+			}
+		}
+		// Try to find users current properties for this gym
 		GymPropsEntity props = null;
 		try {
-			// Try to find users current properties for this gym
-			props = getGymProps(userId, gymId);
+			
+			props = getGymProps(user.getId(), gymId);
 		} catch (GymPropsNotFoundException e) {
 			// Expected if user has never edited this gym before
 			// Insert new user/gym property record
 			props = new GymPropsEntity();
-			props.setUserId(userId);
+			props.setUserId(user.getId());
 			props.setGymId(gymId);
 		}
+		// Now update the per-user properties of the gym
 		props.setBadgeStatus(status);
 		gymPropsRepo.save(props);
+		// Create a summary object with the gym details and per-user gym details
 		final GymSummaryDao dao = GymSummaryDao.fromGymEntity(gym);
 		dao.setStatus(props.getBadgeStatus());
 		return dao;

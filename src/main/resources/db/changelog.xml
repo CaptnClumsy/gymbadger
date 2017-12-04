@@ -9,4 +9,5 @@
     <include file="db/changelogs/data-22112017.sql"/>
     <include file="db/changelogs/area-data-28112017.sql"/>
     <include file="db/changelogs/gym-data-23112017.sql"/>
+    <include file="db/changelogs/admin-changes-01122017.xml"/>
 </databaseChangeLog>

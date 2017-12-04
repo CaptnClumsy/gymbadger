@@ -23,6 +23,9 @@
       </button>
       <div class="collapse navbar-collapse badger-list-row" id="navbarNavDropdown">
         <ul class="navbar-nav ml-auto">
+          <li>
+              <span id="badger-gold-percent" class="badger-navbar-label"></span>
+          </li>
           <li class="nav-item nav-link">
             <select id="filterButton" class="badger-filtericon-hidden" multiple="multiple">
             </select>
@@ -110,6 +113,7 @@
                 	  // Deselect all the areas
                 	  selectedAreaIds.length=0;
                 	  resetSearch();
+                	  resetPercentage();
                 	  // Hide all the gym markers
                 	  for (var i = 0; i < gymData.length; i++) {
                 		  gymData[i].marker.setVisible(false);
@@ -123,6 +127,7 @@
                           selectedAreaIds.push(parseInt(area.value,10));
                       });
                       resetSearch();
+                      resetPercentage();
                   
                       // Ensure every single gym marker is shown
                 	  for (var i = 0; i < gymData.length; i++) {
@@ -140,6 +145,7 @@
                           selectedAreaIds.push(parseInt(area.value,10));
                       });
                       resetSearch();
+                      resetPercentage();
                       
                 	  // Find all the gyms in the area and either show or hide them
                       for (var i = 0; i < gymData.length; i++) {
@@ -219,12 +225,80 @@
                   } 
               },
               complete: function (result) {
+            	  resetPercentage();
             	  initSearch();  
               },
               error: function (result) {
               	alert("Failed to query gym data from server");
               }
       	});
+      }
+      
+      function resetPercentage() {
+    	  var size = 42;
+    	  var lineWidth = 5;
+    	  var rotate = 0;
+    	  // Calculate the percentage
+    	  var data = getPercentGold();
+    	  var percent = 0;
+    	  if (data.total != 0) {
+    	      percent = Math.round((data.gold / data.total) * 100);
+          }
+    	  // Clear previous percentage
+    	  $('#badger-gold-percent').html('');
+    	  
+    	  var el = document.getElementById('badger-gold-percent');
+    	  var canvas = document.createElement('canvas');
+    	  
+    	  // The percentage text
+    	  var span = document.createElement('span');
+    	  var spanClass = "badger-percentage-text";
+    	  if (percent < 10) {
+    		  spanClass += " badger-percentage-text-lg";
+    	  } else if (percent > 99) {
+    		  spanClass += " badger-percentage-text-sm";
+    	  } else {
+    		  spanClass += " badger-percentage-text-md";
+    	  }
+    	  span.className = spanClass;
+    	  span.textContent = '' + percent + '%';
+    	  
+    	  // The details of the gold verses total
+    	  var detailsSpan = document.createElement('span');
+    	  detailsSpan.className = "badger-percentage-details";
+    	  detailsSpan.innerHTML = "" + data.gold + "/" + data.total;
+    	  
+    	  if (typeof(G_vmlCanvasManager) !== 'undefined') {
+    	    G_vmlCanvasManager.initElement(canvas);
+    	  }
+
+          var ctx = canvas.getContext('2d');
+    	  canvas.width = canvas.height = size;
+
+    	  el.appendChild(detailsSpan);
+    	  el.appendChild(span);
+    	  el.appendChild(canvas);
+    	  
+
+    	  ctx.translate(size / 2, size / 2); // change center
+    	  ctx.rotate((-1 / 2 + rotate / 180) * Math.PI); // rotate -90 deg
+
+          var radius = (size - lineWidth) / 2;
+
+          var drawCircle = function(color, lineWidth, percent) {
+    				percent = Math.min(Math.max(0, percent || 1), 1);
+    				ctx.beginPath();
+    				ctx.arc(0, 0, radius, 0, Math.PI * 2 * percent, false);
+    				ctx.strokeStyle = color;
+    		        ctx.lineCap = 'round'; // butt, round or square
+    				ctx.lineWidth = lineWidth
+    				ctx.stroke();
+          };
+
+    	  drawCircle('#efefef', lineWidth, 100 / 100);
+    	  if (percent != 0) {
+    	      drawCircle('#f0f000', lineWidth, percent / 100);
+    	  }
       }
 
       function getSearchData() {
@@ -272,11 +346,12 @@
             type: "PUT",
             contentType: "application/json; charset=utf-8",
             url: "api/gyms/"+props.id,
-            data: JSON.stringify(props, ["id", "name", "lat", "lng", "status"]),
+            data: JSON.stringify(props, ["id", "name", "lat", "lng", "status", "park"]),
             success: function (data) {
               marker.setIcon(customIcon(props.status));
               $("#infoBadge").removeClass(getBadgeClass(oldStatus));
               $("#infoBadge").addClass(getBadgeClass(props.status));
+              resetPercentage();
             },
             error: function (result) {
               alert("Failed to update gym data");
@@ -360,6 +435,21 @@
     		  return "<span class=\"badge badge-success badger-small-lm\">park</span>";
     	  }
     	  return "";
+      }
+
+      function getPercentGold() {
+    	  var results = { total: 0, gold: 0 };
+    	  for (var i = 0; i < gymData.length; i++) {
+    		  for (var j = 0; j < selectedAreaIds.length; j++) {
+    			  if (gymData[i].area.id === selectedAreaIds[j]) {
+    				  results.total++;
+    				  if (gymData[i].status==='GOLD') {
+    				      results.gold++;
+    			      }
+    			  }
+    		  }
+    	  }
+    	  return results;
       }
 
     </script>

@@ -22,4 +22,6 @@ public class UserEntity {
 	@Column(name = "name")
 	private String name;
 
+	@Column(name = "admin")
+	private Boolean admin;
 }

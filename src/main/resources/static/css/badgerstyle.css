@@ -129,3 +129,50 @@
 .badger-navbar .select2-container {
 	min-width: 280px;
 } 
+.badger-navbar-label {
+	line-height: 24px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    display: inline-block;
+}
+#badger-gold-percent {
+    position:relative;
+    width:42px; height:42px;
+}
+#badger-gold-percent canvas {
+    display: block;
+    position:absolute;
+    top:0;
+    left:0;
+}
+.badger-percentage-text {
+    color:white;
+    display:block;
+    line-height: 42px;
+    width:42px;
+    text-align:center;
+    font-weight: bold;
+    position:absolute;
+    top:0;
+    left:0;
+}
+.badger-percentage-text-sm {
+	font-size:11px;
+}
+.badger-percentage-text-md {
+	font-size:12px;
+}
+.badger-percentage-text-lg {
+	font-size:13px;
+}
+#badger-gold-percent input {
+    width: 42px;
+}
+.badger-percentage-details {
+	position: absolute;
+	top: 38px;
+	width: 42px;
+	text-align: center;
+	color: white;
+	font-size: 10px;
+}

@@ -48,7 +48,7 @@ public class GymController {
     public GymSummaryDao updateGym(@PathVariable("id") Long gymId, @RequestBody GymSummaryDao newGym) {
 		try {
 			final UserEntity user = userService.getCurrentUser();
-			return gymService.updateGym(user.getId(), gymId, newGym.getStatus());
+			return gymService.updateGym(user, gymId, newGym.getStatus(), newGym.getPark());
 		} catch (GymNotFoundException e) {
 			throw new ObjectNotFoundException();
 		} catch (UserNotFoundException e) {
