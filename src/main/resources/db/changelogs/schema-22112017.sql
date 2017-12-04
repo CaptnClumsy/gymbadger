@@ -3,6 +3,7 @@ create sequence hibernate_sequence START WITH 1 INCREMENT BY 1;
 create table users (
   id bigint not null,
   name varchar(50) not null,
+  admin boolean not null,
   primary key (id)
 );
 
