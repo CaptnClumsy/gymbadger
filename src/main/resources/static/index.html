@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="css/bootstrap-multiselect.css"/>
     <link rel="stylesheet" href="css/select2.min.css">
     <link rel="stylesheet" href="css/badgerstyle.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
 
   </head>
   <body>
@@ -49,6 +50,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
     <script src="js/bootstrap-multiselect.js" type="text/javascript"></script>
     <script src="js/select2.full.min.js" type="text/javascript"></script>
+    <script src="js/jquery.timeago.js" type="text/javascript"></script>
+    <script src="js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
     
     <script>
       var PARKS_ONLY_OPTION = 9999;
@@ -253,10 +256,10 @@
                         	    "<span class=\"badger-info-title-text\">" + gymData[i].name + "</span>" +
                         	  "</div>" +
                         	"</div>" +
-                    		"<div>" + 
+                    		"<div id=\"badger-area-container\">" + 
                     		  "<span class=\"badge badge-primary\">" + gymData[i].area.name + "</span>" +
                     		  getParkStatus(gymData[i].park) + "</div>" + 
-                    		"<div>Last raided:</div>" +
+                    		  getLastRaid(gymData[i].lastRaid) +
                     		"<div><div>Comments</div><div><textarea id=\"comments\" cols=\"40\" rows=\"5\"></textarea>" +
                             "</div></div>" +
                     		"</div>";
@@ -269,6 +272,7 @@
                             	$('.badger-dropdownitem').click(function() {
                                     selectBadge(currentMarker, currentProps, getStatusFromId(this.id));
                                 });
+                            	registerRaidEvents();
                             });
                     		currentInfoWindow.setContent(content);
                     		currentInfoWindow.open(map, currentMarker);
@@ -286,6 +290,59 @@
       	});
       }
       
+      function registerRaidEvents() {
+        jQuery("time.timeago").timeago();
+      	$('#now').click(function() {
+      		selectRaid(currentProps, new Date());
+          });
+      	$('[data-toggle="tooltip"]').tooltip({
+      		'delay': { show: 1500, hide: 300 }
+      	});
+      	$('#choose').datetimepicker({
+      		format: 'dd-mm-yyyy hh:ii',
+      		autoclose: true,
+      		todayHighlight: true
+      	}).on('changeDate', function(e) {
+      		selectRaid(currentProps, e.date);
+      	});
+      }
+
+      function getLastRaid(lastRaid) {
+    	  var htmlContent = "";
+    	  if (lastRaid!=null) {
+    		  var lastRaidDate = new Date(lastRaid);
+    		  htmlContent = "<div id=\"badger-info-raid\" class=\"alert alert-success badger-info-warn\" data-toggle=\"tooltip\" title=\"" + 
+    		    lastRaidDate.toLocaleString() + "\">Last raided <time class=\"timeago\" datetime=\"" + lastRaidDate.toISOString() + "\"></time>";
+    	  } else {
+    	      htmlContent = "<div id=\"badger-info-raid\" class=\"alert alert-warning badger-info-warn\">No recorded raid at this gym";
+    	  }
+    	  // Append the raid button    
+    	  htmlContent += "<div class=\"dropdown badger-info-raid-dropdown\">" +
+    	      "<button class=\"btn btn-info dropdown-toggle badger-info-raid-button\" type=\"button\" data-toggle=\"dropdown\">Raid" + 
+    	      "<span class=\"caret\"></span></button><ul class=\"dropdown-menu badger-info-raid-menu\"><li id=\"now\" class=\"badger-info-raid-item\">Now" +
+    	      "</li><li id=\"choose\" class=\"badger-info-raid-item\" data-provide=\"datepicker\">Choose a Date</li></ul></div></div>";
+    	  return htmlContent;
+      }
+      
+      function selectRaid(props, lastRaid) {
+    	  props.lastRaid = lastRaid;
+          $.ajax({
+            type: "PUT",
+            contentType: "application/json; charset=utf-8",
+            url: "api/gyms/"+props.id,
+            data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid"]),
+            success: function (data) {
+              // Update the UI by removing old raid time and adding new one
+              $("#badger-info-raid").remove();
+              $("#badger-area-container").after(getLastRaid(data.lastRaid));
+              registerRaidEvents();
+            },
+            error: function (result) {
+              alert("Failed to update last raid gym data");
+            }
+    	  }); 	  
+      }
+
       function resetPercentage() {
     	  var size = 42;
     	  var lineWidth = 5;

@@ -1,5 +1,6 @@
 package com.clumsy.gymbadger.services;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -72,6 +73,7 @@ public class GymService {
 		final GymSummaryDao dao = GymSummaryDao.fromGymEntity(gym);
 		if (props != null) {
 			dao.setStatus(props.getBadgeStatus());
+			dao.setLastRaid(props.getLastRaid());
 		}
 		return dao;
 	}
@@ -92,6 +94,7 @@ public class GymService {
 				final GymSummaryDao dao = GymSummaryDao.fromGymEntity(gym);
 				if (gymProps != null) {
 					dao.setStatus(gymProps.getBadgeStatus());
+					dao.setLastRaid(gymProps.getLastRaid());
 				} 
 				return dao;
 	        }));
@@ -106,8 +109,8 @@ public class GymService {
 
 	}
 
-	public GymSummaryDao updateGym(final UserEntity user, final Long gymId,
-			final GymBadgeStatus status, final Boolean isPark) throws GymNotFoundException {
+	public GymSummaryDao updateGym(final UserEntity user, final Long gymId, final Boolean isPark,
+			final GymBadgeStatus status, final Date lastRaid) throws GymNotFoundException {
 		final GymEntity gym = getGym(gymId);
 		if (gym==null) {
 			throw new GymNotFoundException("Unable to query gym for update");
@@ -122,7 +125,6 @@ public class GymService {
 		// Try to find users current properties for this gym
 		GymPropsEntity props = null;
 		try {
-			
 			props = getGymProps(user.getId(), gymId);
 		} catch (GymPropsNotFoundException e) {
 			// Expected if user has never edited this gym before
@@ -133,10 +135,12 @@ public class GymService {
 		}
 		// Now update the per-user properties of the gym
 		props.setBadgeStatus(status);
+		props.setLastRaid(lastRaid);
 		gymPropsRepo.save(props);
 		// Create a summary object with the gym details and per-user gym details
 		final GymSummaryDao dao = GymSummaryDao.fromGymEntity(gym);
 		dao.setStatus(props.getBadgeStatus());
+		dao.setLastRaid(props.getLastRaid());
 		return dao;
 	}
 	

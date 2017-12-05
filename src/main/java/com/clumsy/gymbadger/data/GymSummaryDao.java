@@ -1,5 +1,7 @@
 package com.clumsy.gymbadger.data;
 
+import java.util.Date;
+
 import com.clumsy.gymbadger.entities.AreaEntity;
 import com.clumsy.gymbadger.entities.GymBadgeStatus;
 import com.clumsy.gymbadger.entities.GymEntity;
@@ -17,6 +19,8 @@ public class GymSummaryDao {
 
 	private GymBadgeStatus status;
 	
+	private Date lastRaid;
+
 	private Boolean park;
 	
 	private AreaEntity area;
@@ -32,6 +36,7 @@ public class GymSummaryDao {
 		this.park = park;
 		this.area = area;
 		this.status = GymBadgeStatus.NONE;
+		this.lastRaid = null;
 	}
 
 	public static GymSummaryDao fromGymEntity(final GymEntity gym) {
