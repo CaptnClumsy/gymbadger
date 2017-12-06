@@ -313,9 +313,9 @@
     	  if (lastRaid!=null) {
     		  var lastRaidDate = new Date(lastRaid);
     		  htmlContent = "<div id=\"badger-info-raid\" class=\"alert alert-success badger-info-warn\" data-toggle=\"tooltip\" title=\"" + 
-    		    lastRaidDate.toLocaleString() + "\">Last raided <time class=\"timeago\" datetime=\"" + lastRaidDate.toISOString() + "\"></time>";
+    		    lastRaidDate.toLocaleString() + "\"><div>Last raided <time class=\"timeago\" datetime=\"" + lastRaidDate.toISOString() + "\"></time></div>";
     	  } else {
-    	      htmlContent = "<div id=\"badger-info-raid\" class=\"alert alert-warning badger-info-warn\">No recorded raid at this gym";
+    	      htmlContent = "<div id=\"badger-info-raid\" class=\"alert alert-warning badger-info-warn\"><div>No raid recorded yet</div>";
     	  }
     	  // Append the raid button    
     	  htmlContent += "<div class=\"dropdown badger-info-raid-dropdown\">" +
