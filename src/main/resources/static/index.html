@@ -40,11 +40,11 @@
         </ul>
       </div>
     </nav>
-
+    
     <div class="container-fluid badger-container">
       <div id="map"></div>
     </div>
-
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
@@ -74,7 +74,8 @@
             success: function (data) {
             	map = new google.maps.Map(document.getElementById('map'), {
                     zoom: data.zoom,
-                    center: { lat: data.lat, lng: data.lng }
+                    center: { lat: data.lat, lng: data.lng },
+                    gestureHandling: 'greedy'
                 });
             },
             error: function (result) {
@@ -242,7 +243,7 @@
                       (function (marker, i) {
                         google.maps.event.addListener(marker, 'click', function () {
                         	var content = "<div class=\"badger-info\"><div class=\"badger-info-title\">" + 
-                        	  "<div class=\"dropdown\">" +
+                        	  "<div class=\"dropdown badger-info-title-container\">" +
                         	    "<button class=\"btn btn-default badger-small-button\" type=\"button\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
                         	    "<span class=\"badger-badge-container\"><span id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(data[i].status) + "\"></span></span>" +
                          	    "</button>" +
@@ -253,7 +254,7 @@
                         	      "<a id=\"select-basic\" class=\""+ getDropdownBadgeClass(gymData[i].status, "BASIC") + "\" href=\"#\">Basic</a>" +
                         	      "<a id=\"select-none\" class=\""+ getDropdownBadgeClass(gymData[i].status, "NONE") + "\" href=\"#\">None</a>" +
                         	    "</div>" +
-                        	    "<span class=\"badger-info-title-text\">" + gymData[i].name + "</span>" +
+                        	    "<span class=\"badger-info-title-placeholder\"><span class=\"badger-info-title-text\">" + gymData[i].name + "</span></span>" +
                         	  "</div>" +
                         	"</div>" +
                     		"<div id=\"badger-area-container\">" + 

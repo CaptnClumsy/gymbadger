@@ -1,12 +1,12 @@
-#map {
-    height: 600px;
-    width: 100%;
-    top: 10px;
-}
 .badger-container {
-	width: 100%;
-    padding-right: 10px;
-    padding-left: 10px;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+}
+#map {
+    height: calc(100vh - 82px);
+    width: calc(100% - 16px);
+    top: 8px;
+    margin-left: 8px;
 }
 .badger-navbar {
 	padding-top: 4px;
@@ -72,12 +72,20 @@
     border-bottom: 1px solid #000;
     margin-bottom: 4px;
 }
+.badger-info-title-container {
+	display: table;	
+}
+.badger-info-title-placeholder {
+	display: table-cell;
+	vertical-align: middle;
+	height: 100%;
+	padding-left: 8px;
+}
 .badger-info-title-text {
-	line-height: 32px;
+	/* line-height: 32px; */
 	font-weight: bold;
 	font-size: 14px;
 	vertical-align: middle;
-	margin-left: 8px
 }
 .badger-info-warn {
     margin-top: 5px;
