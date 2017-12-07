@@ -229,3 +229,7 @@
 .icon-arrow-right::after {
 	content: ">";"
 }
+.badger-comments {
+	width: 100%;
+	height: 100%;
+}
