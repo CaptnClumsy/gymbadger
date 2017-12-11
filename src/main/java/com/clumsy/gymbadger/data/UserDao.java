@@ -7,10 +7,12 @@ public class UserDao {
 	
 	private Long id;
 	private String name;
+	private String displayName;
 	
-	public UserDao(final Long id, final String name) {
+	public UserDao(final Long id, final String name, final String displayName) {
 		this.id=id;
 		this.name=name;
+		this.displayName=displayName;
 	}
 
 }

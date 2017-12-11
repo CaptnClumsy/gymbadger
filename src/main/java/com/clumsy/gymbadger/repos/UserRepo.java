@@ -7,4 +7,5 @@ import com.clumsy.gymbadger.entities.UserEntity;
  
 @Repository
 public interface UserRepo extends JpaRepository<UserEntity, Long> {
+	UserEntity findOneByName(String name);
 }

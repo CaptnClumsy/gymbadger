@@ -14,10 +14,12 @@ import com.clumsy.gymbadger.services.GymService;
 import com.clumsy.gymbadger.services.UserNotFoundException;
 import com.clumsy.gymbadger.services.UserService;
 
+import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
  
 @RestController
 @RequestMapping("/api/gyms")
@@ -31,28 +33,31 @@ public class GymController {
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public List<GymSummaryDao> getGyms() {
+    public List<GymSummaryDao> getGyms(Principal principal) {
 		try {
-			final UserEntity user = userService.getCurrentUser();
+			final UserEntity user = userService.getCurrentUser(principal);
 			final List<GymSummaryDao> gyms = gymService.getGymSummaries(user.getId());
 			return gyms;
 		} catch (GymNotFoundException e) {
-			throw new ObjectNotFoundException();
+			throw new ObjectNotFoundException(e);
 		} catch (UserNotFoundException e) {
-			throw new ObjectNotFoundException();
+			throw new ObjectNotFoundException(e);
 		}
     }
     
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
-    public GymSummaryDao updateGym(@PathVariable("id") Long gymId, @RequestBody GymSummaryDao newGym) {
+    public GymSummaryDao updateGym(@PathVariable("id") Long gymId, @RequestBody GymSummaryDao newGym, Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
 		try {
-			final UserEntity user = userService.getCurrentUser();
+			final UserEntity user = userService.getCurrentUser(principal);
 			return gymService.updateGym(user, gymId, newGym.getPark(), newGym.getStatus(), newGym.getLastRaid());
 		} catch (GymNotFoundException e) {
-			throw new ObjectNotFoundException();
+			throw new ObjectNotFoundException(e);
 		} catch (UserNotFoundException e) {
-			throw new ObjectNotFoundException();
+			throw new ObjectNotFoundException(e);
 		}
     }
 }

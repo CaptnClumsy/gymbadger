@@ -42,7 +42,7 @@ public class GymService {
 	
 	@Transactional(readOnly = true)
 	public List<GymPropsEntity> getAllGymProps(final Long userId) throws GymPropsNotFoundException {
-		final List<GymPropsEntity> props = gymPropsRepo.findAll();
+		final List<GymPropsEntity> props = gymPropsRepo.findAllByUserId(userId);
 		if (props == null) {
 			throw new GymPropsNotFoundException("Unable to query per-user gym properties");
 		}

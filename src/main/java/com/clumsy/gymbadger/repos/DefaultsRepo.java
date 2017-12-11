@@ -7,4 +7,5 @@ import com.clumsy.gymbadger.entities.DefaultsEntity;
  
 @Repository
 public interface DefaultsRepo extends JpaRepository<DefaultsEntity, Long> {
+	DefaultsEntity findOneByUserid(Long userId);
 }

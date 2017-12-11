@@ -8,9 +8,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.clumsy.gymbadger.data.DefaultsDao;
 import com.clumsy.gymbadger.entities.DefaultsEntity;
 import com.clumsy.gymbadger.entities.UserEntity;
-import com.clumsy.gymbadger.repos.DefaultsRepo;
+import com.clumsy.gymbadger.services.DefaultsService;
 import com.clumsy.gymbadger.services.UserNotFoundException;
 import com.clumsy.gymbadger.services.UserService;
+
+import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,20 +22,21 @@ import org.springframework.http.HttpStatus;
 public class DefaultsController {
  
 	@Autowired
-	private DefaultsRepo defaultsRepo;
+	private DefaultsService defaultsService;
 	
 	@Autowired
 	private UserService userService;
 
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public DefaultsDao getDefaults() {
+    public DefaultsDao getDefaults(Principal principal) {
 		try {
-			final UserEntity user = userService.getCurrentUser();
-			final DefaultsEntity defaults = defaultsRepo.findOne(user.getId());
+			final UserEntity user = userService.getCurrentUser(principal);
+			final DefaultsEntity defaults = defaultsService.getDefaults(user.getId());
 			return new DefaultsDao(defaults.getZoom(), defaults.getLatitude(), defaults.getLongitude());
 		} catch (UserNotFoundException e) {
-			throw new ObjectNotFoundException();
+			throw new ObjectNotFoundException(e);
 		}
     }
+
 }
