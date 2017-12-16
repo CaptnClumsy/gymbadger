@@ -113,7 +113,7 @@
 }
 .badger-info-warn {
     margin-top: 5px;
-    margin-bottom: 5px;
+    margin-bottom: 0px;
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 5px;
@@ -219,6 +219,10 @@
 	padding-right: 6px;
 	padding-left: 6px;
 	padding-bottom: 5px;
+}
+.badger-time-badge {
+	background-color: #111311cc;
+	margin-top: 0px;
 }
 .badger-navbar .select2-selection {
 	height: 32px;

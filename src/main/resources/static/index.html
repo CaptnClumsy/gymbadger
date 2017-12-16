@@ -423,12 +423,11 @@
     		        "data-toggle=\"collapse\" href=\"#collapseDate\" aria-expanded=\"false\" aria-controls=\"collapseDate\">" +
     		          "Last raided <time class=\"timeago\" datetime=\"" + lastRaidDate.toISOString() + "\"></time>" +
     	              getRaidButtonHtml(includeButton) + "</div>" +
-    		    "<div id=\"collapseDate\" class=\"collapse show\" role=\"tabpanel\" aria-labelledby=\"headingOne\" data-parent=\"#accordion\">" +
-    		      "<div class=\"card-body\">"+
+    		    "<div id=\"collapseDate\" class=\"collapse hide\" role=\"tabpanel\" aria-labelledby=\"badger-info-raid\" data-parent=\"#badger-info\">" +
+    		      "<div><span class=\"badge badge-success badger-time-badge\">"+
     		      lastRaidDate.toLocaleString() +
-    		      "</div>" +
-    		    "</div>" +
-    		  "</div>";
+    		      "</span></div>" +
+    		    "</div>";
     	  } else {
     	      htmlContent = "<div id=\"badger-info-raid\" class=\"alert alert-warning " + containerClass +"\"><div>No raid recorded yet</div>" +
     	          getRaidButtonHtml(includeButton) + "</div>";
@@ -464,7 +463,8 @@
             success: function (data) {
               // Update the UI by removing old raid time and adding new one
               $("#badger-info-raid").remove();
-              $("#badger-area-container").after(getLastRaid(data.lastRaid));
+              $("#collapseDate").remove();
+              $("#badger-area-container").after(getLastRaid(data.lastRaid, true));
               registerRaidEvents();
             },
             error: function (result) {
