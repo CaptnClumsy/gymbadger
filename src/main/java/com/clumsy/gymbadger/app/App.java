@@ -26,7 +26,7 @@ public class App extends WebSecurityConfigurerAdapter {
       http
         .antMatcher("/**")
         .authorizeRequests()
-          .antMatchers("/", "/login**", "/api/areas/**", "/api/defaults/**", "/api/gyms/**")
+          .antMatchers("/", "/login**", "/api/areas/**", "/api/defaults/**", "/api/gyms/**", "/tos**")
           .permitAll()
         .anyRequest()
           .authenticated()

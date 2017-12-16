@@ -1,3 +1,15 @@
+@font-face {
+  font-family: 'FontAwesome';
+  src: url('fontawesome-webfont.eot');
+  src: url('fontawesome-webfont.eot?#iefix') format('embedded-opentype'),
+       url('fontawesome-webfont.woff2') format('woff2'),
+       url('fontawesome-webfont.woff') format('woff'),
+       url('fontawesome-webfont.ttf') format('truetype'),
+       url('fontawesome-webfont.svg#fontawesomeregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
 .badger-container {
 	padding-left: 0px !important;
 	padding-right: 0px !important;
@@ -21,6 +33,18 @@
 .badger-navbar-text {
 	font-size: 16px;
 	font-weight: normal;
+}
+.badger-login-button {
+	background-color: #4267b2;
+    padding-left: 4px;
+    padding-right: 6px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    margin-top: 2px;
+}
+.badger-login-icon {
+	padding-right: 4px;
+	padding-left: 2px;
 }
 .badger-list-row {
 	flex-direction: row;
@@ -94,6 +118,17 @@
     padding-bottom: 5px;
     padding-left: 5px;
     padding-right: 7px;
+    line-height: 26px;
+    display: flex;
+    justify-content: space-between;
+}
+.badger-info-warn-small {
+	margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 4px;
+    padding-right: 4px;
     line-height: 26px;
     display: flex;
     justify-content: space-between;
@@ -172,8 +207,18 @@
   content: '✓';
   font-weight: 600;
 }
-.badger-small-lm {
-	margin-left: 4px;
+.badger-small-pill-lm {
+	margin-left: 6px;
+	padding-top: 4px;
+	padding-right: 6px;
+	padding-left: 6px;
+	padding-bottom: 5px;
+}
+.badger-small-pill {
+	padding-top: 4px;
+	padding-right: 6px;
+	padding-left: 6px;
+	padding-bottom: 5px;
 }
 .badger-navbar .select2-selection {
 	height: 32px;
@@ -243,10 +288,10 @@
 	border-bottom: 1px solid #00000080;
 }
 .icon-arrow-left::after {
-	content: "<";"
+	content: "<";
 }
 .icon-arrow-right::after {
-	content: ">";"
+	content: ">";
 }
 .badger-comments {
 	width: 100%;
@@ -294,4 +339,24 @@
 	padding-left: 8px;
 	padding-right: 8px;
 	line-height: 20px;
+}
+@media (min-width: 768px) {
+  .modal-xl {
+    width: 90%;
+    max-width:1200px;
+  }
+}
+.badger-report-page-body {
+	padding: 4px;
+}
+.badger-report-table {
+	font-size: 12px;
+}
+.badger-report-table-body td {
+	font-size: 12px;
+	padding-top: 4px;
+	padding-left: 4px;
+	padding-right: 4px;
+	padding-bottom: 4px;
+	white-space: nowrap;
 }
