@@ -147,30 +147,37 @@
     		}
         });
     	// Try to get logged in user details
-      	$.get("/api/users/currentUser", function(data) {
-      	    $("#user").html(data.displayName);
-      	    $(".badger-unauthenticated").hide()
-      	    $(".badger-authenticated").show()
-        });
-        // Get defaults
-    	$.ajax({
-            type: "GET",
-            contentType: "application/json; charset=utf-8",
-            url: "api/defaults/",
-            success: function (data) {
-            	map = new google.maps.Map(document.getElementById('map'), {
-                    zoom: data.zoom,
-                    center: { lat: data.lat, lng: data.lng },
-                    gestureHandling: 'greedy'
-                });
-            },
-            error: function (result) {
-            	errorPage("Failed to query default data", result);
-            },
-            complete: function (res) {
-            	initMarkers();
-            }
-    	});
+      	$.ajax({
+      		type: "GET",
+      		contentType: "application/json; charset=utf-8",
+      		url: "/api/users/currentUser", 
+      		success: function (data) {
+      	        $("#user").html(data.displayName);
+      	        $(".badger-unauthenticated").hide();
+      	        $(".badger-authenticated").show();
+      		},
+      		complete: function (res) {
+      	        // Get defaults
+        	    $.ajax({
+                    type: "GET",
+                    contentType: "application/json; charset=utf-8",
+                    url: "api/defaults/",
+                    success: function (data) {
+                	    map = new google.maps.Map(document.getElementById('map'), {
+                        zoom: data.zoom,
+                        center: { lat: data.lat, lng: data.lng },
+                        gestureHandling: 'greedy'
+                        });
+                    },
+                    error: function (result) {
+                	    errorPage("Failed to query default data", result);
+                    },
+                    complete: function (res) {
+                	    initMarkers();
+                    }
+        	    });
+      		}
+        });   
       }
       
       function logout() {
@@ -179,7 +186,7 @@
     	      $(".badger-unauthenticated").show();
     	      $(".badger-authenticated").hide();
     	      location.reload();
-    	  })
+    	  });
           return true;
       }
       
