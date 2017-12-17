@@ -121,6 +121,16 @@
     display: flex;
     justify-content: space-between;
 }
+.badger-no-raid-small {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 4px;
+    padding-right: 4px;
+    line-height: 26px;
+    display: flex;
+}
 .badger-last-raid {
     margin-top: 5px;
     margin-bottom: 0px;
@@ -139,7 +149,7 @@
 	content: "\f0d7\a0";
 	font-family: FontAwesome;
 }
-.badger-raid-small {
+.badger-last-raid-small {
 	margin-top: 0px;
     margin-bottom: 0px;
     padding-top: 0px;
@@ -148,7 +158,14 @@
     padding-right: 4px;
     line-height: 26px;
     display: flex;
-    justify-content: space-between;
+}
+.badger-last-raid-small.collapsed::before {
+	content: "\f0da\a0";
+	font-family: FontAwesome;
+}
+.badger-last-raid-small:not(.collapsed)::before {
+	content: "\f0d7\a0";
+	font-family: FontAwesome;
 }
 .badger-info-raid-dropdown {
 	display: inline-block;
