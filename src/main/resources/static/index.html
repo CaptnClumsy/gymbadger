@@ -751,7 +751,8 @@
     	  reportTable = $("#reportsTable").DataTable({
     	    "autoWidth": true,
     		"scrollY": 300,
-    	    "scrollX": true
+    	    "scrollX": true,
+    	    "columns": [ {"searchable": true}, {"searchable": false}, {"searchable": false}, {"searchable": false}, {"searchable": false} ]
     	  });
     	  $('#reportsPage').on('shown.bs.modal', function () {
     		  reportTable.columns.adjust().draw();
