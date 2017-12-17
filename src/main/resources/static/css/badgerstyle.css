@@ -118,9 +118,16 @@
     padding-bottom: 5px;
     padding-left: 5px;
     padding-right: 7px;
-    line-height: 26px;
     display: flex;
     justify-content: space-between;
+}
+.badger-info-warn.collapsed::before {
+	content: "\f0da\a0";
+	font-family: FontAwesome;
+}
+.badger-info-warn:not(.collapsed)::before {
+	content: "\f0d7\a0";
+	font-family: FontAwesome;
 }
 .badger-info-warn-small {
 	margin-top: 0px;
@@ -135,6 +142,7 @@
 }
 .badger-info-raid-dropdown {
 	display: inline-block;
+	margin-left: 4px;
 }
 .badger-info-raid-button {
 	font-size: 12px;
@@ -220,9 +228,13 @@
 	padding-left: 6px;
 	padding-bottom: 5px;
 }
+.badger-time-badge-container {
+	margin-top: 0px;
+    padding-top: 0px;
+    line-height: 0px;
+}
 .badger-time-badge {
 	background-color: #111311cc;
-	margin-top: 0px;
 }
 .badger-navbar .select2-selection {
 	height: 32px;
