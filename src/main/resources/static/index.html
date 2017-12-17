@@ -376,6 +376,7 @@
                     		currentInfoWindow = new SnazzyInfoWindow({
                     			map: map,
                     			marker: currentMarker,
+                    			closeButtonMarkup: "<button type=\"button\" class=\"btn btn-outline-secondary badger-info-close\">&#215;</button>",
                     			closeWhenOthersOpen: false,
                     			closeOnMapClick: false,
                     			content: content,
@@ -385,6 +386,9 @@
                     			  afterOpen: function() {
                     				$('.badger-dropdownitem').click(function() {
                                         selectBadge(currentMarker, currentProps, getStatusFromId(this.id));
+                                    });
+                    				$('.badger-info-close').click(function() {
+                                        closeAnyInfoWindows();
                                     });
                                 	registerRaidEvents();
                     			  }
@@ -642,6 +646,22 @@
     	  return ret;
       }
       
+      function getBadgeOrder (status) {
+    	  if (status==="BASIC") {
+    		  return 1;
+    	  }
+    	  else if (status==="BRONZE") {
+    		  return 2;
+    	  }
+    	  else if (status==="SILVER") {
+    		  return 3;
+    	  }
+    	  else if (status==="GOLD") {
+    		  return 4;
+    	  }
+    	  return 0;
+      }
+      
       function getBadgeClass (status) {
     	  if (status==="BASIC") {
     		  return 'badger-badge-basic';
@@ -716,7 +736,7 @@
     	  for (var i = 0; i < gymData.length; i++) {
     		  $("#reportsTableBody").append("<tr>" +
     	          "<td>" + gymData[i].name + "</td>" +
-    	          "<td>" + 
+    	          "<td data-order=\"" + getBadgeOrder(gymData[i].status) + "\">" + 
     	            "<div id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(gymData[i].status) + "\"></div>" +
     	          "</td>" +
     	          

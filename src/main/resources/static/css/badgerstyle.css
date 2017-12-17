@@ -167,6 +167,18 @@
 	content: "\f0d7\a0";
 	font-family: FontAwesome;
 }
+.badger-info-close {
+	right: 4px;
+	position: absolute;
+	padding-left: 6px;
+	padding-right: 6px;
+	padding-top: 4px;	
+	padding-bottom: 4px;
+	line-height: 10px;
+	font-size: 18px;
+	top: 3px;
+	border: none;
+}
 .badger-info-raid-dropdown {
 	display: inline-block;
 	margin-left: 4px;
