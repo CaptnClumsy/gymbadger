@@ -38,4 +38,11 @@ public class GymPropsEntity {
 	
 	@Column(name = "last_raid")
 	private Date lastRaid;
+	
+	@Column(name = "pokemonid")
+	private Long pokemonId;
+	
+	@Column(name = "caught")
+	private Boolean caught;
+
 }

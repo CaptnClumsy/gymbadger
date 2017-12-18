@@ -74,6 +74,8 @@ public class GymService {
 		if (props != null) {
 			dao.setStatus(props.getBadgeStatus());
 			dao.setLastRaid(props.getLastRaid());
+			dao.setPokemonId(props.getPokemonId());
+			dao.setCaught(props.getCaught());
 		}
 		return dao;
 	}
@@ -95,6 +97,8 @@ public class GymService {
 				if (gymProps != null) {
 					dao.setStatus(gymProps.getBadgeStatus());
 					dao.setLastRaid(gymProps.getLastRaid());
+					dao.setPokemonId(gymProps.getPokemonId());
+					dao.setCaught(gymProps.getCaught());
 				} 
 				return dao;
 	        }));
@@ -110,7 +114,8 @@ public class GymService {
 	}
 
 	public GymSummaryDao updateGym(final UserEntity user, final Long gymId, final Boolean isPark,
-			final GymBadgeStatus status, final Date lastRaid) throws GymNotFoundException {
+			final GymBadgeStatus status, final Date lastRaid,
+			final Long pokemonId, final Boolean caught) throws GymNotFoundException {
 		final GymEntity gym = getGym(gymId);
 		if (gym==null) {
 			throw new GymNotFoundException("Unable to query gym for update");
@@ -136,11 +141,15 @@ public class GymService {
 		// Now update the per-user properties of the gym
 		props.setBadgeStatus(status);
 		props.setLastRaid(lastRaid);
+		props.setPokemonId(pokemonId);
+		props.setCaught(caught);
 		gymPropsRepo.save(props);
 		// Create a summary object with the gym details and per-user gym details
 		final GymSummaryDao dao = GymSummaryDao.fromGymEntity(gym);
 		dao.setStatus(props.getBadgeStatus());
 		dao.setLastRaid(props.getLastRaid());
+		dao.setPokemonId(props.getPokemonId());
+		dao.setCaught(props.getCaught());
 		return dao;
 	}
 	

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"
+                   logicalFilePath="META-INF/liquibase-changelog/starlight-14.4.0/db.006-executors.xml">
+
+    <changeSet id="18122017T1345" author="captnclumsy">
+        <addColumn tableName="user_gym_props">
+            <column name="pokemonid" type="BIGINT">
+                <constraints nullable="true" foreignKeyName="fk_ugp_pokemon" references="pokemon(id)" />
+            </column>
+            <column name="caught" type="BOOLEAN"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

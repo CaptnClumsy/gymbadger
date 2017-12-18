@@ -9,4 +9,7 @@
     <include file="db/changelogs/data-22112017.sql"/>
     <include file="db/changelogs/area-data-28112017.sql"/>
     <include file="db/changelogs/gym-data-23112017.sql"/>
+    <include file="db/changelogs/gym-data-updates-18122017.xml"/>
+    <include file="db/changelogs/pokemon-table-18122017.xml"/>
+    <include file="db/changelogs/extra-user-gym-props-18122017.xml"/>
 </databaseChangeLog>

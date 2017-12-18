@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"
+                   logicalFilePath="META-INF/liquibase-changelog/starlight-14.4.0/db.006-executors.xml">
+
+	<changeSet id="18122017T1020" author="captnclumsy">
+	    <delete tableName="user_gym_props">
+	        <where>gymid = (select id from gyms where name='The Camp Pub')</where>
+	    </delete>
+	</changeSet>
+	
+	<changeSet id="18122017T1021" author="captnclumsy">
+	    <delete tableName="gyms">
+	        <where>name = 'The Camp Pub'</where>
+	    </delete>
+	</changeSet>
+	
+	<changeSet id="18122017T1025" author="captnclumsy">
+	    <insert tableName="gyms">
+	        <column name="id" valueSequenceNext="hibernate_sequence"/>
+	        <column name="name" value="N&amp;C Entrance"/>
+	        <column name="lat" value="51.750469"/>
+	        <column name="long" value="-0.3107350"/>
+	        <column name="park" value="false"/>
+	        <column name="areaid" valueComputed="(SELECT id FROM areas WHERE name = 'Cell Barnes &amp; Camp')"/>
+	    </insert>
+	</changeSet>
+
+</databaseChangeLog>

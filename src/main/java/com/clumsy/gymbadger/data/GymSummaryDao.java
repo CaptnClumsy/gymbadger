@@ -24,6 +24,10 @@ public class GymSummaryDao {
 	private Boolean park;
 	
 	private AreaEntity area;
+	
+	private Long pokemonId;
+	
+	private Boolean caught;
 
 	public GymSummaryDao() {
 	}

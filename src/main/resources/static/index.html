@@ -11,8 +11,10 @@
     <link rel="stylesheet" href="css/select2.min.css"/>
     <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css"/>
     <link rel="stylesheet" href="css/datatables.min.css"/>
-    <link rel="stylesheet" href="css/badgerstyle.css"/>
     <link rel="stylesheet" href="css/snazzy-info-window.min.css">
+    <link rel="stylesheet" href="css/bootstrap-switch.min.css">
+    <link rel="stylesheet" href="css/badgerstyle.css"/>
+    
       
   </head>
   <body>
@@ -108,7 +110,7 @@
       </div>
     </div>
     </div>
-
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
@@ -116,6 +118,7 @@
     <script src="js/select2.full.min.js" type="text/javascript"></script>
     <script src="js/jquery.timeago.js" type="text/javascript"></script>
     <script src="js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+    <script src="js/bootstrap-switch.min.js" type="text/javascript"></script>
     <script src="js/js.cookie.js" type="text/javascript"></script>
     <script src="js/datatables.min.js" type="text/javascript"></script>
     <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9OSRLuuH3o7YhJ6bRUVtD9TxhlSDqSDU&callback=initPage"></script>
@@ -133,6 +136,8 @@
       var currentMarker = null;
       var currentProps = null;
       var reportTable = null;
+      var raidBossData = null;
+      var advancedOptionsPage = null;
 
       function initPage() {
     	// Setup CSRF token
@@ -414,12 +419,38 @@
       		selectRaid(currentProps, new Date());
           });
       	$('#choose').datetimepicker({
-      		format: 'dd-mm-yyyy hh:ii',
+      		format: 'dd-mm-yyyy',
       		autoclose: true,
-      		todayHighlight: true
+      		todayHighlight: true,
+      		minView: 2
       	}).on('changeDate', function(e) {
       		selectRaid(currentProps, e.date);
       	});
+      	if (advancedOptionsPage!=null) {
+      		$('.popover').remove();
+      	}
+      	advancedOptionsPage = $("#options").popover({
+            placement : 'bottom',
+            html : true,
+            title : 'Advanced Raid Options <a href="#" class="close" data-dismiss="alert">&times;</a>',
+            content : "<div id=\"badger-opt-date\" class=\"input-group date badger-opt-date\">" + 
+                  "<input type=\"text\" class=\"form-control badger-opt-date-text\" placeholder=\"Date of the raid\">" + 
+                  "<span class=\"input-group-addon\"><i class=\"fa fa-calendar\"></i></span>" +
+                "</div>" + 
+                "<div id=\"badger-opt-time\" class=\"input-group date badger-opt-item\">" + 
+                  "<input type=\"text\" class=\"form-control badger-opt-date-text\" placeholder=\"Time of the raid\">" + 
+                  "<span class=\"input-group-addon\"><i class=\"fa fa-clock-o\"></i></span>" +
+                "</div>" +
+                "<div class=\"badger-opt-item\"><select id=\"poke-search\" name=\"poke-search\" class=\"form-control\"><option></option></select></div>" +
+                "<div class=\"badger-opt-item\"><input type=\"checkbox\" name=\"caught\" checked></div>" +
+                "<div class=\"badger-opt-item badger-opt-btn-div\"><button id=\"badger-opt-save\" class=\"btn btn-primary btn-sm\">Save</button></div>"
+        });
+        $("#options").on('shown.bs.popover', function(){
+        	initAdvancedOptions();
+        });
+        $(document).on("click", ".popover .close" , function(){
+        	$(this).parents(".popover").popover('hide');
+        });
       }
 
       function getLastRaid(lastRaid, includeButton) {
@@ -461,6 +492,7 @@
 	            "<div class=\"dropdown-menu\" aria-labelledby=\"raidMenuButton\">" +
 	              "<a id=\"now\" class=\"dropdown-item badger-info-raid-item\" href=\"#\">Now</a>" +
 	          "<a id=\"choose\" class=\"dropdown-item badger-info-raid-item\" data-provide=\"datepicker\" href=\"#\">Choose a Date</a>" +
+	          "<a id=\"options\" class=\"dropdown-item badger-info-raid-item\" href=\"#\">Advanced</a>" +
 	        "</div>" +
 	      "</div>";
       }
@@ -473,6 +505,7 @@
             url: "api/gyms/"+props.id,
             data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid"]),
             success: function (data) {
+              currentProps = data;
               // Update the UI by removing old raid time and adding new one
               $("#badger-info-raid").remove();
               $("#badger-area-container").after(getLastRaid(data.lastRaid, true));
@@ -577,6 +610,7 @@
     	      map.setCenter({ lat: e.params.data.lat, lng: e.params.data.lng});
     	      google.maps.event.trigger(e.params.data.marker, 'click');
           });
+    	  initRaidBosses();
       }
 
       function resetSearch() {
@@ -760,6 +794,96 @@
     	  $("#reportsPage").modal('show');
       }
 
+      function initRaidBosses() {
+    	  $.ajax({
+              type: "GET",
+              contentType: "application/json; charset=utf-8",
+              url: "api/bosses/",
+              success: function (data) {
+          	    raidBossData = data;
+              },
+              error: function (result) {
+          	    errorPage("Failed to query raid boss data", result);
+              }
+  	      });
+	  }
+      
+      function initAdvancedOptions() {
+    	// Fill in fields with currentProps
+      	$("#badger-opt-date").datetimepicker({
+          	format: 'dd-mm-yyyy',
+        		autoclose: true,
+        		todayHighlight: true,
+        		minView: 2
+          }).on('changeDate', function(ev){
+          	$('#badger-opt-time').datetimepicker('update', ev.date);
+          });
+          $("#badger-opt-time").datetimepicker({
+          	format: 'dd-mm-yyyy hh:ii',
+        		autoclose: true,
+        		startView: 1
+          });
+          if (currentProps.lastRaid!=null) {
+    		    var lastRaidDate = new Date(currentProps.lastRaid);
+    		    $('#badger-opt-date').datetimepicker('update', lastRaidDate);
+    		    $('#badger-opt-time').datetimepicker('update', lastRaidDate);
+          }
+
+          $("#poke-search").select2({
+    		  placeholder: "Pokemon",
+    		  width: '100%',
+    		  data: raidBossData
+    	    });
+          $("[name='caught']").bootstrapSwitch({
+          	state: currentProps.caught,
+          	onColor: 'success',
+          	offColor: 'danger',
+          	labelText: 'Caught',
+          	onText: 'Yes',
+          	offText: 'No'
+          });
+          $("#badger-opt-save").on('click', function (e) {
+          	var lastRaid = "";
+          	var date = $("#badger-opt-date").data("datetimepicker").getDate();
+          	var time = $('#badger-opt-time').data("datetimepicker").getDate();
+          	if (time!=null) {
+          		lastRaid = time;
+          	} else {
+          		lastRaid = date;
+          	}
+          	var pokemonId = parseInt($('#poke-search').val(), 10);
+          	var caught = $("[name='caught']").prop('checked');
+          	saveAdvanced(lastRaid, pokemonId, caught);
+          });
+          if (currentProps.pokemonId!=null) {
+              $('#poke-search').val(currentProps.pokemonId.toString());
+              $('#poke-search').trigger('change');
+          }
+      }
+
+      function saveAdvanced(lastRaid, pokemonId, caught) {
+    	  var props = currentProps;
+    	  props.lastRaid=lastRaid;
+    	  props.pokemonId=pokemonId;
+    	  props.caught=caught;
+          $.ajax({
+            type: "PUT",
+            contentType: "application/json; charset=utf-8",
+            url: "api/gyms/"+props.id,
+            data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid", "pokemonId", "caught"]),
+            success: function (data) {
+              currentProps = data;
+              // Update the UI by removing old raid time and adding new one
+              $("#badger-info-raid").remove();
+              $("#badger-area-container").after(getLastRaid(data.lastRaid, true));
+              registerRaidEvents();
+            },
+            error: function (result) {
+              errorPage("Failed to update advanced options", result);
+            }
+    	  }); 	  
+      }
+ 
     </script>
   </body>
 </html>
