@@ -122,7 +122,7 @@
     <script src="js/js.cookie.js" type="text/javascript"></script>
     <script src="js/datatables.min.js" type="text/javascript"></script>
     <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9OSRLuuH3o7YhJ6bRUVtD9TxhlSDqSDU&callback=initPage"></script>
-    <script defer src="js/snazzy-info-window.min.js" type="text/javascript"></script>
+    <script defer src="js/snazzy-info-window-hacked.js" type="text/javascript"></script>
         
     <script>
       var PARKS_ONLY_OPTION = 9999;
@@ -353,7 +353,7 @@
                       // Add a callback to create an info window for each marker if clicked
                       (function (marker, i) {
                         google.maps.event.addListener(marker, 'click', function () {
-                        	var content = "<div class=\"badger-info\"><div class=\"badger-info-title\">" + 
+                        	var content = "<div class=\"badger-info-title\">" + 
                         	  "<div class=\"dropdown badger-info-title-container\">" +
                         	    "<button class=\"btn btn-default badger-small-button\" type=\"button\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
                         	    "<span class=\"badger-badge-container\"><span id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(data[i].status) + "\"></span></span>" +
@@ -371,20 +371,25 @@
                     		"<div id=\"badger-area-container\">" + 
                     		  "<span class=\"badge badge-primary badger-small-pill\">" + gymData[i].area.name + "</span>" +
                     		  getParkStatus(gymData[i].park) + "</div>" + 
-                    		  getLastRaid(gymData[i].lastRaid, true) +
+                    		  getLastRaid(gymData[i].lastRaid) +
                     		"<div><div>Comments</div><div><textarea class=\"badger-comments\" id=\"comments\"></textarea>" +
-                            "</div></div>" +
-                    		"</div>";
+                            "</div></div>";
                     		currentMarker = marker;
                     		currentProps = gymData[i];
                     		closeAnyInfoWindows();
+                    		
+                    		var popup = document.createElement('div');
+                    		popup.setAttribute('class', 'badger-info');
+                    		popup.innerHTML = content;
+                    	
                     		currentInfoWindow = new SnazzyInfoWindow({
                     			map: map,
                     			marker: currentMarker,
+                    			wrapperClass: 'badger-info-wrapper',
                     			closeButtonMarkup: "<button type=\"button\" class=\"btn btn-outline-secondary badger-info-close\">&#215;</button>",
                     			closeWhenOthersOpen: false,
                     			closeOnMapClick: false,
-                    			content: content,
+                    			content: popup,
                     			padding: '6px',
                     			maxWidth: 350,
                     			callbacks: {
@@ -453,15 +458,22 @@
         });
       }
 
-      function getLastRaid(lastRaid, includeButton) {
+      function getLastRaid(lastRaid) {
+    	  return getLastRaidDetails(lastRaid, "", true);
+      }
+      
+      function getLastRaidForReport(lastRaid) {
+    	  return getLastRaidDetails(lastRaid, "-small", false);
+      }
+      
+      function getLastRaidDetails(lastRaid, containerClass, includeButton) {
     	  var htmlContent = "";
-    	  var containerClass = "";
-    	  if (!includeButton) {
-    		  containerClass = "-small";
-    	  }
     	  if (lastRaid!=null) {
     		  var lastRaidDate = new Date(lastRaid);
-    		  htmlContent="<div id=\"badger-info-raid\" class=\"alert alert-success badger-last-raid" + containerClass +" collapsed\"" + 
+        	  if (!includeButton) {
+        		  htmlContent = "<td data-order=\"" + lastRaid + "\">";
+        	  }
+    		  htmlContent += "<div id=\"badger-info-raid\" class=\"alert alert-success badger-last-raid" + containerClass +" collapsed\"" + 
     		        "data-toggle=\"collapse\" href=\"#collapseDate\" aria-expanded=\"false\" aria-controls=\"collapseDate\">" +
     		          "<div>Last raided <time class=\"timeago\" datetime=\"" + lastRaidDate.toISOString() + "\"></time>" +
     		          "<div id=\"collapseDate\" class=\"collapse hide\" role=\"tabpanel\" aria-labelledby=\"badger-info-raid\" data-parent=\"#badger-info\">" +
@@ -470,14 +482,21 @@
         		          "</span></div>" +
         		      "</div>" +
     		          "</div>" +
-    	              getRaidButtonHtml(includeButton) + "</div>"; 
+    	              getRaidButtonHtml(includeButton) + "</div>";
+    	      return htmlContent;
     	  } else {
-    	      htmlContent = "<div id=\"badger-info-raid\" class=\"alert alert-warning badger-no-raid" + containerClass +"\"><div>No raid recorded yet</div>" +
+    		  if (!includeButton) {
+        		  htmlContent = "<td data-order=\"0\">";
+        	  }
+    	      htmlContent += "<div id=\"badger-info-raid\" class=\"alert alert-warning badger-no-raid" + containerClass +"\"><div>No raid recorded yet</div>" +
     	          getRaidButtonHtml(includeButton) + "</div>";
     	  }
-    	  return htmlContent;
+    	  if (!includeButton) {
+    		  htmlContent += "</td>";
+    	  }
+          return htmlContent;
       }
-      
+
       function getRaidButtonHtml(includeButton) {
     	  if (!includeButton) {
     		  return "";
@@ -508,7 +527,7 @@
               currentProps = data;
               // Update the UI by removing old raid time and adding new one
               $("#badger-info-raid").remove();
-              $("#badger-area-container").after(getLastRaid(data.lastRaid, true));
+              $("#badger-area-container").after(getLastRaid(data.lastRaid));
               registerRaidEvents();
             },
             error: function (result) {
@@ -778,7 +797,7 @@
         		    "<div class=\"badge badge-primary badger-small-pill\">" + gymData[i].area.name + "</div></div>" +
         		  "</td><td><div id=\"badger-area-container\">" +
         		      getParkStatus(gymData[i].park) + "</div></td>" + 
-        		  "<td>" + getLastRaid(gymData[i].lastRaid, false) + "</td>" +
+        		      getLastRaidForReport(gymData[i].lastRaid) +
     	          "</tr>");
     	  }
     	  $("time.timeago").timeago();
@@ -875,7 +894,7 @@
               currentProps = data;
               // Update the UI by removing old raid time and adding new one
               $("#badger-info-raid").remove();
-              $("#badger-area-container").after(getLastRaid(data.lastRaid, true));
+              $("#badger-area-container").after(getLastRaid(data.lastRaid));
               registerRaidEvents();
             },
             error: function (result) {
