@@ -138,6 +138,7 @@
       var reportTable = null;
       var raidBossData = null;
       var advancedOptionsPage = null;
+      var elementId = 0;
 
       function initPage() {
     	// Setup CSRF token
@@ -474,15 +475,18 @@
         		  htmlContent = "<td data-order=\"" + lastRaid + "\">";
         	  }
     		  htmlContent += "<div id=\"badger-info-raid\" class=\"alert alert-success badger-last-raid" + containerClass +" collapsed\"" + 
-    		        "data-toggle=\"collapse\" href=\"#collapseDate\" aria-expanded=\"false\" aria-controls=\"collapseDate\">" +
+    		        "data-toggle=\"collapse\" href=\"#collapseDate" + elementId + "\" aria-expanded=\"false\" aria-controls=\"collapseDate" + elementId + "\">" +
     		          "<div>Last raided <time class=\"timeago\" datetime=\"" + lastRaidDate.toISOString() + "\"></time>" +
-    		          "<div id=\"collapseDate\" class=\"collapse hide\" role=\"tabpanel\" aria-labelledby=\"badger-info-raid\" data-parent=\"#badger-info\">" +
+    		          "<div id=\"collapseDate" + elementId + "\" class=\"collapse hide\" role=\"tabpanel\" aria-labelledby=\"badger-info-raid\" data-parent=\"#badger-info\">" +
         		        "<div class=\"badger-time-badge-container\"><span class=\"badge badge-success badger-time-badge\">" +
         		          lastRaidDate.toLocaleString() +
         		          "</span></div>" +
         		      "</div>" +
     		          "</div>" +
     	              getRaidButtonHtml(includeButton) + "</div>";
+    	      elementId++;
+    	      if (elementId>1000)
+    	    	  elementId=0;
     	      return htmlContent;
     	  } else {
     		  if (!includeButton) {
