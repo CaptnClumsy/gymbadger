@@ -138,7 +138,6 @@
       var reportTable = null;
       var raidBossData = null;
       var advancedOptionsPage = null;
-      var elementId = 0;
 
       function initPage() {
     	// Setup CSRF token
@@ -372,7 +371,7 @@
                     		"<div id=\"badger-area-container\">" + 
                     		  "<span class=\"badge badge-primary badger-small-pill\">" + gymData[i].area.name + "</span>" +
                     		  getParkStatus(gymData[i].park) + "</div>" + 
-                    		  getLastRaid(gymData[i].lastRaid) +
+                    		  getLastRaid(gymData[i]) +
                     		"<div><div>Comments</div><div><textarea class=\"badger-comments\" id=\"comments\"></textarea>" +
                             "</div></div>";
                     		currentMarker = marker;
@@ -459,34 +458,31 @@
         });
       }
 
-      function getLastRaid(lastRaid) {
-    	  return getLastRaidDetails(lastRaid, "", true);
+      function getLastRaid(data) {
+    	  return getLastRaidDetails(data, "", true);
       }
       
-      function getLastRaidForReport(lastRaid) {
-    	  return getLastRaidDetails(lastRaid, "-small", false);
+      function getLastRaidForReport(data) {
+    	  return getLastRaidDetails(data, "-small", false);
       }
       
-      function getLastRaidDetails(lastRaid, containerClass, includeButton) {
+      function getLastRaidDetails(data, containerClass, includeButton) {
     	  var htmlContent = "";
-    	  if (lastRaid!=null) {
-    		  var lastRaidDate = new Date(lastRaid);
+    	  if (data.lastRaid!=null) {
+    		  var lastRaidDate = new Date(data.lastRaid);
         	  if (!includeButton) {
-        		  htmlContent = "<td data-order=\"" + lastRaid + "\">";
+        		  htmlContent = "<td data-order=\"" + data.lastRaid + "\">";
         	  }
     		  htmlContent += "<div id=\"badger-info-raid\" class=\"alert alert-success badger-last-raid" + containerClass +" collapsed\"" + 
-    		        "data-toggle=\"collapse\" href=\"#collapseDate" + elementId + "\" aria-expanded=\"false\" aria-controls=\"collapseDate" + elementId + "\">" +
+    		        "data-toggle=\"collapse\" href=\"#collapseDate" + data.id + "\" aria-expanded=\"false\" aria-controls=\"collapseDate" + data.id + "\">" +
     		          "<div>Last raided <time class=\"timeago\" datetime=\"" + lastRaidDate.toISOString() + "\"></time>" +
-    		          "<div id=\"collapseDate" + elementId + "\" class=\"collapse hide\" role=\"tabpanel\" aria-labelledby=\"badger-info-raid\" data-parent=\"#badger-info\">" +
+    		          "<div id=\"collapseDate" + data.id + "\" class=\"collapse hide\" role=\"tabpanel\" aria-labelledby=\"badger-info-raid\" data-parent=\"#badger-info\">" +
         		        "<div class=\"badger-time-badge-container\"><span class=\"badge badge-success badger-time-badge\">" +
         		          lastRaidDate.toLocaleString() +
-        		          "</span></div>" +
+        		          "</span></div>" + getRaidPokemonHtml(data) +
         		      "</div>" +
     		          "</div>" +
     	              getRaidButtonHtml(includeButton) + "</div>";
-    	      elementId++;
-    	      if (elementId>1000)
-    	    	  elementId=0;
     	      return htmlContent;
     	  } else {
     		  if (!includeButton) {
@@ -531,7 +527,7 @@
               currentProps = data;
               // Update the UI by removing old raid time and adding new one
               $("#badger-info-raid").remove();
-              $("#badger-area-container").after(getLastRaid(data.lastRaid));
+              $("#badger-area-container").after(getLastRaid(data));
               registerRaidEvents();
             },
             error: function (result) {
@@ -674,6 +670,34 @@
 		      currentInfoWindow = null;
 		  }
       }
+      
+      function getRaidPokemonHtml(data) {
+    	  if (data.pokemonId == null) {
+    		  return "";
+    	  }
+    	  // Set the pill colour to be green for cuaght, red for fled
+    	  var pillClass = "badge-info";
+    	  if (data.caught != null) {
+    		  if (data.caught) {
+    			  pillClass = "badge-success";
+    		  } else {
+    			  pillClass = "badge-danger";
+    		  }
+    	  }
+    	  var pokemonName = null;
+    	  for (var i = 0; i < raidBossData.length; i++) {
+    	      if (raidBossData[i].id == data.pokemonId) {
+    	    	  pokemonName = raidBossData[i].text;
+    	    	  break;
+    	      }
+    	  }
+          if (pokemonName == null) {
+        	  return "";
+          }
+    	  return "<div class=\"badger-pokemon-container\"><span class=\"badge " + pillClass + " badger-pokemon-badge\">" +
+              pokemonName +
+              "</span></div>";
+      }
 
       function getBadgeColor (status) {
     	  if (status==="BASIC") {
@@ -786,6 +810,7 @@
       }
       
       function showReports() {
+    	  closeAnyInfoWindows();
     	  if (reportTable != null) {
     	      $("#reportsTable").DataTable().destroy();
     	  }
@@ -801,7 +826,7 @@
         		    "<div class=\"badge badge-primary badger-small-pill\">" + gymData[i].area.name + "</div></div>" +
         		  "</td><td><div id=\"badger-area-container\">" +
         		      getParkStatus(gymData[i].park) + "</div></td>" + 
-        		      getLastRaidForReport(gymData[i].lastRaid) +
+        		      getLastRaidForReport(gymData[i]) +
     	          "</tr>");
     	  }
     	  $("time.timeago").timeago();
@@ -902,7 +927,7 @@
               currentProps = data;
               // Update the UI by removing old raid time and adding new one
               $("#badger-info-raid").remove();
-              $("#badger-area-container").after(getLastRaid(data.lastRaid));
+              $("#badger-area-container").after(getLastRaid(data));
               registerRaidEvents();
             },
             error: function (result) {
