@@ -11,14 +11,23 @@
   font-display: block;
 }
 .badger-container {
-	padding-left: 0px !important;
+    width: 100vw;
+    min-height: 100%;
+    height: 100%;
+    padding-top: 66px;
+    padding-bottom: 0px;
+    box-sizing: border-box;
+    top: 0;
+    left: 0;
+    position: fixed;
+    z-index: -1;
+    padding-left: 0px !important;
 	padding-right: 0px !important;
 }
 #map {
-    height: calc(100vh - 82px);
-    width: calc(100% - 16px);
-    top: 8px;
-    margin-left: 8px;
+    min-height: 100%;
+    width: 100vw;
+    height 100%;
 }
 .badger-navbar {
 	padding-top: 4px;
