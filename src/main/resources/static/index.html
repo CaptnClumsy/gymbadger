@@ -147,7 +147,6 @@
     <script src="js/gymbadger-percentage.js" type="text/javascript"></script>
     <script defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA9OSRLuuH3o7YhJ6bRUVtD9TxhlSDqSDU&callback=initPage"></script>
     <script defer src="js/snazzy-info-window-hacked.js" type="text/javascript"></script>
-
         
     <script>
       var PARKS_ONLY_OPTION = 9999;
@@ -413,10 +412,11 @@
                     			wrapperClass: 'badger-info-wrapper',
                     			closeButtonMarkup: "<button type=\"button\" class=\"btn btn-outline-secondary badger-info-close\">&#215;</button>",
                     			closeWhenOthersOpen: false,
-                    			closeOnMapClick: false,
+                    			closeOnMapClick: true,
                     			content: popup,
                     			padding: '6px',
                     			maxWidth: 350,
+                    			mapTop: 66,
                     			callbacks: {
                     			  afterOpen: function() {
                     				$('.badger-dropdownitem').click(function() {

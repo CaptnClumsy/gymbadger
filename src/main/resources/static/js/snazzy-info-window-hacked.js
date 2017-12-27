@@ -96,7 +96,9 @@
             right: 20,
             bottom: 20,
             left: 20
-        }
+        },
+        mapTop: 0,
+        mapLeft: 0
     };
 
     // Copy keys from the source into the target
@@ -502,10 +504,11 @@
                     }
                 }
 
-                var divPixel = this.getProjection().fromLatLngToDivPixel(this._position || this._marker.position);
+                //var divPixel = this.getProjection().fromLatLngToDivPixel(this._position || this._marker.position);
+                var divPixel = this.getProjection().fromLatLngToContainerPixel(this._position || this._marker.position);
                 if (divPixel) {
-                    this._html.floatWrapper.style.top = Math.floor(divPixel.y) + 'px';
-                    this._html.floatWrapper.style.left = Math.floor(divPixel.x) + 'px';
+                    this._html.floatWrapper.style.top = (Math.floor(divPixel.y)+this._opts.mapTop) + 'px';
+                    this._html.floatWrapper.style.left = (Math.floor(divPixel.x)+this._opts.mapLeft) + 'px';
                 }
                 if (!this._isOpen) {
                     this._isOpen = true;
@@ -607,9 +610,9 @@
                 this._html.floatWrapper = newElement('float-wrapper');
                 this._html.floatWrapper.appendChild(this._html.wrapper);
 
-                // Add the wrapper to the Google Maps float pane
-                this.getPanes().floatPane.appendChild(this._html.floatWrapper);
-
+                // Add the wrapper to the document body
+                document.body.appendChild(this._html.floatWrapper);
+                
                 // Now add all the event listeners
                 var map = this.getMap();
                 this.clearListeners();
@@ -640,6 +643,11 @@
                         _this2._previousHeight = oh;
                         _this2.resize();
                     }
+                    var divPixel = _this2.getProjection().fromLatLngToContainerPixel(_this2._position || _this2._marker.position);
+                    if (divPixel) {
+                        _this2._html.floatWrapper.style.top = (Math.floor(divPixel.y)+_this2._opts.mapTop) + 'px';
+                        _this2._html.floatWrapper.style.left = (Math.floor(divPixel.x)+_this2._opts.mapLeft) + 'px';
+                    }
                 }));
 
                 // Marker moves
@@ -659,19 +667,6 @@
                         _this2.close();
                     }));
                 }
-
-                // Stop the mouse event propagation
-                var mouseEvents = ['click', 'dblclick', 'rightclick', 'contextmenu', 'drag', 'dragend', 'dragstart', 'mousedown', 'mouseout', 'mouseover', 'mouseup', 'touchstart', 'touchend', 'touchmove', 'wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'];
-                //var mouseEvents = ['dblclick', 'rightclick', 'contextmenu', 'drag', 'dragend', 'dragstart', 'mousedown', 'mouseout', 'mouseover', 'mouseup', 'touchstart', 'touchend', 'touchmove', 'wheel', 'mousewheel', 'DOMMouseScroll', 'MozMousePixelScroll'];
-                //mouseEvents.forEach(function (event) {
-                //    $(".si-wrapper-top").on(event, function (e) {
-                    	//if ($(e.currentTarget).hasClass('badger-info-wrapper'))
-                    	//{
-                    	    //e.stopImmediatePropagation();
-                //    	    e.stopPropagation();
-                    	//}
-                //    });
-                //});
 
                 this.activateCallback('open');
             }
@@ -725,6 +720,11 @@
                 }
                 if (dx !== 0 || dy !== 0) {
                     this.getMap().panBy(dx, dy);
+                    var divPixel = this.getProjection().fromLatLngToContainerPixel(this._position || this._marker.position);
+                    if (divPixel) {
+                        this._html.floatWrapper.style.top = (Math.floor(divPixel.y)+this._opts.mapTop) + 'px';
+                        this._html.floatWrapper.style.left = (Math.floor(divPixel.x)+this._opts.mapLeft) + 'px';
+                    }
                 }
             }
         }, {
