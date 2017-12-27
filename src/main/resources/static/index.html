@@ -57,7 +57,7 @@
       </div>
     </nav>
     
-    <div class="container fill badger-container">
+    <div id="badger-container" class="container fill badger-container">
       <div id="map"></div>
     </div>
 
@@ -442,28 +442,50 @@
               }
       	});
       }
-      
+
       function registerRaidEvents() {
-        $("time.timeago").timeago();
-      	$('#now').click(function() {
-      		selectRaid(currentProps, new Date());
-          });
-      	$('#choose').datetimepicker({
-      		format: 'dd-mm-yyyy',
-      		autoclose: true,
-      		todayHighlight: true,
-      		minView: 2
-      	}).on('changeDate', function(e) {
-      		selectRaid(currentProps, e.date);
-      	});
-      	if (advancedOptionsPage!=null) {
+        // remove old time pickers and popovers from the DOM
+        $('.datetimepicker').remove();
+        if (advancedOptionsPage!=null) {
       		$('.popover').remove();
       	}
-      	advancedOptionsPage = $("#options").popover({
-            placement : 'bottom',
-            html : true,
-            title : 'Advanced Raid Options <a href="#" class="close" data-dismiss="alert">&times;</a>',
-            content : "<div id=\"badger-opt-date\" class=\"input-group date badger-opt-date\">" + 
+        
+        // Enable date/time plugin
+        $('time.timeago').timeago();
+      	
+      	// Setup the three raid button menu options
+      	$('#now').click(function() {
+      		selectRaid(currentProps, new Date());
+        });
+             
+        $('#raidPopover1').popover({
+      	    trigger: "manual",
+            placement: 'auto',
+            viewport: '#badger-container', 
+            html: true,
+            title: 'Choose a date <a href="#" class="close" data-dismiss="alert">&times;</a>',
+            content: "<div class=\"badger-date-popover\"></div>"
+        });
+        $('#raidPopover1').on('shown.bs.popover', function(){
+            $('.badger-date-popover').datetimepicker({
+      		    format: 'dd-mm-yyyy',
+      		    autoclose: true,
+      		    todayHighlight: true,
+      		    minView: 2
+      	    }).on('changeDate', function(e) {
+      		    selectRaid(currentProps, e.date);
+      	    });
+        });
+        $('#choose').click(function() {
+      		$("#raidPopover1").popover("show");
+        });
+      	
+      	advancedOptionsPage = $('#raidPopover2').popover({
+      	    trigger: "manual",
+            placement: 'bottom',
+            html: true,
+            title: 'Advanced Raid Options <a href="#" class="close" data-dismiss="alert">&times;</a>',
+            content: "<div id=\"badger-opt-date\" class=\"input-group date badger-opt-date\">" + 
                   "<input type=\"text\" class=\"form-control badger-opt-date-text\" placeholder=\"Date of the raid\">" + 
                   "<span class=\"input-group-addon\"><i class=\"fa fa-calendar\"></i></span>" +
                 "</div>" + 
@@ -475,9 +497,13 @@
                 "<div class=\"badger-opt-item\"><input type=\"checkbox\" id=\"caught-switch\" name=\"caught\"></div>" +
                 "<div class=\"badger-opt-item badger-opt-btn-div\"><button id=\"badger-opt-save\" class=\"btn btn-primary btn-sm\">Save</button></div>"
         });
-        $("#options").on('shown.bs.popover', function(){
+        $('#raidPopover2').on('shown.bs.popover', function(){
         	initAdvancedOptions();
         });
+        $('#options').click(function() {
+      		$("#raidPopover2").popover("show");
+        });
+        
         $(document).on("click", ".popover .close" , function(){
         	$(this).parents(".popover").popover('hide');
         });
@@ -538,6 +564,7 @@
 	          "<a id=\"choose\" class=\"dropdown-item badger-info-raid-item\" data-provide=\"datepicker\" href=\"#\">Choose a Date</a>" +
 	          "<a id=\"options\" class=\"dropdown-item badger-info-raid-item\" href=\"#\">Advanced</a>" +
 	        "</div>" +
+	        "<span id=\"raidPopover1\"></span><span id=\"raidPopover2\"></span>" +
 	      "</div>";
       }
 
