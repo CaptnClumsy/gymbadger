@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"
+                   logicalFilePath="META-INF/liquibase-changelog/starlight-14.4.0/db.006-executors.xml">
+
+    <changeSet id="27122017T1415" author="captnclumsy">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="comments" />
+            </not>
+        </preConditions>
+        <createTable tableName="comments">
+			<column name="id" type="BIGINT">
+			    <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="createdate" type="TIMESTAMP" >
+                <constraints nullable="false" />
+            </column>
+            <column name="gymid" type="BIGINT" >
+                <constraints nullable="false" foreignKeyName="fk_comments_gymid" references="gyms(id)" />
+            </column>
+            <column name="userid" type="BIGINT" >
+                <constraints nullable="false" foreignKeyName="fk_comments_userid" references="users(id)"/>
+            </column>
+            <column name="public" type="BOOLEAN" >
+                <constraints nullable="false" />
+            </column>
+            <column name="comment" type="CLOB" >
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
