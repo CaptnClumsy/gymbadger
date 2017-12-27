@@ -850,19 +850,24 @@
     	  }
     	  $("#reportsTableBody").html("");
     	  for (var i = 0; i < gymData.length; i++) {
-    		  $("#reportsTableBody").append("<tr>" +
-    	          "<td>" + gymData[i].name + "</td>" +
-    	          "<td data-order=\"" + getBadgeOrder(gymData[i].status) + "\">" + 
-    	            "<div id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(gymData[i].status) + "\"></div>" +
-    	          "</td>" +
-    	          
-    	          "<td><div id=\"badger-area-container\">" + 
-        		    "<div class=\"badge badge-primary badger-small-pill\">" + gymData[i].area.name + "</div></div>" +
-        		  "</td><td><div id=\"badger-area-container\">" +
-        		      getParkStatus(gymData[i].park) + "</div></td>" + 
-        		      getLastRaidForReport(gymData[i]) +
-    	          "</tr>");
-    	  }
+    	      for (var j = 0; j < selectedAreaIds.length; j++) {
+	    	      if (gymData[i].area.id === selectedAreaIds[j]) {
+	    		      if (!parksOnly || gymData[i].park===true) {
+	    		          $("#reportsTableBody").append("<tr>" +
+	    	                  "<td>" + gymData[i].name + "</td>" +
+	    	                  "<td data-order=\"" + getBadgeOrder(gymData[i].status) + "\">" + 
+	    	                      "<div id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(gymData[i].status) + "\"></div>" +
+	    	                  "</td>" +
+	    	                  "<td><div id=\"badger-area-container\">" + 
+	        		              "<div class=\"badge badge-primary badger-small-pill\">" + gymData[i].area.name + "</div></div>" +
+	        		          "</td><td><div id=\"badger-area-container\">" +
+	        		              getParkStatus(gymData[i].park) + "</div></td>" + 
+	        		              getLastRaidForReport(gymData[i]) +
+	    	              "</tr>");
+	    	          }
+	    	      }
+	    	  }
+	      }
     	  $("time.timeago").timeago();
     	  reportTable = $("#reportsTable").DataTable({
     	    "autoWidth": true,
