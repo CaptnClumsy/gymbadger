@@ -402,8 +402,13 @@
                     htmlContent = "<div class=\"alert alert-info badger-small-alert\" role=\"alert\">No comments posted yet.</div>";
                 }
                 for (var i = 0; i < data.comments.length; i++) {
+                    var commentDate = new Date(data.comments[i].createdate);
                     htmlContent+="<div class=\"badger-comment\"><span class=\"badger-comment-user\">"+data.comments[i].displayname+"</span>" +
-                        "<span class=\"badger-comment-text\">" + data.comments[i].text + "</span></div>";
+                        "<span class=\"badger-comment-text\">" + data.comments[i].text + "</span></div><div class=\"badger-sub-comment\">" + 
+                        "<span class=\"badger-delete-link\">" + 
+                        "<a class=\"badger-delete\" id=\"delete-link-" + data.comments[i].id + "\" data-commentid=\"" + data.comments[i].id + "\" href=\"#\">Delete</a></span>" + 
+                        "<time class=\"timeago badger-comment-time\" datetime=\"" + commentDate.toISOString() + "\"></time>" +
+                        "</div>";
                 }
                 if (data.loggedin) {
                     htmlContent+="<div><div class=\"badger-comment\"><textarea class=\"badger-comment-input\" name=\"message\" type=\"text\" id=\"input-message\" placeholder=\"Write a comment...\"></textarea></div>" +
@@ -416,6 +421,24 @@
                         "</div></div>";
                 }
                 $('#comments').html(htmlContent);
+                $('time.badger-comment-time').timeago();
+                $('.badger-delete').on('click', function() {
+                    var idtodelete = $(this).attr('data-commentid');
+                    $.ajax({
+                        type: "DELETE",
+                        contentType: "application/json; charset=utf-8",
+                        url: "api/comments/"+idtodelete,
+                        success: function (data) {
+                            // Update the UI by removing old raid time and adding new one
+                            $('#comments').html('Loading...');
+                            queryGymDataAndUpdateInfoWindow(thisGym);
+                        },
+                        error: function (result) {
+                            errorPage("Failed to delete comment", result);
+                        }
+    	            });     
+                });
+                
                 $('#badger-public-menu').select2({
                     minimumResultsForSearch: Infinity,
                     containerCssClass: 'badger-public-menu',
@@ -443,6 +466,8 @@
                         data: JSON.stringify(postData),
                         success: function (data) {
                             // Update the UI by removing old raid time and adding new one
+                            $('#comments').html('Loading...');
+                            queryGymDataAndUpdateInfoWindow(thisGym);
                         },
                         error: function (result) {
                             errorPage("Failed to post new comment", result);

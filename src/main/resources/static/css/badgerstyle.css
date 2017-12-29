@@ -557,3 +557,20 @@ body {
     padding-right: 6px;
     margin-right: 4px;
 }
+.badger-sub-comment {
+    line-height: 8px;
+    padding-bottom: 6px;
+}
+.badger-delete-link {
+    margin-left: 10px;
+    font-size: 11px;
+    padding: 0px;
+    margin-top: 0px;
+}
+.badger-comment-time {
+    margin-right: 8px;
+    margin-top: 2px;
+    float: right;
+    font-size: 11px;
+    color: grey;
+}

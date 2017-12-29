@@ -43,5 +43,17 @@ public class CommentService {
 		newComment.setGym(gym);
 		CommentEntity savedComment = commentRepo.save(newComment);
 		return CommentDao.fromCommentEntity(savedComment);
+	}
+
+	@Transactional
+	public void deleteComment(final UserEntity user, final Long commentId) throws CommentNotFoundException, AccessControlException {
+		CommentEntity comment = commentRepo.findOne(commentId);
+		if (comment == null) {
+			throw new CommentNotFoundException("Unable to find specified comment");
+		}
+		if (comment.getUser().getId()!=user.getId()) {
+			throw new AccessControlException("User was not author of the comment");
+		}
+		commentRepo.delete(commentId);
 	}	
 }

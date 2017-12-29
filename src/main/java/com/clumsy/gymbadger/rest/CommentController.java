@@ -17,7 +17,9 @@ import com.clumsy.gymbadger.data.CommentListDao;
 import com.clumsy.gymbadger.data.NewCommentDao;
 import com.clumsy.gymbadger.entities.GymEntity;
 import com.clumsy.gymbadger.entities.UserEntity;
+import com.clumsy.gymbadger.services.CommentNotFoundException;
 import com.clumsy.gymbadger.services.CommentService;
+import com.clumsy.gymbadger.services.AccessControlException;
 import com.clumsy.gymbadger.services.GymNotFoundException;
 import com.clumsy.gymbadger.services.GymService;
 import com.clumsy.gymbadger.services.UserNotFoundException;
@@ -68,6 +70,24 @@ public class CommentController {
 			throw new ObjectNotFoundException(e);
 		} catch (GymNotFoundException e) {
 			throw new ObjectNotFoundException(e);
+		}
+    }
+    
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteComment(@PathVariable("id") Long commentId, Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			final UserEntity user = userService.getCurrentUser(principal);
+			commentService.deleteComment(user, commentId);
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (CommentNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (AccessControlException e) {
+			throw new ForbiddenException(e);
 		}
     }
 }
