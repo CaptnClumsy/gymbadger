@@ -519,4 +519,41 @@ body {
 	font-size: 13px;
     line-height: 16px;
 }
+.badger-comment-input {
+    border:0; outline:0;
+    padding: 3px;
+    resize: none;
+    margin-top: 4px;
+    width: 100%;
+}
+.badger-comment-options {
+    display: flex;
+    justify-content: right;
+    margin-top: 4px;
+}
+.badger-public-menu {
+    font-size: 11px;
+    height: 18px !important;
+}
+.badger-public-menu ~ .select2-container {
+	width: 70px !important;
+}
+#select2-badger-public-menu-container {
+    line-height: 16px;
+    width: 70px !important;
+}
+.badger-public-menu .select2-selection__arrow {
+    height: 16px !important;
+}
+.badger-public-item {
+    font-size: 11px;
+}
+.badger-comment-post {
+    font-size: 11px;
+    padding-top: 0px;
+    margin-left: 5px;
+    padding-bottom: 0px;
+    padding-left: 6px;
+    padding-right: 6px;
+    margin-right: 4px;
 }

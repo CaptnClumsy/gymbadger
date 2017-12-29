@@ -1,5 +1,6 @@
 package com.clumsy.gymbadger.services;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.clumsy.gymbadger.data.CommentDao;
 import com.clumsy.gymbadger.entities.CommentEntity;
+import com.clumsy.gymbadger.entities.GymEntity;
+import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.repos.CommentRepo;
 import com.google.common.collect.Lists;
 
@@ -28,5 +31,17 @@ public class CommentService {
 			final CommentDao dao = CommentDao.fromCommentEntity(comment);
 			return dao;
         }));
+	}
+
+	@Transactional
+	public CommentDao createComment(final UserEntity user, final GymEntity gym, final String comment, final Boolean isPublic) {
+		CommentEntity newComment = new CommentEntity();
+		newComment.setCreateDate(new Date());
+		newComment.setUser(user);
+		newComment.setComment(comment);
+		newComment.setIsPublic(isPublic);
+		newComment.setGym(gym);
+		CommentEntity savedComment = commentRepo.save(newComment);
+		return CommentDao.fromCommentEntity(savedComment);
 	}	
 }

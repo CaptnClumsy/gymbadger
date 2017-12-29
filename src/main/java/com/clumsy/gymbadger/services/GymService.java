@@ -113,6 +113,7 @@ public class GymService {
 
 	}
 
+	@Transactional
 	public GymSummaryDao updateGym(final UserEntity user, final Long gymId, final Boolean isPark,
 			final GymBadgeStatus status, final Date lastRaid,
 			final Long pokemonId, final Boolean caught) throws GymNotFoundException {

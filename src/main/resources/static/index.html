@@ -398,15 +398,57 @@
             url: "api/comments/"+thisGym.id,
             success: function (data) {
                 var htmlContent="";
-                if (data.length==0) {
+                if (data.comments.length==0 && !data.loggedin) {
                     htmlContent = "<div class=\"alert alert-info badger-small-alert\" role=\"alert\">No comments posted yet.</div>";
-                } else {
-                    for (var i = 0; i < data.length; i++) {
-                        htmlContent+="<div class=\"badger-comment\"><span class=\"badger-comment-user\">"+data[i].displayname+"</span>" +
-                            "<span class=\"badger-comment-text\">" + data[i].text + "</span></div>";
-                    }
+                }
+                for (var i = 0; i < data.comments.length; i++) {
+                    htmlContent+="<div class=\"badger-comment\"><span class=\"badger-comment-user\">"+data.comments[i].displayname+"</span>" +
+                        "<span class=\"badger-comment-text\">" + data.comments[i].text + "</span></div>";
+                }
+                if (data.loggedin) {
+                    htmlContent+="<div><div class=\"badger-comment\"><textarea class=\"badger-comment-input\" name=\"message\" type=\"text\" id=\"input-message\" placeholder=\"Write a comment...\"></textarea></div>" +
+                        "<div class=\"badger-comment-options\">" +
+                            "<select id=\"badger-public-menu\" class=\"badger-public-menu\">" +
+                                "<option class=\"dropdown-item badger-public-item\" selected>Public</option>" +
+                                "<option class=\"dropdown-item badger-public-item\">Private</option>" +
+                            "</select>" + 
+                            "<button id=\"badger-post-button\" type=\"button\" class=\"btn btn-primary badger-comment-post\">Post</button>" +
+                        "</div></div>";
                 }
                 $('#comments').html(htmlContent);
+                $('#badger-public-menu').select2({
+                    minimumResultsForSearch: Infinity,
+                    containerCssClass: 'badger-public-menu',
+                    dropdownCssClass: 'badger-public-item'
+                });
+                $('#badger-post-button').on('click', function () {
+                    var comment = $('#input-message').val();
+                    var selectedText = $('#badger-public-menu').val();
+                    var ispublic = false;
+                    if (selectedText == 'Public') {
+                        ispublic = true;
+                    }
+                    if (comment.length == 0) {
+                        return;
+                    }
+                    var postData = {
+                        gymid: thisGym.id,
+                        text: comment,
+                        ispublic: ispublic
+                    };
+                    $.ajax({
+                        type: "POST",
+                        contentType: "application/json; charset=utf-8",
+                        url: "api/comments/",
+                        data: JSON.stringify(postData),
+                        success: function (data) {
+                            // Update the UI by removing old raid time and adding new one
+                        },
+                        error: function (result) {
+                            errorPage("Failed to post new comment", result);
+                        }
+    	            }); 
+                });
             },
             error: function (result) {
                 $('#comments').html("<div class=\"alert alert-danger badger-small-alert\" role=\"alert\">Failed to query gym comments.</div>");
@@ -870,7 +912,9 @@
       
       function errorPage(title, results) {
     	  $("#errorPageTitle").text(title);
-    	  $("#errorPageBody").text(results.responseJSON.message);
+    	  if (results.responseJSON !== undefined) {
+    	      $("#errorPageBody").text(results.responseJSON.message);
+    	  }
     	  $('#errorPage').modal('show');
       }
       
