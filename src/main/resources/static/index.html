@@ -377,59 +377,7 @@
                       // Add a callback to create an info window for each marker if clicked
                       (function (marker, i) {
                         google.maps.event.addListener(marker, 'click', function () {
-                        	var content = "<div class=\"badger-info-title\">" + 
-                        	  "<div class=\"dropdown badger-info-title-container\">" +
-                        	    "<button class=\"btn btn-default badger-small-button\" type=\"button\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
-                        	    "<span class=\"badger-badge-container\"><span id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(data[i].status) + "\"></span></span>" +
-                         	    "</button>" +
-                        	    "<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">" +
-                        	      "<a id=\"select-gold\" class=\""+ getDropdownBadgeClass(gymData[i].status, "GOLD") + "\" href=\"#\">Gold</a>" +
-                        	      "<a id=\"select-silver\" class=\""+ getDropdownBadgeClass(gymData[i].status, "SILVER") + "\" href=\"#\">Silver</a>" +
-                        	      "<a id=\"select-bronze\" class=\""+ getDropdownBadgeClass(gymData[i].status, "BRONZE") + "\" href=\"#\">Bronze</a>" +
-                        	      "<a id=\"select-basic\" class=\""+ getDropdownBadgeClass(gymData[i].status, "BASIC") + "\" href=\"#\">Basic</a>" +
-                        	      "<a id=\"select-none\" class=\""+ getDropdownBadgeClass(gymData[i].status, "NONE") + "\" href=\"#\">None</a>" +
-                        	    "</div>" +
-                        	    "<span class=\"badger-info-title-placeholder\"><span class=\"badger-info-title-text\">" + gymData[i].name + "</span></span>" +
-                        	  "</div>" +
-                        	"</div>" +
-                    		"<div id=\"badger-area-container\">" + 
-                    		  "<span class=\"badge badge-primary badger-small-pill\">" + gymData[i].area.name + "</span>" +
-                    		  getParkStatus(gymData[i].park) + "</div>" + 
-                    		  getLastRaid(gymData[i]) +
-                    		"<div><div>Comments</div><div><textarea class=\"badger-comments\" id=\"comments\"></textarea>" +
-                            "</div></div>";
-                    		currentMarker = marker;
-                    		currentProps = gymData[i];
-                    		closeAnyInfoWindows();
-                    		
-                    		var popup = document.createElement('div');
-                    		popup.setAttribute('class', 'badger-info');
-                    		popup.innerHTML = content;
-                    	
-                    		currentInfoWindow = new SnazzyInfoWindow({
-                    			map: map,
-                    			marker: currentMarker,
-                    			wrapperClass: 'badger-info-wrapper',
-                    			closeButtonMarkup: "<button type=\"button\" class=\"btn btn-outline-secondary badger-info-close\">&#215;</button>",
-                    			closeWhenOthersOpen: false,
-                    			closeOnMapClick: true,
-                    			content: popup,
-                    			padding: '6px',
-                    			maxWidth: 350,
-                    			mapTop: 66,
-                    			callbacks: {
-                    			  afterOpen: function() {
-                    				$('.badger-dropdownitem').click(function() {
-                                        selectBadge(currentMarker, currentProps, getStatusFromId(this.id));
-                                    });
-                    				$('.badger-info-close').click(function() {
-                                        closeAnyInfoWindows();
-                                    });
-                                	registerRaidEvents();
-                    			  }
-                    			}
-                    	    });
-                    		currentInfoWindow.open();
+                            createInfoWindow(gymData[i], marker);
                         });
                       })(marker, i);
                   } 
@@ -441,6 +389,89 @@
               	errorPage("Failed to query gym data", result);
               }
       	});
+      }
+
+      function queryGymDataAndUpdateInfoWindow(thisGym) {
+          $.ajax({
+            type: "GET",
+            contentType: "application/json; charset=utf-8",
+            url: "api/comments/"+thisGym.id,
+            success: function (data) {
+                var htmlContent="";
+                if (data.length==0) {
+                    htmlContent = "<div class=\"alert alert-info badger-small-alert\" role=\"alert\">No comments posted yet.</div>";
+                } else {
+                    for (var i = 0; i < data.length; i++) {
+                        htmlContent+="<div class=\"badger-comment\"><span class=\"badger-comment-user\">"+data[i].displayname+"</span>" +
+                            "<span class=\"badger-comment-text\">" + data[i].text + "</span></div>";
+                    }
+                }
+                $('#comments').html(htmlContent);
+            },
+            error: function (result) {
+                $('#comments').html("<div class=\"alert alert-danger badger-small-alert\" role=\"alert\">Failed to query gym comments.</div>");
+            }
+          });
+      }
+ 
+      function createInfoWindow(data, marker) {
+          var content = "<div class=\"badger-info-title\">" + 
+              "<div class=\"dropdown badger-info-title-container\">" +
+                  "<button class=\"btn btn-default badger-small-button\" type=\"button\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
+                      "<span class=\"badger-badge-container\"><span id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(data.status) + "\"></span></span>" +
+                  "</button>" +
+                  "<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">" +
+                      "<a id=\"select-gold\" class=\""+ getDropdownBadgeClass(data.status, "GOLD") + "\" href=\"#\">Gold</a>" +
+                      "<a id=\"select-silver\" class=\""+ getDropdownBadgeClass(data.status, "SILVER") + "\" href=\"#\">Silver</a>" +
+                      "<a id=\"select-bronze\" class=\""+ getDropdownBadgeClass(data.status, "BRONZE") + "\" href=\"#\">Bronze</a>" +
+                      "<a id=\"select-basic\" class=\""+ getDropdownBadgeClass(data.status, "BASIC") + "\" href=\"#\">Basic</a>" +
+                      "<a id=\"select-none\" class=\""+ getDropdownBadgeClass(data.status, "NONE") + "\" href=\"#\">None</a>" +
+                  "</div>" +
+                  "<span class=\"badger-info-title-placeholder\"><span class=\"badger-info-title-text\">" + data.name + "</span></span>" +
+              "</div>" +
+              "</div>" +
+              "<div id=\"badger-area-container\">" + 
+                  "<span class=\"badge badge-primary badger-small-pill\">" + data.area.name + "</span>" +
+                      getParkStatus(data.park) + 
+               "</div>" + 
+               getLastRaid(data) +
+               "<div class=\"badger-comments-group\"><div class=\"badger-comments-label\">Comments</div>" + 
+                   "<div id=\"comments\" class=\"badger-comments-container\">Loading...</div>" +
+          "</div>";
+               
+          currentMarker = marker;
+          currentProps = data;
+          closeAnyInfoWindows();
+                    		
+          var popup = document.createElement('div');
+          popup.setAttribute('class', 'badger-info');
+          popup.innerHTML = content;
+                    	
+          currentInfoWindow = new SnazzyInfoWindow({
+               map: map,
+               marker: currentMarker,
+               wrapperClass: 'badger-info-wrapper',
+               closeButtonMarkup: "<button type=\"button\" class=\"btn btn-outline-secondary badger-info-close\">&#215;</button>",
+               closeWhenOthersOpen: false,
+               closeOnMapClick: true,
+               content: popup,
+               padding: '6px',
+               maxWidth: 350,
+               mapTop: 66,
+               callbacks: {
+                   afterOpen: function() {
+                       $('.badger-dropdownitem').click(function() {
+                           selectBadge(currentMarker, currentProps, getStatusFromId(this.id));
+                       });
+                 	   $('.badger-info-close').click(function() {
+                           closeAnyInfoWindows();
+                       });
+                       registerRaidEvents();
+                       queryGymDataAndUpdateInfoWindow(data);
+                   }
+              }
+          });
+          currentInfoWindow.open();
       }
 
       function registerRaidEvents() {

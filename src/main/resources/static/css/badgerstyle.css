@@ -483,3 +483,40 @@ body {
     width: 190px;
     height: 192px;
 }
+.badger-small-alert {
+    padding: 2px;
+    margin: 2px;
+}
+.badger-comments-label {
+    color: #4267b2;
+	padding-bottom: 2px;
+	line-height: 16px;
+}
+.badger-comments-group {
+    background-color: #ececec;
+	padding: 4px;
+	margin-top: 4px;
+	border-radius: .25rem;
+	max-height: 150px;
+    overflow: auto;
+}
+.badger-comment-user {
+    font-weight: bold;
+    color: #4267b2;
+	font-size: 14px;
+}
+.badger-comment {
+	background-color: white;
+	margin: 3px;
+    border-radius: .85rem;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-bottom: 2px;
+    padding-top: 0px;
+}
+.badger-comment-text {
+	margin-left: 4px;
+	font-size: 13px;
+    line-height: 16px;
+}
+}
