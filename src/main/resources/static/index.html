@@ -1036,7 +1036,7 @@
           		lastRaid = date;
           	}
           	var pokemonId = parseInt($('#poke-search').val(), 10);
-          	var isCaught = $("#caught-switch").prop('checked');
+          	var isCaught = $("#caught-switch").bootstrapSwitch('state');
           	saveAdvanced(lastRaid, pokemonId, isCaught);
           });
           if (currentProps.pokemonId!=null) {
