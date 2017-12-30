@@ -507,6 +507,7 @@ body {
 	margin-top: 4px;
 	border-radius: .25rem;
 	max-height: 124px;
+	height: 124px;
     overflow: auto;
 }
 .badger-comment-user {
