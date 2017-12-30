@@ -504,6 +504,7 @@ body {
     font-weight: bold;
     color: #4267b2;
 	font-size: 14px;
+	white-space: pre;
 }
 .badger-comment {
 	background-color: white;
@@ -518,6 +519,8 @@ body {
 	margin-left: 4px;
 	font-size: 13px;
     line-height: 16px;
+    word-wrap: break-word;
+    overflow: hidden;
 }
 .badger-comment-input {
     border:0; outline:0;
