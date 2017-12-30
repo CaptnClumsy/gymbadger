@@ -79,6 +79,34 @@
       </div>   
     </div>
     </div>
+    
+    <div class="modal fade" id="advancedOptions" role="dialog">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header badger-opt-header">
+            <h5 class="modal-title">Advanced Raid Options</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body badger-options-page-body">
+            <div id="badger-opt-date" class="input-group date badger-opt-date"> 
+              <input type="text" class="form-control badger-opt-date-text" placeholder="Date of the raid"> 
+              <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            </div>
+            <div id="badger-opt-time" class="input-group date badger-opt-item"> 
+              <input type="text" class="form-control badger-opt-date-text" placeholder="Time of the raid"> 
+              <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+            </div>
+            <div class="badger-opt-item"><select id="poke-search" name="poke-search" class="form-control"><option></option></select></div>
+            <div class="badger-opt-item"><input type="checkbox" id="caught-switch" name="caught"></div>
+            <div class="modal-footer badger-opt-footer">
+              <div class="badger-opt-item badger-opt-btn-div"><button id="badger-opt-save" class="btn btn-primary btn-sm">Save</button></div>
+            </div>
+          </div>    
+        </div>
+      </div>
+    </div>
 
     <div class="modal fade" id="reportsPage" role="dialog">
     <div class="modal-dialog modal-xl" role="document">
@@ -161,7 +189,6 @@
       var currentProps = null;
       var reportTable = null;
       var raidBossData = null;
-      var advancedOptionsPage = null;
 
       function initPage() {
     	// Setup CSRF token
@@ -184,9 +211,9 @@
       		contentType: "application/json; charset=utf-8",
       		url: "/api/users/currentUser", 
       		success: function (data) {
-      	        $("#user").html(data.displayName);
-      	        $(".badger-unauthenticated").hide();
-      	        $(".badger-authenticated").show();
+      	        $('#user').html(data.displayName);
+      	        $('.badger-unauthenticated').hide();
+      	        $('.badger-authenticated').show();
       		},
       		complete: function (res) {
       	        // Get defaults
@@ -214,9 +241,9 @@
       
       function logout() {
     	  $.post("/logout", function() {
-    	      $("#user").html('');
-    	      $(".badger-unauthenticated").show();
-    	      $(".badger-authenticated").hide();
+    	      $('#user').html('');
+    	      $('.badger-unauthenticated').show();
+    	      $('.badger-authenticated').hide();
     	      location.reload();
     	  });
           return true;
@@ -252,7 +279,7 @@
               	errorPage("Failed to query area data", result);
               },
               complete: function (res) {
-                $("#filterButton").multiselect({
+                $('#filterButton').multiselect({
                   buttonClass: 'btn btn-primary',
                   buttonContainer: '<div id="badger-dropdown-list" class="btn-group" />',
                   enableClickableOptGroups: true,
@@ -541,6 +568,10 @@
                        });
                        registerRaidEvents();
                        queryGymDataAndUpdateInfoWindow(data);
+                   },
+                   afterClose: function() {
+                       // Forget any advanced options since gym info window is closing
+                       resetAdvancedOptions();
                    }
               }
           });
@@ -548,11 +579,8 @@
       }
 
       function registerRaidEvents() {
-        // remove old time pickers and popovers from the DOM
-        $('.datetimepicker').remove();
-        if (advancedOptionsPage!=null) {
-      		$('.popover').remove();
-      	}
+        // remove old popovers from the DOM
+        $('.popover').remove();
         
         // Enable date/time plugin for the raid dates
         $('time.badger-raid-time').timeago();
@@ -583,31 +611,12 @@
         $('#choose').click(function() {
       		$("#raidPopover1").popover("show");
         });
-      	
-      	advancedOptionsPage = $('#raidPopover2').popover({
-      	    trigger: "manual",
-            placement: 'bottom',
-            html: true,
-            title: 'Advanced Raid Options <a href="#" class="close" data-dismiss="alert">&times;</a>',
-            content: "<div id=\"badger-opt-date\" class=\"input-group date badger-opt-date\">" + 
-                  "<input type=\"text\" class=\"form-control badger-opt-date-text\" placeholder=\"Date of the raid\">" + 
-                  "<span class=\"input-group-addon\"><i class=\"fa fa-calendar\"></i></span>" +
-                "</div>" + 
-                "<div id=\"badger-opt-time\" class=\"input-group date badger-opt-item\">" + 
-                  "<input type=\"text\" class=\"form-control badger-opt-date-text\" placeholder=\"Time of the raid\">" + 
-                  "<span class=\"input-group-addon\"><i class=\"fa fa-clock-o\"></i></span>" +
-                "</div>" +
-                "<div class=\"badger-opt-item\"><select id=\"poke-search\" name=\"poke-search\" class=\"form-control\"><option></option></select></div>" +
-                "<div class=\"badger-opt-item\"><input type=\"checkbox\" id=\"caught-switch\" name=\"caught\"></div>" +
-                "<div class=\"badger-opt-item badger-opt-btn-div\"><button id=\"badger-opt-save\" class=\"btn btn-primary btn-sm\">Save</button></div>"
-        });
-        $('#raidPopover2').on('shown.bs.popover', function(){
-        	initAdvancedOptions();
-        });
-        $('#options').click(function() {
-      		$("#raidPopover2").popover("show");
-        });
         
+        $('#options').click(function() {
+            initAdvancedOptions();
+      		$("#advancedOptions").modal('show');
+        });
+
         $(document).on("click", ".popover .close" , function(){
         	$(this).parents(".popover").popover('hide');
         });
@@ -628,7 +637,7 @@
         	  if (!includeButton) {
         		  htmlContent = "<td data-order=\"" + data.lastRaid + "\">";
         	  }
-    		  htmlContent += "<div id=\"badger-info-raid" + data.id + "\" class=\"alert alert-success badger-last-raid" + containerClass +" collapsed\"" + 
+    		  htmlContent += "<div id=\"badger-info-raid" + data.id + "\" class=\"alert alert-success badger-raid-container badger-last-raid" + containerClass +" collapsed\"" + 
     		        "data-toggle=\"collapse\" href=\"#collapseDate" + data.id + "\" aria-expanded=\"false\" aria-controls=\"collapseDate" + data.id + "\">" +
     		          "<div class=\"badger-info-raid\">Last raided <time class=\"timeago badger-raid-time\" datetime=\"" + lastRaidDate.toISOString() + "\"></time>" +
     		          "<div id=\"collapseDate" + data.id + "\" class=\"collapse hide\" role=\"tabpanel\" aria-labelledby=\"badger-info-raid" + data.id + "\" data-parent=\"#badger-info\">" +
@@ -643,7 +652,7 @@
     		  if (!includeButton) {
         		  htmlContent = "<td data-order=\"0\">";
         	  }
-    	      htmlContent += "<div id=\"badger-info-raid\" class=\"alert alert-warning badger-no-raid" + containerClass +"\"><div>No raid recorded yet</div>" +
+    	      htmlContent += "<div id=\"badger-info-raid\" class=\"alert alert-warning badger-raid-container badger-no-raid" + containerClass +"\"><div>No raid recorded yet</div>" +
     	          getRaidButtonHtml(includeButton) + "</div>";
     	  }
     	  if (!includeButton) {
@@ -682,8 +691,8 @@
             success: function (data) {
               currentProps = data;
               // Update the UI by removing old raid time and adding new one
-              $("#badger-info-raid").remove();
-              $("#badger-area-container").after(getLastRaid(data));
+              $('.badger-raid-container').remove();
+              $('#badger-area-container').after(getLastRaid(data));
               registerRaidEvents();
             },
             error: function (result) {
@@ -1022,7 +1031,7 @@
       
       function initAdvancedOptions() {
     	// Fill in fields with currentProps
-      	$("#badger-opt-date").datetimepicker({
+      	$('#badger-opt-date').datetimepicker({
           	format: 'dd-mm-yyyy',
         		autoclose: true,
         		todayHighlight: true,
@@ -1030,7 +1039,7 @@
           }).on('changeDate', function(ev){
           	$('#badger-opt-time').datetimepicker('update', ev.date);
           });
-          $("#badger-opt-time").datetimepicker({
+          $('#badger-opt-time').datetimepicker({
           	format: 'dd-mm-yyyy hh:ii',
         		autoclose: true,
         		startView: 1
@@ -1041,7 +1050,7 @@
     		    $('#badger-opt-time').datetimepicker('update', lastRaidDate);
           }
 
-          $("#poke-search").select2({
+          $('#poke-search').select2({
     		  placeholder: "Pokemon",
     		  width: '100%',
     		  data: raidBossData
@@ -1050,7 +1059,7 @@
           if (currentProps.caught != null) {
         	  caught = currentProps.caught;
           }
-          $("#caught-switch").bootstrapSwitch({
+          $('#caught-switch').bootstrapSwitch({
           	state: caught,
           	onColor: 'success',
           	offColor: 'danger',
@@ -1058,7 +1067,7 @@
           	onText: 'Yes',
           	offText: 'No'
           });
-          $("#badger-opt-save").on('click', function (e) {
+          $('#badger-opt-save').on('click', function (e) {
           	var lastRaid = "";
           	var date = $("#badger-opt-date").data("datetimepicker").getDate();
           	var time = $('#badger-opt-time').data("datetimepicker").getDate();
@@ -1068,7 +1077,7 @@
           		lastRaid = date;
           	}
           	var pokemonId = parseInt($('#poke-search').val(), 10);
-          	var isCaught = $("#caught-switch").bootstrapSwitch('state');
+          	var isCaught = $('#caught-switch').bootstrapSwitch('state');
           	saveAdvanced(lastRaid, pokemonId, isCaught);
           });
           if (currentProps.pokemonId!=null) {
@@ -1090,16 +1099,28 @@
             success: function (data) {
               currentProps = data;
               // Update the UI by removing old raid time and adding new one
-              $("#badger-info-raid").remove();
-              $("#badger-area-container").after(getLastRaid(data));
+              $('.badger-raid-container').remove();
+              $('#badger-area-container').after(getLastRaid(data));
               registerRaidEvents();
             },
             error: function (result) {
               errorPage("Failed to update advanced options", result);
+            },
+            complete: function (res) {
+              $('#advancedOptions').modal('hide');
             }
     	  }); 	  
       }
  
+      function resetAdvancedOptions() {
+          $('#poke-search').val("");
+          $('#poke-search').trigger('change');
+          $('#badger-opt-date').datetimepicker('remove');
+          $('#badger-opt-time').datetimepicker('remove');
+          $('.badger-opt-date-text').val("");
+          $('#caught-switch').bootstrapSwitch('destroy');
+      }
+
     </script>
   </body>
 </html>
