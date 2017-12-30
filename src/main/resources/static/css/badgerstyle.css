@@ -506,7 +506,7 @@ body {
 	padding: 4px;
 	margin-top: 4px;
 	border-radius: .25rem;
-	max-height: 150px;
+	max-height: 124px;
     overflow: auto;
 }
 .badger-comment-user {
@@ -542,6 +542,7 @@ body {
     display: flex;
     justify-content: right;
     margin-top: 4px;
+    margin-bottom: 4px;
 }
 .badger-public-menu {
     font-size: 11px;
