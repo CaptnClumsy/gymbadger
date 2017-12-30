@@ -548,8 +548,8 @@
       		$('.popover').remove();
       	}
         
-        // Enable date/time plugin
-        $('time.timeago').timeago();
+        // Enable date/time plugin for the raid dates
+        $('time.badger-raid-time').timeago();
       	
       	// Setup the three raid button menu options
       	$('#now').click(function() {
@@ -622,10 +622,10 @@
         	  if (!includeButton) {
         		  htmlContent = "<td data-order=\"" + data.lastRaid + "\">";
         	  }
-    		  htmlContent += "<div id=\"badger-info-raid\" class=\"alert alert-success badger-last-raid" + containerClass +" collapsed\"" + 
+    		  htmlContent += "<div id=\"badger-info-raid" + data.id + "\" class=\"alert alert-success badger-last-raid" + containerClass +" collapsed\"" + 
     		        "data-toggle=\"collapse\" href=\"#collapseDate" + data.id + "\" aria-expanded=\"false\" aria-controls=\"collapseDate" + data.id + "\">" +
-    		          "<div>Last raided <time class=\"timeago\" datetime=\"" + lastRaidDate.toISOString() + "\"></time>" +
-    		          "<div id=\"collapseDate" + data.id + "\" class=\"collapse hide\" role=\"tabpanel\" aria-labelledby=\"badger-info-raid\" data-parent=\"#badger-info\">" +
+    		          "<div class=\"badger-info-raid\">Last raided <time class=\"timeago badger-raid-time\" datetime=\"" + lastRaidDate.toISOString() + "\"></time>" +
+    		          "<div id=\"collapseDate" + data.id + "\" class=\"collapse hide\" role=\"tabpanel\" aria-labelledby=\"badger-info-raid" + data.id + "\" data-parent=\"#badger-info\">" +
         		        "<div class=\"badger-time-badge-container\"><span class=\"badge badge-success badger-time-badge\">" +
         		          lastRaidDate.toLocaleString() +
         		          "</span></div>" + getRaidPokemonHtml(data) +
@@ -945,10 +945,6 @@
       
       function showReports() {
     	  closeAnyInfoWindows();
-    	  if (reportTable != null) {
-    	      $("#reportsTable").DataTable().destroy();
-    	  }
-    	  $("#reportsTableBody").html("");
     	  for (var i = 0; i < gymData.length; i++) {
     	      for (var j = 0; j < selectedAreaIds.length; j++) {
 	    	      if (gymData[i].area.id === selectedAreaIds[j]) {
@@ -968,7 +964,7 @@
 	    	      }
 	    	  }
 	      }
-    	  $("time.timeago").timeago();
+    	  $("time.badger-raid-time").timeago();
     	  reportTable = $("#reportsTable").DataTable({
     	    "autoWidth": true,
     		"scrollY": 300,
@@ -991,6 +987,11 @@
     	  $('#badger-rep-total-percent').html('');
     	  var el = document.getElementById('badger-rep-total-percent');
     	  drawPercentage(el, 62, 8, data.amount, data.total, '#a9a9a9', '#87cefa', false, true);
+
+          $('#reportsPage').on('hidden.bs.modal', function() {
+    	      $("#reportsTable").DataTable().destroy();
+    	      $("#reportsTableBody").html("");
+          });
 
     	  // Show the window
     	  $('#reportsPage').on('shown.bs.modal', function () {

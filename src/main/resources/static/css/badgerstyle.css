@@ -155,11 +155,11 @@ body {
     display: flex;
     justify-content: space-between;
 }
-.badger-last-raid.collapsed::before {
+.badger-last-raid.collapsed .badger-info-raid::before {
 	content: "\f0da\a0";
 	font-family: FontAwesome;
 }
-.badger-last-raid:not(.collapsed)::before {
+.badger-last-raid:not(.collapsed) .badger-info-raid::before {
 	content: "\f0d7\a0";
 	font-family: FontAwesome;
 }
