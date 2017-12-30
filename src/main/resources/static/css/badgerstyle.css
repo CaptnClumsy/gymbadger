@@ -154,6 +154,7 @@ body {
     padding-right: 7px;
     display: flex;
     justify-content: space-between;
+    cursor: pointer; 
 }
 .badger-last-raid.collapsed .badger-info-raid::before {
 	content: "\f0da\a0";
