@@ -10,8 +10,12 @@
   font-style: normal;
   font-display: block;
 }
-html, body {
+body {
     overflow: hidden;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
 }
 .badger-container {
     width: 100%;
@@ -40,6 +44,7 @@ html, body {
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
     color: white;
     z-index: 3;
+    overflow-y: visible;
 }
 .badger-navbar-title {
     font-size: 24px;
@@ -588,20 +593,18 @@ html, body {
     font-size: 11px;
     color: grey;
 }
-.modal {
+#advancedOptions {
   text-align: center;
   padding: 0!important;
 }
-
-.modal:before {
+#advancedOptions:before {
   content: '';
   display: inline-block;
   height: 100%;
   vertical-align: middle;
   margin-right: -4px;
 }
-
-.modal-dialog {
+#advancedOptionsDialog {
   display: inline-block;
   text-align: left;
   vertical-align: middle;
