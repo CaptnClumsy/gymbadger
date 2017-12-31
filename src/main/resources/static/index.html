@@ -759,7 +759,7 @@
             type: "PUT",
             contentType: "application/json; charset=utf-8",
             url: "api/gyms/"+props.id,
-            data: JSON.stringify(props, ["id", "name", "lat", "lng", "status", "park"]),
+            data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid", "pokemonId", "caught"]),
             success: function (data) {
               marker.setIcon(customIcon(props.status));
               $("#infoBadge").removeClass(getBadgeClass(oldStatus));
