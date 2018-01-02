@@ -256,10 +256,11 @@
               contentType: "application/json; charset=utf-8",
               url: "api/areas/",
               success: function (data) {
-            	  selectedAreaIds.length=0;
+            	  var anyLoaded = loadAreaSelection();
             	  $('#filterButton').append($('<option>', {
         			  value: PARKS_ONLY_OPTION,
-        			  text: 'Parks Only'
+        			  text: 'Parks Only',
+        			  selected: parksOnly
         		  }));
             	  $('#filterButton').append($('<optgroup>', {
             		  id: 'area-group',
@@ -268,11 +269,21 @@
         		  }));
             	  
             	  for (var i = 0; i < data.length; i++) {
+            		  var areaSelected = true;
+            		  if (anyLoaded) {
+            		      areaSelected = false;
+            		      for (var j = 0; j < selectedAreaIds.length; j++) {
+            			      if (selectedAreaIds[j]==data[i].id) {
+            				      areaSelected = true;
+            				      break;
+            			      }
+            		      }
+            		  }
             		  $('#area-group').append($('<option>', {
             			  value: data[i].id,
-            			  text: data[i].name
+            			  text: data[i].name,
+            			  selected: areaSelected
             		  }));
-            		  selectedAreaIds.push(data[i].id);
             	  }
               },
               error: function (result) {
@@ -304,33 +315,34 @@
                 	  onChangeArea(option, checked);
                   }
                 });
-                selectAllAreas();
           	    $("#filterButton").multiselect('updateButtonText');
-          	    resetPercentage();
-        	    initSearch();  
+          	    initSearch();  
               }
       	});
       }
       
-      function selectAllAreas() {
-    	  // Make sure all areas are selected and all gyms available for search
-    	  selectedAreaIds.length=0;
-    	  var areas = $('#filterButton option');
-          $(areas).each(function(index, area){
-        	  var id = parseInt(area.value,10);
-        	  if (id !== PARKS_ONLY_OPTION) {
-                  selectedAreaIds.push(parseInt(area.value,10));
-        	  }
-          });
+      // Make sure gyms in all selected areas are visible and available for search
+      function updateVisibleGyms() {  
           resetSearch();
-          resetPercentage();
-      
-          // Ensure every single gym marker is shown
+          resetPercentage(); 
+          // Ensure every gym marker in the selected areas is shown
     	  for (var i = 0; i < gymData.length; i++) {
-    		  gymData[i].marker.setVisible(true);
-    	  }
-    	  $("#filterButton").val(selectedAreaIds);
-    	  $("#filterButton").multiselect("refresh");
+    		  var found = false;
+			  for (var j = 0; j < selectedAreaIds.length; j++) {
+    			  if (gymData[i].area.id === selectedAreaIds[j]) {
+    				  found = true;
+    				  if (parksOnly && gymData[i].park===false) {
+    					  gymData[i].marker.setVisible(false);
+    				  } else {
+    					  gymData[i].marker.setVisible(true);
+    				  }
+    			  }
+			  }
+			  // Gyms outside the selected areas are hidden
+			  if (!found) {
+				  gymData[i].marker.setVisible(false);
+			  }
+		  }
       }
 
       function onChangeParkOption(checked) {
@@ -339,20 +351,8 @@
 		  } else {
 			  parksOnly=false;
 		  }
-		  // For all the gyms in the selected areas filter them by park
-		  for (var i = 0; i < gymData.length; i++) {
-			  for (var j = 0; j < selectedAreaIds.length; j++) {
-    			  if (gymData[i].area.id === selectedAreaIds[j]) {
-    				  if (parksOnly && gymData[i].park===false) {
-    					  gymData[i].marker.setVisible(false);
-    				  } else {
-    					  gymData[i].marker.setVisible(true);
-    				  }
-    			  }
-			  }
-		  }
-		  resetSearch();
-          resetPercentage();
+    	  storeAreaSelection();
+    	  updateVisibleGyms();
       }
 
       function onChangeArea(option, checked) {
@@ -362,26 +362,8 @@
           $(areas).each(function(index, area){
               selectedAreaIds.push(parseInt(area.value,10));
           });
-          resetSearch();
-          resetPercentage();
-          
-    	  // Find all the gyms in the areas and either show or hide them
-          for (var i = 0; i < gymData.length; i++) {
-        	  for (var j = 0; j < option.length; j++) {
-        		  var id = parseInt($(option[j]).val(),10);
-        	      if (id===gymData[i].area.id) {
-        	          if (checked) {
-        	    	      if (parksOnly && gymData[i].park===false) {
-        	    		      gymData[i].marker.setVisible(false);
-        	    	      } else {
-        	                  gymData[i].marker.setVisible(true);
-        	    	      }
-        		      } else {
-        		          gymData[i].marker.setVisible(false);
-        		      }
-        	      }
-              }
-          }
+          storeAreaSelection();
+          updateVisibleGyms();
       }
 
       function initMarkers() {
@@ -738,6 +720,7 @@
     	      google.maps.event.trigger(e.params.data.marker, 'click');
           });
     	  initRaidBosses();
+    	  updateVisibleGyms();
       }
 
       function resetSearch() {
@@ -1119,6 +1102,33 @@
           $('#badger-opt-time').datetimepicker('remove');
           $('.badger-opt-date-text').val("");
           $('#caught-switch').bootstrapSwitch('destroy');
+      }
+
+      // Load previously selected areas from local storage
+      function loadAreaSelection() {
+    	  var anyLoaded = false;
+    	  selectedAreaIds.length=0;
+    	  if (typeof(Storage) !== "undefined") {
+    		  var selectedAreaJson = localStorage.getItem("selectedAreaIds");
+    		  if (selectedAreaJson !== null) {
+    	          selectedAreaIds = JSON.parse(localStorage.getItem("selectedAreaIds"));
+    	          anyLoaded = true;
+    		  }
+    		  var parksOnlyStorage = localStorage.getItem("parksOnly");
+    		  if (parksOnlyStorage !== null) {
+    			  parksOnly = (parksOnlyStorage == 'true');
+    			  anyLoaded = true;
+    		  }
+    	  }
+          return anyLoaded;
+      }
+      
+      // Store currently selected areas into local storage
+      function storeAreaSelection() {
+    	  if (typeof(Storage) !== "undefined") {
+    	      localStorage.setItem("selectedAreaIds", JSON.stringify(selectedAreaIds));
+    	      localStorage.setItem("parksOnly", parksOnly);
+    	  }
       }
 
     </script>
