@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.clumsy.gymbadger.data.GymSummaryDao;
+import com.clumsy.gymbadger.entities.AreaEntity;
 import com.clumsy.gymbadger.entities.GymBadgeStatus;
 import com.clumsy.gymbadger.entities.GymEntity;
 import com.clumsy.gymbadger.entities.GymPropsEntity;
 import com.clumsy.gymbadger.entities.UserEntity;
+import com.clumsy.gymbadger.repos.AreaRepo;
 import com.clumsy.gymbadger.repos.GymPropsRepo;
 import com.clumsy.gymbadger.repos.GymRepo;
 import com.google.common.collect.Lists;
@@ -24,16 +26,18 @@ public class GymService {
 
 	private final GymRepo gymRepo;
 	private final GymPropsRepo gymPropsRepo;
+	private final AreaRepo areaRepo;
 	
 	@Autowired
-	GymService(final GymRepo gymRepo, final GymPropsRepo gymPropsRepo) {
+	GymService(final GymRepo gymRepo, final GymPropsRepo gymPropsRepo, final AreaRepo areaRepo) {
 		this.gymRepo = gymRepo;
 		this.gymPropsRepo = gymPropsRepo;
+		this.areaRepo = areaRepo;
 	}
 	
 	@Transactional(readOnly = true)
 	public List<GymEntity> getAllGyms(final Long userId) throws GymNotFoundException {
-		final List<GymEntity> gyms = gymRepo.findAll();
+		final List<GymEntity> gyms = gymRepo.findAllNotDeleted();
 		if (gyms == null) {
 			throw new GymNotFoundException("Unable to query gym list");
 		}
@@ -152,6 +156,38 @@ public class GymService {
 		dao.setPokemonId(props.getPokemonId());
 		dao.setCaught(props.getCaught());
 		return dao;
+	}
+
+	@Transactional
+	public GymSummaryDao newGym(final UserEntity user, final String name, final Double lat, final Double lng,
+			final Long areaId, final Boolean park) throws AccessControlException, AreaNotFoundException {
+		if (!user.getAdmin()) {
+			throw new AccessControlException("Only admin users can create new gyms");
+		}
+		final AreaEntity area = areaRepo.findOne(areaId);
+		if (area == null) {
+			throw new AreaNotFoundException("Specified area does not exist");
+		}
+		final GymEntity newGym = new GymEntity();
+		newGym.setName(name);
+		newGym.setLatitude(lat);
+		newGym.setLongitude(lng);
+		newGym.setArea(area);
+		newGym.setPark(park);
+		final GymEntity savedGym = gymRepo.save(newGym);
+		return GymSummaryDao.fromGymEntity(savedGym);
+	}
+	
+	@Transactional
+	public void deleteGym(final UserEntity user, final Long gymId) throws AccessControlException, GymNotFoundException {
+		if (!user.getAdmin()) {
+			throw new AccessControlException("Only admin users can delete gyms");
+		}
+		final GymEntity gym = gymRepo.findOne(gymId);
+		if (gym == null) {
+			throw new GymNotFoundException("Specified gym does not exist");
+		}
+		gymRepo.delete(gym);
 	}
 	
 }

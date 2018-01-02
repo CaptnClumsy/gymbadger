@@ -14,4 +14,5 @@
     <include file="db/changelogs/extra-user-gym-props-18122017.xml"/>
     <include file="db/changelogs/comments-table-27122017.xml"/>
     <include file="db/changelogs/pokemon-update-29122017.xml"/>
+    <include file="db/changelogs/gym-data-updates-02012018.xml"/>
 </databaseChangeLog>

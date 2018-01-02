@@ -36,4 +36,7 @@ public class GymEntity {
 	@JoinColumn(name = "areaid")
 	@ManyToOne
 	private AreaEntity area;
+	
+	@Column(name = "deleted")
+	private Boolean deleted;
 }

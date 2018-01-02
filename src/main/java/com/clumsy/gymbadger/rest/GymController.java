@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.clumsy.gymbadger.data.GymSummaryDao;
 import com.clumsy.gymbadger.entities.UserEntity;
+import com.clumsy.gymbadger.services.AccessControlException;
+import com.clumsy.gymbadger.services.AreaNotFoundException;
 import com.clumsy.gymbadger.services.GymNotFoundException;
 import com.clumsy.gymbadger.services.GymService;
 import com.clumsy.gymbadger.services.UserNotFoundException;
@@ -45,6 +47,24 @@ public class GymController {
 		}
     }
     
+    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
+    public GymSummaryDao addGym(@RequestBody GymSummaryDao newGym, Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			final UserEntity user = userService.getCurrentUser(principal);
+			return gymService.newGym(user, newGym.getName(), newGym.getLat(), newGym.getLng(), newGym.getArea().getId(), newGym.getPark());
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (AccessControlException e) {
+			throw new ForbiddenException(e);
+		} catch (AreaNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		}
+    }
+
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     public GymSummaryDao updateGym(@PathVariable("id") Long gymId, @RequestBody GymSummaryDao newGym, Principal principal) {
