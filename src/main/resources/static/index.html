@@ -189,6 +189,7 @@
       var currentProps = null;
       var reportTable = null;
       var raidBossData = null;
+      var isDarkColourScheme = false;
 
       function initPage() {
     	// Setup CSRF token
@@ -205,6 +206,11 @@
     		  }
     		}
         });
+    	// Get the desired colour scheme
+    	var colourSchemeStr = new URLSearchParams(window.location.search).get("dark");
+    	if (colourSchemeStr !== null) {
+    		isDarkColourScheme = true;
+    	}
     	// Try to get logged in user details
       	$.ajax({
       		type: "GET",
@@ -323,11 +329,8 @@
       	});
       }
       
-      // Make sure gyms in all selected areas are visible and available for search
-      function updateVisibleGyms() {  
-          resetSearch();
-          resetPercentage(); 
-          // Ensure every gym marker in the selected areas is shown
+      // Make sure gyms in all selected areas are visible
+      function updateVisibleGyms() {   
     	  for (var i = 0; i < gymData.length; i++) {
     		  var found = false;
 			  for (var j = 0; j < selectedAreaIds.length; j++) {
@@ -354,6 +357,8 @@
 			  parksOnly=false;
 		  }
     	  storeAreaSelection();
+    	  resetSearch();
+          resetPercentage();
     	  updateVisibleGyms();
       }
 
@@ -365,6 +370,8 @@
               selectedAreaIds.push(parseInt(area.value,10));
           });
           storeAreaSelection();
+          resetSearch();
+          resetPercentage();
           updateVisibleGyms();
       }
 
@@ -388,6 +395,7 @@
                       // Add a callback to create an info window for each marker if clicked
                       (function (marker, i) {
                         google.maps.event.addListener(marker, 'click', function () {
+                        	history.replaceState({}, "GymBadger", "/?gymid="+gymData[i].id);
                             createInfoWindow(gymData[i], marker);
                         });
                       })(marker, i);
@@ -722,7 +730,37 @@
     	      google.maps.event.trigger(e.params.data.marker, 'click');
           });
     	  initRaidBosses();
+      	  showGymFromUrl();
+          resetPercentage();
     	  updateVisibleGyms();
+      }
+
+      // Show any gym specified in the URL
+      function showGymFromUrl() {
+          var gymIdStr = new URLSearchParams(window.location.search).get("gymid");
+      	  if (gymIdStr !== null) {
+      	      var urlGymId = parseInt(gymIdStr, 10);
+      	      for (var i = 0; i < gymData.length; i++) {
+      	    	  if (gymData[i].id == urlGymId) {
+      	    		  var found = false;
+      	    		  for (var j = 0; j < selectedAreaIds.length; j++) {
+      	    			  if (selectedAreaIds[j]==gymData[i].area.id) {
+      	    				  found=true;
+      	    				  break;
+      	    			  }
+      	    		  }
+      	    		  if (!found) {
+      	    			  selectedAreaIds.push(gymData[i].area.id);
+      	    		  }
+      	    		  map.setCenter({ lat: gymData[i].lat, lng: gymData[i].lng});
+      	    		  gymData[i].marker.setVisible(true);
+  	                  google.maps.event.trigger(gymData[i].marker, 'click');
+  	                  break;
+      	    	  }
+      	      }
+      	      $("#filterButton").val(selectedAreaIds);
+      	      $("#filterButton").multiselect("refresh");
+      	  }
       }
 
       function resetSearch() {
@@ -800,7 +838,11 @@
     		  return '#ffb366';
     	  }
     	  if (status==="SILVER") {
-    		  return '#e0e0d1';
+    		  if (isDarkColourScheme) {
+    		      return '#c0c0c0';
+    	      } else {
+    	    	  return '#e0e0d1';
+    	      } 
     	  }
     	  if (status==="GOLD") {
     		  return '#ffff00';
