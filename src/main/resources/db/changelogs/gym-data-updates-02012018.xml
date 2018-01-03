@@ -21,12 +21,5 @@
 	        <column name="areaid" valueComputed="(SELECT id FROM areas WHERE name = 'Park Street')"/>
 	    </insert>
 	</changeSet>
-	
-	<changeSet id="02012018T2100" author="captnclumsy">
-	    <update tableName="gyms">
-	        <column name="deleted" value="true"/>
-	        <where>name = 'River Ver Fishing Bench'</where>
-	    </update>
-	</changeSet>
 
 </databaseChangeLog>
