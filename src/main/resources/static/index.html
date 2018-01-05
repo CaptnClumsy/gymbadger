@@ -189,7 +189,6 @@
       var currentProps = null;
       var reportTable = null;
       var raidBossData = null;
-      var isDarkColourScheme = false;
 
       function initPage() {
     	// Setup CSRF token
@@ -206,11 +205,6 @@
     		  }
     		}
         });
-    	// Get the desired colour scheme
-    	var colourSchemeStr = new URLSearchParams(window.location.search).get("dark");
-    	if (colourSchemeStr !== null) {
-    		isDarkColourScheme = true;
-    	}
     	// Try to get logged in user details
       	$.ajax({
       		type: "GET",
@@ -835,17 +829,13 @@
     		  return '#b3ffb3';
     	  }
     	  if (status==="BRONZE") {
-    		  return '#ffb366';
+    		  return '#e66b00';
     	  }
     	  if (status==="SILVER") {
-    		  if (isDarkColourScheme) {
-    		      return '#c0c0c0';
-    	      } else {
-    	    	  return '#e0e0d1';
-    	      } 
+    		  return '#f5f5f0';
     	  }
     	  if (status==="GOLD") {
-    		  return '#ffff00';
+    		  return '#ffd700';
     	  }
     	  return '#b3daff';
       }
