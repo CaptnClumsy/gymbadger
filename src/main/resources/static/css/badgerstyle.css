@@ -366,6 +366,12 @@ body {
 .icon-arrow-right::after {
 	content: ">";
 }
+.glyphicon-arrow-left::after {
+	content: "<";
+}
+.glyphicon-arrow-right::after {
+	content: ">";
+}
 .badger-comments {
 	width: 100%;
 	height: 100%;
