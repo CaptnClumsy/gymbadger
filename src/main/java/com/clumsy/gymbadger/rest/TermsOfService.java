@@ -9,4 +9,8 @@ public class TermsOfService {
 	public String handler() {
 	    return "terms.html";
 	}
+	@RequestMapping("/Kyogre")
+	public String kyogre() {
+	    return "kyogre.html";
+	}
 }

@@ -665,7 +665,7 @@ body {
     background-color: #e6f2ff;
 }
 .badger-kyogre-container {
-	background-image: url('../images/kyogre.jpg');
+	background-image: url('../images/Kyogre.jpg');
     width: 100%;
 	min-width: 100%;
 	min-height: 100%;
@@ -680,4 +680,5 @@ body {
 	position: fixed;
 	z-index: -1;
 	background-repeat: no-repeat;
+	background-size: contain;
 }
