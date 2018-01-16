@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -11,16 +12,23 @@ import com.clumsy.gymbadger.data.GymSummaryDao;
 import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.services.AccessControlException;
 import com.clumsy.gymbadger.services.AreaNotFoundException;
+import com.clumsy.gymbadger.services.ExportException;
+import com.clumsy.gymbadger.services.ExportService;
 import com.clumsy.gymbadger.services.GymNotFoundException;
 import com.clumsy.gymbadger.services.GymService;
 import com.clumsy.gymbadger.services.UserNotFoundException;
 import com.clumsy.gymbadger.services.UserService;
 
 import java.security.Principal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
  
 @RestController
@@ -33,12 +41,15 @@ public class GymController {
 	@Autowired
 	private GymService gymService;
 
+	@Autowired
+	private ExportService exportService;
+
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public List<GymSummaryDao> getGyms(Principal principal) {
 		try {
 			final UserEntity user = userService.getCurrentUser(principal);
-			final List<GymSummaryDao> gyms = gymService.getGymSummaries(user.getId());
+			final List<GymSummaryDao> gyms = gymService.getAllGymSummaries(user.getId());
 			return gyms;
 		} catch (GymNotFoundException e) {
 			throw new ObjectNotFoundException(e);
@@ -79,6 +90,34 @@ public class GymController {
 			throw new ObjectNotFoundException(e);
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException(e);
+		}
+    }
+    
+    @RequestMapping(value = "/export", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<ByteArrayResource> exportGyms(@RequestParam(value = "gyms", required = false) List<Long> gyms,
+    		@RequestParam(value = "areas", required = false) List<Long> areas,
+    		@RequestParam(value = "sort", required = false) String sort, 
+    		Principal principal) {
+    	try {
+    		// Get the CSV file content as a byte array
+			final UserEntity user = userService.getCurrentUser(principal);
+			// Export all gyms in the selected areas or specifically listed gyms
+			final byte[] content = exportService.exportToCsv(user, gyms, areas, sort);
+			// Get current date/time for the output filename
+			String timeStamp = new SimpleDateFormat("yyyyMMdd-HHmmss").format(Calendar.getInstance().getTime());
+			// Setup the response headers
+			HttpHeaders responseHeaders = new HttpHeaders();
+	        responseHeaders.add("content-disposition", "attachment; filename=" + "export-" + timeStamp + ".csv");
+	        responseHeaders.add("Content-Type","text/csv");
+	        // Return the data
+			return new ResponseEntity<ByteArrayResource>(new ByteArrayResource(content), responseHeaders, HttpStatus.OK);
+		} catch (GymNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (ExportException e) {
+			throw new ExportFailedException(e);
 		}
     }
 }

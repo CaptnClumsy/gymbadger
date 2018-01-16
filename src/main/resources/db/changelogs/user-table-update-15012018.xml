@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd"
+                   logicalFilePath="BOOT-INF/classes/db/changelogs/user-table-update-15012018.xml">
+                   
+    <changeSet id="15012018T2145" author="captnclumsy">
+        <addColumn tableName="users">
+            <column name="sharedata" type="BOOLEAN" defaultValue="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+   <changeSet id="15012018T2150" author="captnclumsy">
+	    <sql splitStatements="true">
+	    insert into pokemon (id, name, raidboss) SELECT nextval('hibernate_sequence'), 'Kyogre', true WHERE NOT EXISTS (SELECT 'X' FROM pokemon WHERE name='Kyogre');
+	    </sql>
+	</changeSet>
+	
+</databaseChangeLog>

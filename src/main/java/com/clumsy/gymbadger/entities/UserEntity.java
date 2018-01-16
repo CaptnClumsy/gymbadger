@@ -27,4 +27,8 @@ public class UserEntity {
 
 	@Column(name = "admin")
 	private Boolean admin;
+	
+	@Column(name = "sharedata")
+	private Boolean shareData;
+
 }

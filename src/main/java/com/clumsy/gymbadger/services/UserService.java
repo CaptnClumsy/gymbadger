@@ -2,6 +2,7 @@ package com.clumsy.gymbadger.services;
 
 import java.security.Principal;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -9,6 +10,10 @@ import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.clumsy.gymbadger.data.LeaderDao;
+import com.clumsy.gymbadger.data.LeadersDao;
+import com.clumsy.gymbadger.data.UserDao;
+import com.clumsy.gymbadger.entities.LeaderEntity;
 import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.repos.UserRepo;
 
@@ -57,5 +62,28 @@ public class UserService {
 			return savedUser;
 		}
 		return user;
+	}
+
+	@Transactional(readOnly = true)
+	public LeadersDao getLeaderboard(final UserEntity user) {
+		List<LeaderEntity> leaderEntities = userRepo.findLeaders();
+		LeadersDao leaders = new LeadersDao();
+		leaders.setShare(user.getShareData());
+		int rank = 1;
+		for (LeaderEntity leaderEntity : leaderEntities) {
+			LeaderDao leader = new LeaderDao(rank++, leaderEntity.getdisplayName(), leaderEntity.getBadges());
+			leaders.add(leader);
+		}
+		return leaders;
+	}
+
+	@Transactional
+	public UserDao setLeaderboard(UserEntity user, Boolean share) {
+		if (user.getShareData()==share) {
+			return new UserDao(user.getId(), user.getName(), user.getDisplayName());
+		}
+		user.setShareData(share);
+		UserEntity savedUser = userRepo.save(user);
+		return new UserDao(savedUser.getId(), savedUser.getName(), savedUser.getDisplayName());
 	}
 }

@@ -40,18 +40,22 @@
             <select id="search" name="search" class="form-control"><option></option></select>
           </li>
           <li class="nav-item nav-link">
-            <div class="badger-unauthenticated">
+            <div class="badger-button-bar">
+            <span><button id="navReportButton" class="btn btn-primary badger-btn-item"><i class="fa fa-th-list"></i></button></span>
+            <span><button id="navLeaderButton" class="btn btn-primary badger-btn-item"><i class="fa fa-trophy"></i></button></span>
+            <span><div class="badger-unauthenticated">
               <a href="/login" class="btn btn-primary badger-login-button"><i class="fa fa-facebook badger-login-icon"></i>Sign In</a>
-            </div>
-            <div class="badger-authenticated btn-group" style="display: none;">
+            </div></span>
+            <span><div class="badger-authenticated btn-group" style="display: none;">
                 <button class="dropdown-toggle btn btn-primary badger-user-button" type="button" id="userMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="badger-user-container"><span id="user"></span></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-right badger-user-menu" aria-labelledby="userMenuButton">
                     <li><a id="reports" class="dropdown-item badger-user-item" onclick="return showReports();">Reports</a></li>
+                    <li><a id="leaderBoard" class="dropdown-item badger-user-item" onclick="return showLeaderboard();">Leaderboard</a></li>
                     <li><a id="logout" class="dropdown-item badger-user-item" onclick="return logout();">Logout</a></li>
                 </ul>
-            </div>
+            </div></span>
           </li>
         </ul>
       </div>
@@ -141,6 +145,7 @@
             <table id="reportsTable" class="table table-striped table-bordered badger-report-table scrollable" style="width: 100%;">
             <thead>
               <tr>
+                <th style="display:none;">Id</th>
                 <th>Gym</th>
                 <th>Badge</th>
                 <th>Area</th>
@@ -155,13 +160,47 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button id="exportReports" type="button" class="btn btn-info">Export</button>
+          <a id="exportButton" href="/api/gyms/export" class="btn btn-info">Export</a>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>
     </div>
     
+    <div class="modal fade" id="leadersPage" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Leaderboard</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body badger-leaders-page-body">
+          <div class="alert alert-info badger-share-area" role="alert">
+              <span class="badger-share-switch"><input type="checkbox" id="share-switch" name="share"></span>
+              <span class="badger-share-note"><b>Note:</b> If you choose to join the leaderboard your total number of gold badges will be displayed to other trainers.</span>
+          </div>
+          <div class="badger-lead-table-container">
+            <table id="leadersTable" class="table badger-lead-table scrollable" style="width: 100%;">
+              <thead style="display:none;">
+                <tr>
+                  <th>Rank</th>
+                  <th>Name</th>
+                  <th>Badges</th>
+                </tr>
+              </thead>
+              <tbody id="leadersTableBody" class="badger-lead-table-body"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+    </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
@@ -189,6 +228,7 @@
       var currentProps = null;
       var reportTable = null;
       var raidBossData = null;
+      var leadersTable = null;
 
       function initPage() {
     	// Setup CSRF token
@@ -317,7 +357,7 @@
                 	  onChangeArea(option, checked);
                   }
                 });
-          	    $("#filterButton").multiselect('updateButtonText');
+          	    $('#filterButton').multiselect('updateButtonText');
           	    initSearch();  
               }
       	});
@@ -595,12 +635,12 @@
       	    });
         });
         $('#choose').click(function() {
-      		$("#raidPopover1").popover("show");
+      		$('#raidPopover1').popover("show");
         });
         
         $('#options').click(function() {
             initAdvancedOptions();
-      		$("#advancedOptions").modal('show');
+      		$('#advancedOptions').modal('show');
         });
 
         $(document).on("click", ".popover .close" , function(){
@@ -714,15 +754,17 @@
       }
 
       function initSearch() {
-    	  $("#search").select2({
+    	  $('#search').select2({
     		  placeholder: "Search",
     		  width: '100%',
     		  data: getSearchData()
     	  });
-    	  $("#search").on("select2:select", function(e) {
+    	  $('#search').on("select2:select", function(e) {
     	      map.setCenter({ lat: e.params.data.lat, lng: e.params.data.lng});
     	      google.maps.event.trigger(e.params.data.marker, 'click');
           });
+    	  $('#navReportButton').on("click", showReports);
+    	  $('#navLeaderButton').on("click", showLeaderboard);
     	  initRaidBosses();
       	  showGymFromUrl();
           resetPercentage();
@@ -752,16 +794,16 @@
   	                  break;
       	    	  }
       	      }
-      	      $("#filterButton").val(selectedAreaIds);
-      	      $("#filterButton").multiselect("refresh");
+      	      $('#filterButton').val(selectedAreaIds);
+      	      $('#filterButton').multiselect("refresh");
       	  }
       }
 
       function resetSearch() {
     	  closeAnyInfoWindows();
-    	  $("#search option").remove(); 
-    	  $("#search").html("<option></option>");
-    	  $("#search").select2({
+    	  $('#search option').remove(); 
+    	  $('#search').html("<option></option>");
+    	  $('#search').select2({
     		  placeholder: "Search",
     		  width: '100%',
     		  data: getSearchData()
@@ -779,8 +821,8 @@
             data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid", "pokemonId", "caught"]),
             success: function (data) {
               marker.setIcon(customIcon(props.status));
-              $("#infoBadge").removeClass(getBadgeClass(oldStatus));
-              $("#infoBadge").addClass(getBadgeClass(props.status));
+              $('#infoBadge').removeClass(getBadgeClass(oldStatus));
+              $('#infoBadge').addClass(getBadgeClass(props.status));
               resetPercentage();
             },
             error: function (result) {
@@ -968,20 +1010,23 @@
       }
       
       function errorPage(title, results) {
-    	  $("#errorPageTitle").text(title);
+    	  $('#errorPageTitle').text(title);
     	  if (results.responseJSON !== undefined) {
-    	      $("#errorPageBody").text(results.responseJSON.message);
+    	      $('#errorPageBody').text(results.responseJSON.message);
     	  }
     	  $('#errorPage').modal('show');
       }
       
       function showReports() {
     	  closeAnyInfoWindows();
+    	  var gymsInTable = [];
+    	  var areaSet = new Set();
     	  for (var i = 0; i < gymData.length; i++) {
     	      for (var j = 0; j < selectedAreaIds.length; j++) {
 	    	      if (gymData[i].area.id === selectedAreaIds[j]) {
 	    		      if (!parksOnly || gymData[i].park===true) {
-	    		          $("#reportsTableBody").append("<tr>" +
+	    		          $('#reportsTableBody').append("<tr>" +
+	    		        	  "<td style=\"display:none;\">" + gymData[i].id + "</td>" +
 	    	                  "<td>" + gymData[i].name + "</td>" +
 	    	                  "<td data-order=\"" + getBadgeOrder(gymData[i].status) + "\">" + 
 	    	                      "<div id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(gymData[i].status) + "\"></div>" +
@@ -992,17 +1037,58 @@
 	        		              getParkStatus(gymData[i].park) + "</div></td>" + 
 	        		              getLastRaidForReport(gymData[i]) +
 	    	              "</tr>");
+	    		          gymsInTable.push(gymData[i].id);
+	    		          areaSet.add(selectedAreaIds[j]);
 	    	          }
 	    	      }
 	    	  }
 	      }
-    	  $("time.badger-raid-time").timeago();
-    	  reportTable = $("#reportsTable").DataTable({
+
+    	  $('time.badger-raid-time').timeago();
+    	  
+    	  reportTable = $('#reportsTable').DataTable({
     	    "autoWidth": true,
     		"scrollY": 300,
     	    "scrollX": true,
-    	    "columns": [ {"searchable": true}, {"searchable": false}, {"searchable": false}, {"searchable": false}, {"searchable": false} ]
+    	    "columns": [ {"searchable": false}, {"searchable": true}, {"searchable": false}, {"searchable": false}, {"searchable": false}, {"searchable": false} ]
     	  });
+    	  
+    	  reportTable.on( 'search.dt', function () {
+    		  var query = reportTable.search();
+    		  if (query == "") {
+    			  // no query so use gyms from all areas
+        	      var areaIds="";
+        	      for (let item of areaSet.values()) {
+        		      if (areaIds != "") {
+        			      areaIds+=",";
+        		      }
+        		      areaIds+=item;
+        	      }
+        	      $('#exportButton').prop('href',"/api/gyms/export?areas="+areaIds);
+    		  } else {
+    			  var gymIds = "";
+    			  reportTable.rows({search: 'applied'}).data().each(function(value, index) {
+    			  	  console.log(value[0], index);
+    			  	  if (gymIds != "") {
+      			          gymIds+=",";
+      		          }
+      		          gymIds+=value[0];
+    			  });
+    			  $('#exportButton').prop('href',"/api/gyms/export?gyms="+gymIds);
+    		  }
+        	  
+    	  } );
+    	  
+    	  // search will not be filled in yet so all gyms for all areas are shown
+    	  var areaIds="";
+    	  for (let item of areaSet.values()) {
+    		  if (areaIds != "") {
+    			  areaIds+=",";
+    		  }
+    		  areaIds+=item;
+    	  }
+    	  $('#exportButton').prop('href',"/api/gyms/export?areas="+areaIds);
+    	  
     	  // Show the percentage reports
     	  var data = getPercentVisited();
     	  $('#badger-rep-visited-percent').html('');
@@ -1021,15 +1107,15 @@
     	  drawPercentage(el, 62, 8, data.amount, data.total, '#a9a9a9', '#87cefa', false, true);
 
           $('#reportsPage').on('hidden.bs.modal', function() {
-    	      $("#reportsTable").DataTable().destroy();
-    	      $("#reportsTableBody").html("");
+    	      $('#reportsTable').DataTable().destroy();
+    	      $('#reportsTableBody').html("");
           });
 
     	  // Show the window
     	  $('#reportsPage').on('shown.bs.modal', function () {
     		  reportTable.columns.adjust().draw();
     	  });
-    	  $("#reportsPage").modal('show');
+    	  $('#reportsPage').modal('show');
       }
 
       function initRaidBosses() {
@@ -1086,7 +1172,7 @@
           });
           $('#badger-opt-save').on('click', function (e) {
           	var lastRaid = "";
-          	var date = $("#badger-opt-date").data("datetimepicker").getDate();
+          	var date = $('#badger-opt-date').data("datetimepicker").getDate();
           	var time = $('#badger-opt-time').data("datetimepicker").getDate();
           	if (time!=null) {
           		lastRaid = time;
@@ -1164,7 +1250,121 @@
     	      localStorage.setItem("parksOnly", parksOnly);
     	  }
       }
+      
+      function showLeaderboard() {
+    	  closeAnyInfoWindows();
+    	  $('#leadersTableBody').html("Loading...");
+    	  queryLeaderboardData();
+       	  // Setup callbacks
+       	  $('#leadersPage').on('hidden.bs.modal', function() {
+           	  if (leadersTable != null) {
+           		  leadersTable.destroy();
+           		  leadersTable = null;
+           	  }
+           	  $('#share-switch').bootstrapSwitch('destroy');
+       	      $('#leadersTableBody').html("");
+       	  });
+          $('#share-switch').bootstrapSwitch({
+          	state: false,
+          	onColor: 'success',
+          	offColor: 'danger',
+          	labelText: 'Participate',
+          	onText: 'Yes',
+          	offText: 'No'
+          });
+  	      $('#share-switch').on('switchChange.bootstrapSwitch', function(e) {
+  		    $.ajax({
+  	            type: "PUT",
+  	            contentType: "application/json; charset=utf-8",
+  	            url: "api/users/leaderboard/",
+  	            data: JSON.stringify(e.target.checked),
+  	            success: function (data) {
+  	              // Update the UI by removing table and requerying everything
+  	               if (leadersTable != null) {
+           		       leadersTable.destroy();
+           		       leadersTable = null;
+           	       }
+  	               queryLeaderboardData();
+  	            },
+  	            error: function (result) {
+  	              alert("Failed to update leaderboard status", result);
+  	            }
+  	    	  });
+          });
+          // Show the window
+          $('#leadersPage').modal('show');
+      }
 
+      function queryLeaderboardData() {
+    	  $.ajax({
+              type: "GET",
+              contentType: "application/json; charset=utf-8",
+              url: "api/users/leaderboard",
+              success: function (data) {
+            	  $('#leadersTableBody').html("");
+            	  $('#share-switch').bootstrapSwitch('state', data.share, false);
+            	  if (data.leaders == null || data.leaders.length==0) {
+            		  $('#leadersTableBody').append("<tr><td><div class=\"alert alert-warning\" role=\"alert\">No gym badge leaders to display.</div></td></tr>");
+            	  } else {
+            	      for (var i = 0; i < data.leaders.length; i++) {
+            		      var rankClass = getRankClass(data.leaders[i].rank);
+            		      $('#leadersTableBody').append("<tr>" +
+            	              "<td class=\"" + rankClass + "\">" + getRankText(data.leaders[i].rank) + "</td>" +
+            	              "<td class=\"" + rankClass + "\">"  + data.leaders[i].name + "</td>" +
+            	              "<td class=\"" + rankClass + "\">"  + data.leaders[i].badges + "</td>");
+            	      }
+            	      // Initialize the table
+                	  leadersTable = $('#leadersTable').DataTable({
+                	    "autoWidth": true,
+                		"scrollY": 300,
+                	    "scrollX": true,
+                	    "searching": false,
+                	    "lengthChange": false
+                	  });
+                  }
+           	  },
+              error: function (result) {
+            	  $('#leadersTableBody').html("");
+            	  var errorHtml = "<tr><td><div class=\"alert alert-danger\" role=\"alert\">Failed to query leaderboard.";
+            	  if (result.responseJSON !== undefined) {
+            		  errorHtml += "<br>" + result.responseJSON.message;
+            	  }
+            	  errorHtml += "</div></td></tr>";
+            	  $('#leadersTableBody').append(errorHtml);
+              },
+              complete: function() {
+            	  if (leadersTable != null) {
+           		      leadersTable.columns.adjust().draw();
+           		  }
+              }
+    	  });
+      }
+
+      function getRankText(rank) {
+    	  if (rank==1) {
+    		  return "1st";
+    	  }
+    	  if (rank==2) {
+    		  return "2nd";
+    	  }
+    	  if (rank==3) {
+    		  return "3rd";
+    	  }
+    	  return ""+rank;
+      }
+      
+      function getRankClass(rank) {
+    	  if (rank==1) {
+    		  return "badger-rank-1";
+    	  }
+    	  if (rank==2) {
+    		  return "badger-rank-2";
+    	  }
+    	  if (rank==3) {
+    		  return "badger-rank-3";
+    	  }
+    	  return "badger-rank-other";
+      }
     </script>
   </body>
 </html>

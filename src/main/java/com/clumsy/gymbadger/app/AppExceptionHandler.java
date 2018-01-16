@@ -9,6 +9,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.clumsy.gymbadger.data.ErrorDao;
+import com.clumsy.gymbadger.rest.ExportFailedException;
 import com.clumsy.gymbadger.rest.ForbiddenException;
 import com.clumsy.gymbadger.rest.NotLoggedInException;
 import com.clumsy.gymbadger.rest.ObjectNotFoundException;
@@ -32,5 +33,11 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleForbidden(RuntimeException ex, WebRequest request) {
         return handleExceptionInternal(ex, new ErrorDao("Error", "Forbidden"), 
           new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+    }
+
+    @ExceptionHandler(value = { ExportFailedException.class })
+    protected ResponseEntity<Object> handleExportFailed(RuntimeException ex, WebRequest request) {
+        return handleExceptionInternal(ex, new ErrorDao("Error", "Internal Error"), 
+          new HttpHeaders(), HttpStatus.INTERNAL_SERVER_ERROR, request);
     }
 }

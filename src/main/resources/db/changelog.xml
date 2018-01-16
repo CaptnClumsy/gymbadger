@@ -18,4 +18,5 @@
     <include file="db/changelogs/gym-data-updates-04012018.xml"/>
     <include file="db/changelogs/gym-data-updates-06012018.xml"/>
     <include file="db/changelogs/gym-data-updates-12012018.xml"/>
+    <include file="db/changelogs/user-table-update-15012018.xml"/>
 </databaseChangeLog>

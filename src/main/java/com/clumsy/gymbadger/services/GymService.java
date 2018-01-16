@@ -36,10 +36,28 @@ public class GymService {
 	}
 	
 	@Transactional(readOnly = true)
-	public List<GymEntity> getAllGyms(final Long userId) throws GymNotFoundException {
-		final List<GymEntity> gyms = gymRepo.findAllNotDeleted();
+	public List<GymEntity> getAllGyms() throws GymNotFoundException {
+		final List<GymEntity> gyms = gymRepo.findAllGyms();
 		if (gyms == null) {
 			throw new GymNotFoundException("Unable to query gym list");
+		}
+		return gyms;
+	}
+	
+	@Transactional(readOnly = true)
+	public List<GymEntity> getGymsById(final List<Long> ids) throws GymNotFoundException {
+		final List<GymEntity> gyms = gymRepo.findGyms(ids);
+		if (gyms == null) {
+			throw new GymNotFoundException("Unable to query gym list by id");
+		}
+		return gyms;
+	}
+	
+	@Transactional(readOnly = true)
+	public List<GymEntity> getGymsByArea(final List<Long> areas) throws GymNotFoundException {
+		final List<GymEntity> gyms = gymRepo.findGymsByArea(areas);
+		if (gyms == null) {
+			throw new GymNotFoundException("Unable to query gym list by area");
 		}
 		return gyms;
 	}
@@ -84,15 +102,39 @@ public class GymService {
 		return dao;
 	}
 
+	public List<GymSummaryDao> getAllGymSummaries(final Long userId) throws GymNotFoundException {
+		return getGymSummariesInternal(userId, null, null);
+	}
+	
+	public List<GymSummaryDao> getGymSummariesByArea(final Long userId, final List<Long> areas) throws GymNotFoundException {
+		return getGymSummariesInternal(userId, null, areas);
+	}
+	
+	public List<GymSummaryDao> getGymSummariesById(final Long userId, final List<Long> ids) throws GymNotFoundException {
+		return getGymSummariesInternal(userId, ids, null);
+	}
+	
 	@Transactional(readOnly = true)
-	public List<GymSummaryDao> getGymSummaries(final Long userId) throws GymNotFoundException {
+	private List<GymSummaryDao> getGymSummariesInternal(final Long userId, final List<Long> ids, final List<Long> areas) throws GymNotFoundException {
+		// Get the list of gyms
+		List<GymEntity> gyms = null;
+		if (ids != null && ids.size() != 0) {
+			// Only the listed gyms
+		    gyms = getGymsById(ids);
+		} else if (areas != null && areas.size() != 0) {
+			// Only get gyms for the listed areas
+			gyms = getGymsByArea(areas);
+		} else {
+			// Get all the gyms
+			gyms = getAllGyms();
+		}
+		
 		// Get any user specific properties for the gyms and put them in a hash map
 		try {
 			final List<GymPropsEntity> props = getAllGymProps(userId);
-			final Map<Long, GymPropsEntity> gymPropsMap = props.stream().collect(Collectors.toMap(GymPropsEntity::getGymId, x-> x));
 			
-			// Get all the gyms
-			final List<GymEntity> gyms = getAllGyms(userId);
+			// Put all the user specific properties for the gyms into a hash map
+			final Map<Long, GymPropsEntity> gymPropsMap = props.stream().collect(Collectors.toMap(GymPropsEntity::getGymId, x-> x));
 			
 			// Fill in the user-specific data
 			return Lists.newArrayList(Lists.transform(gyms, gym -> {
@@ -108,8 +150,7 @@ public class GymService {
 	        }));
 		} catch (GymPropsNotFoundException e) {
 			// This is expected if the user has never used the system before
-			// So just return all the gyms with default user data
-			final List<GymEntity> gyms = getAllGyms(userId);
+			// So just return the gyms with default user data
 			return Lists.newArrayList(Lists.transform(gyms, gym -> {
 	            return GymSummaryDao.fromGymEntity(gym);
 	        }));

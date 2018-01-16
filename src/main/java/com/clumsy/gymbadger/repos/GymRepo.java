@@ -11,5 +11,11 @@ import com.clumsy.gymbadger.entities.GymEntity;
 @Repository
 public interface GymRepo extends JpaRepository<GymEntity, Long> {
 	@Query("SELECT t FROM GymEntity t WHERE t.deleted = false ORDER BY t.name ASC")
-	List<GymEntity> findAllNotDeleted();
+	List<GymEntity> findAllGyms();
+
+	@Query("SELECT t FROM GymEntity t WHERE t.deleted = false AND t.id IN (?1) ORDER BY t.name ASC")
+	List<GymEntity> findGyms(List<Long> ids);
+	
+	@Query("SELECT t FROM GymEntity t WHERE t.deleted = false AND t.area.id IN ?1 ORDER BY t.name ASC")
+	List<GymEntity> findGymsByArea(List<Long> areas);
 }

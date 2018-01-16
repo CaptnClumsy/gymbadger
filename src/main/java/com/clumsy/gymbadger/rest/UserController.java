@@ -1,11 +1,13 @@
 package com.clumsy.gymbadger.rest;
 
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clumsy.gymbadger.data.LeadersDao;
 import com.clumsy.gymbadger.data.UserDao;
 import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.repos.UserRepo;
@@ -16,6 +18,7 @@ import java.security.Principal;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
  
 @RestController
 @RequestMapping("/api/users")
@@ -46,4 +49,30 @@ public class UserController {
         }
         return new UserDao(user.getId(), user.getName(), user.getDisplayName());
     }
+    
+    @RequestMapping(value = "/leaderboard", method = RequestMethod.GET)
+    public LeadersDao getLeaderboard(Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.getLeaderboard(user);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	}
+	}
+    
+    @RequestMapping(value = "/leaderboard", method = RequestMethod.PUT)
+    public UserDao setLeaderboard(Principal principal, @RequestBody Boolean share) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.setLeaderboard(user, share);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	}
+	}
 }
