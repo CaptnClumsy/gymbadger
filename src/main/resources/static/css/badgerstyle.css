@@ -682,3 +682,34 @@ body {
 	background-repeat: no-repeat;
 	background-size: contain;
 }
+#leadersTableBody td {
+    padding: 8px !important;
+    text-align: left;
+}
+.badger-lead-medal1 {
+    background-image: url('../images/GoldMedal.png');
+    min-width: 10px;
+    min-height: 50px;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.badger-lead-medal2 {
+    background-image: url('../images/SilverMedal.png');
+    min-width: 10px;
+    min-height: 40px;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.badger-lead-medal3 {
+    background-image: url('../images/BronzeMedal.png');
+    min-width: 10px;
+    min-height: 38px;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.badger-lead-total {
+	text-align: center;
+}

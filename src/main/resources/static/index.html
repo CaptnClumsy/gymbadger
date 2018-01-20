@@ -1309,9 +1309,9 @@
             	      for (var i = 0; i < data.leaders.length; i++) {
             		      var rankClass = getRankClass(data.leaders[i].rank);
             		      $('#leadersTableBody').append("<tr>" +
-            	              "<td class=\"" + rankClass + "\">" + getRankText(data.leaders[i].rank) + "</td>" +
+            	              "<td class=\"" + rankClass + "\">" + getRankHtml(data.leaders[i].rank) + "</td>" +
             	              "<td class=\"" + rankClass + "\">"  + data.leaders[i].name + "</td>" +
-            	              "<td class=\"" + rankClass + "\">"  + data.leaders[i].badges + "</td>");
+            	              "<td class=\"" + rankClass + " badger-lead-total\">"  + data.leaders[i].badges + "</td>");
             	      }
             	      // Initialize the table
                 	  leadersTable = $('#leadersTable').DataTable({
@@ -1340,15 +1340,15 @@
     	  });
       }
 
-      function getRankText(rank) {
+      function getRankHtml(rank) {
     	  if (rank==1) {
-    		  return "1st";
+    		  return "<span class=\"badger-lead-medal1\"></span>";
     	  }
     	  if (rank==2) {
-    		  return "2nd";
+    		  return "<span class=\"badger-lead-medal2\"></span>";
     	  }
     	  if (rank==3) {
-    		  return "3rd";
+    		  return "<span class=\"badger-lead-medal3\"></span>";
     	  }
     	  return ""+rank;
       }
