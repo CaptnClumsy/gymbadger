@@ -688,24 +688,24 @@ body {
 }
 .badger-lead-medal1 {
     background-image: url('../images/GoldMedal.png');
-    min-width: 10px;
-    min-height: 50px;
+    width: 28px;
+    height: 50px;
     display: block;
     background-repeat: no-repeat;
     background-size: contain;
 }
 .badger-lead-medal2 {
     background-image: url('../images/SilverMedal.png');
-    min-width: 10px;
-    min-height: 40px;
+    width: 28px;
+    height: 40px;
     display: block;
     background-repeat: no-repeat;
     background-size: contain;
 }
 .badger-lead-medal3 {
     background-image: url('../images/BronzeMedal.png');
-    min-width: 10px;
-    min-height: 38px;
+    width: 28px;
+    height: 38px;
     display: block;
     background-repeat: no-repeat;
     background-size: contain;
