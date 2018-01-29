@@ -50,9 +50,10 @@
                 <button class="dropdown-toggle btn btn-primary badger-user-button" type="button" id="userMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <span class="badger-user-container"><span id="user"></span></span>
                 </button>
-                <ul class="dropdown-menu dropdown-menu-right badger-user-menu" aria-labelledby="userMenuButton">
+                <ul id="actionMenu" class="dropdown-menu dropdown-menu-right badger-user-menu" aria-labelledby="userMenuButton">
                     <li><a id="reports" class="dropdown-item badger-user-item" onclick="return showReports();">Reports</a></li>
                     <li><a id="leaderBoard" class="dropdown-item badger-user-item" onclick="return showLeaderboard();">Leaderboard</a></li>
+                    <li><a id="announcements" class="dropdown-item badger-user-item badger-hidden-item" onclick="return showAnnouncementsAdmin();">Announcements</a></li>
                     <li><a id="logout" class="dropdown-item badger-user-item" onclick="return logout();">Logout</a></li>
                 </ul>
             </div></span>
@@ -61,6 +62,13 @@
       </div>
     </nav>
     
+    <div id="announcementAlert" class="alert alert-warning alert-dismissible fade" role="alert">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <p id="announcement"></p>
+    </div>
+
     <div id="badger-container" class="container fill badger-container">
       <div id="map"></div>
     </div>
@@ -201,6 +209,26 @@
     </div>
     </div>
 
+    <div class="modal fade" id="announcementAdminPage" role="dialog">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Announcements</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <textarea class="badger-announce-input" name="message" type="text" id="announce-message" placeholder="Write an announcement..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button id="postAnnouncement" type="button" class="btn btn-info">Post</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+    </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
@@ -254,6 +282,10 @@
       	        $('#user').html(data.displayName);
       	        $('.badger-unauthenticated').hide();
       	        $('.badger-authenticated').show();
+      	        if (data.admin==true) {
+      	            $('#actionMenu li a').removeClass("badger-hidden-item");
+      	            initAnnouncementsAdmin();
+      	        }
       		},
       		complete: function (res) {
       	        // Get defaults
@@ -267,16 +299,36 @@
                         center: { lat: data.lat, lng: data.lng },
                         gestureHandling: 'greedy'
                         });
+                        showAnnouncements(data.announcements);
                     },
                     error: function (result) {
                 	    errorPage("Failed to query default data", result);
                     },
                     complete: function (res) {
+                        initAdvancedPage();
                 	    initMarkers();
                     }
         	    });
       		}
         });   
+      }
+      
+      function showAnnouncements(announcements) {
+      	  var str = "";
+          for (var i=0; i<announcements.length; i++) {
+              str += announcements[i].message;
+          }
+          if (announcements.length>0) {
+              $('#announcement').html(str);
+              $('#announcementAlert').addClass("show");
+              $('#announcementAlert').on('closed.bs.alert', function () {
+                  $.ajax({
+                      type: "DELETE",
+                      contentType: "application/json; charset=utf-8",
+                      url: "api/users/announcements/"
+    	          });
+              });
+          }
       }
       
       function logout() {
@@ -535,29 +587,23 @@
       }
  
       function createInfoWindow(data, marker) {
-          var content = "<div class=\"badger-info-title\">" + 
+          var content = 
+            "<div class=\"badger-info-title\">" + 
               "<div class=\"dropdown badger-info-title-container\">" +
                   "<button class=\"btn btn-default badger-small-button\" type=\"button\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
                       "<span class=\"badger-badge-container\"><span id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(data.status) + "\"></span></span>" +
                   "</button>" +
-                  "<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\">" +
-                      "<a id=\"select-gold\" class=\""+ getDropdownBadgeClass(data.status, "GOLD") + "\" href=\"#\">Gold</a>" +
-                      "<a id=\"select-silver\" class=\""+ getDropdownBadgeClass(data.status, "SILVER") + "\" href=\"#\">Silver</a>" +
-                      "<a id=\"select-bronze\" class=\""+ getDropdownBadgeClass(data.status, "BRONZE") + "\" href=\"#\">Bronze</a>" +
-                      "<a id=\"select-basic\" class=\""+ getDropdownBadgeClass(data.status, "BASIC") + "\" href=\"#\">Basic</a>" +
-                      "<a id=\"select-none\" class=\""+ getDropdownBadgeClass(data.status, "NONE") + "\" href=\"#\">None</a>" +
+                  "<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\" id=\"badgeDropdown\">" +
+                       getBadgeDropdownHtml(data) +
+                       getTabHeadingHtml() +
                   "</div>" +
                   "<span class=\"badger-info-title-placeholder\"><span class=\"badger-info-title-text\">" + data.name + "</span></span>" +
               "</div>" +
-              "</div>" +
-              "<div id=\"badger-area-container\">" + 
-                  "<span class=\"badge badge-primary badger-small-pill\">" + data.area.name + "</span>" +
-                      getParkStatus(data.park) + 
-               "</div>" + 
-               getLastRaid(data) +
-               "<div class=\"badger-comments-group\"><div class=\"badger-comments-label\">Comments</div>" + 
-                   "<div id=\"comments\" class=\"badger-comments-container scrollable\">Loading...</div>" +
-          "</div>";
+            "</div>" +
+            "<div class=\"tab-content\">" +
+                getGeneralTabHtml(data) +
+                getHistoryTabHtml(data) +
+            "</div>";
                
           currentMarker = marker;
           currentProps = data;
@@ -604,6 +650,81 @@
           currentInfoWindow.open();
       }
 
+      function getBadgeDropdownHtml(data) {
+    	  var html = "<a id=\"select-gold\" class=\""+ getDropdownBadgeClass(data.status, "GOLD") + "\" href=\"#\">Gold</a>" +
+            "<a id=\"select-silver\" class=\""+ getDropdownBadgeClass(data.status, "SILVER") + "\" href=\"#\">Silver</a>" +
+            "<a id=\"select-bronze\" class=\""+ getDropdownBadgeClass(data.status, "BRONZE") + "\" href=\"#\">Bronze</a>" +
+            "<a id=\"select-basic\" class=\""+ getDropdownBadgeClass(data.status, "BASIC") + "\" href=\"#\">Basic</a>" +
+            "<a id=\"select-none\" class=\""+ getDropdownBadgeClass(data.status, "NONE") + "\" href=\"#\">None</a>" +
+            "</div>";
+          return html;
+      }
+
+      function getTabHeadingHtml() {
+          var html = "<span class=\"badger-tab-container\">" +
+              "<ul class=\"nav nav-tabs badger-tab-list\" role=\"tablist\">" +
+                "<li class=\"nav-item\">" +
+                  "<a class=\"nav-link active badger-tab-label\" data-toggle=\"tab\" href=\"#general\" role=\"tab\" aria-selected=\"true\">General</a>" +
+                  "</li>" +
+                  "<li class=\"nav-item\">" +
+                      "<a id=\"historyTab\" class=\"nav-link badger-tab-label\" data-toggle=\"tab\" href=\"#history\" role=\"tab\" aria-selected=\"false\">History</a>" +
+                  "</li>" +
+                "</ul>" +
+             "</span>";
+           return html;
+      }
+      
+      function getGeneralTabHtml(data) {
+          var html =
+            "<div class=\"tab-pane active\" id=\"general\" role=\"tabpanel\">" +
+              "<div id=\"badger-area-container\">" + 
+                  "<span class=\"badge badge-primary badger-small-pill\">" + data.area.name + "</span>" +
+                  getParkStatus(data.park) + 
+               "</div>" + 
+               getLastRaid(data) +
+               "<div class=\"badger-comments-group\">" + 
+                 "<div class=\"badger-comments-label\">Comments</div>" + 
+                 "<div id=\"comments\" class=\"badger-comments-container scrollable\">Loading...</div>" +
+               "</div>" +
+             "</div>";
+          return html;
+      }
+
+      function getHistoryTabHtml(data) {
+          var html =
+            "<div class=\"tab-pane\" id=\"history\" role=\"tabpanel\">" +
+              "<div id=\"historyBody\" class=\"badger-history-container scrollable\">" + 
+                 "Loading..." +    
+               "</div>" +
+             "</div>";
+          return html;
+      }
+      
+      function resetBadgeDropdown(data) {
+          $('#badgeDropdown a').removeClass("badger-dropdownitem-checked");
+          $('#badgeDropdown a').each(function( index ) {
+              if (data.status==getStatusFromId($(this).attr("id"))) {
+                  $(this).addClass("badger-dropdownitem-checked");
+              }
+          });
+      }
+
+	  function initAdvancedPage() {
+	      $('#badger-opt-save').click(function () {
+          	var lastRaid = "";
+          	var date = $('#badger-opt-date').data("datetimepicker").getDate();
+          	var time = $('#badger-opt-time').data("datetimepicker").getDate();
+          	if (time!=null) {
+          		lastRaid = time;
+          	} else {
+          		lastRaid = date;
+          	}
+          	var pokemonId = parseInt($('#poke-search').val(), 10);
+          	var isCaught = $('#caught-switch').bootstrapSwitch('state');
+          	saveAdvanced(lastRaid, pokemonId, isCaught);
+        });
+	  }
+
       function registerRaidEvents() {
         // remove old popovers from the DOM
         $('.popover').remove();
@@ -646,6 +767,62 @@
         $(document).on("click", ".popover .close" , function(){
         	$(this).parents(".popover").popover('hide');
         });
+        
+        $('#historyTab').on('shown.bs.tab', function(e) {
+            $.ajax({
+              type: "GET",
+              contentType: "application/json; charset=utf-8",
+              url: "api/gyms/"+currentProps.id+"/history/",
+              success: function (data) {
+                var html = "<table id=\"historyTable\" class=\"table table-striped table-bordered badger-history-table scrollable\" style=\"width: 100%\">";
+                html += "<thead style=\"display:none;\"><tr><th style=\"display:none;\">Id</th>" +
+                  "<th>Date</th>" +
+                  "<th>Event</th>" +
+                  "<th>Comment</th>" +
+                  "</tr></thead><tbody id=\"historyTableBody\" class=\"badger-history-table-body\">";
+                for (var i=0; i<data.length; i++) {
+                    var raidDate = new Date(data[i].dateTime);
+          	        html += "<tr><td style=\"display:none;\">" + data[i].id + "</td><td class=\"badger-history-text\">" + raidDate.toLocaleString('en-GB') + "</td>";
+          	        if (data[i].type=='BADGE') {
+          	            html += "<td><div id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(data[i].status) + "\"></div></td>";
+          	            if (data[i].status!="NONE") {
+          	                html += "<td class=\"badger-history-text\">You earned a " + getBadgeText(data[i].status) + " badge</td>";
+          	            } else {
+          	            	html += "<td class=\"badger-history-text\">You have no badge for this gym</td>";
+          	            }
+          	        } else {
+          	            var pokemonName = "Pokemon";
+          	            if (data[i].pokemon!=null) {
+          	                pokemonName = data[i].pokemon.text;
+          	            }
+          	            var pillClass = "badge-info";
+          	            var comment = "";
+          	            if (data[i].caught) {
+          	                pillClass = "badge-success";
+          	                comment = pokemonName + " was successfully caught";
+          	            } else {
+          	                pillClass = "badge-danger";
+          	                comment = "Oh no! The wild " + pokemonName + " fled";
+          	            }
+          	            html += "<td><div class=\"badger-pokemon-container\"><span class=\"badge " + 
+          	                pillClass + " badger-pokemon-badge\">" + pokemonName + "</span></div></td>";
+          	            html += "<td class=\"badger-history-text\">" + comment + "</td>";
+          	        }
+          	        html+="</tr>";
+          	    }
+          	    html += "</tbody></table>";
+          	    $('#historyBody').html(html);
+              },
+              error: function (result) {
+          	    errorPage("Failed to query gym history", result);
+              }
+  	      });
+        });
+      }
+
+      function getDateHtml(date) {
+          var html = date.toLocaleString('en-GB');
+          return html;
       }
 
       function getLastRaid(data) {
@@ -773,11 +950,13 @@
 
       // Show any gym specified in the URL
       function showGymFromUrl() {
+          ;
           var gymIdStr = new URLSearchParams(window.location.search).get("gymid");
       	  if (gymIdStr !== null) {
       	      var urlGymId = parseInt(gymIdStr, 10);
       	      for (var i = 0; i < gymData.length; i++) {
       	    	  if (gymData[i].id == urlGymId) {
+      	    	      $('head').append("<meta property=\"og:title\" content=\""+ gymData[i].name + "\" />")
       	    		  var found = false;
       	    		  for (var j = 0; j < selectedAreaIds.length; j++) {
       	    			  if (selectedAreaIds[j]==gymData[i].area.id) {
@@ -823,6 +1002,7 @@
               marker.setIcon(customIcon(props.status));
               $('#infoBadge').removeClass(getBadgeClass(oldStatus));
               $('#infoBadge').addClass(getBadgeClass(props.status));
+              resetBadgeDropdown(props);
               resetPercentage();
             },
             error: function (result) {
@@ -880,6 +1060,22 @@
     		  return '#ffd700';
     	  }
     	  return '#b3daff';
+      }
+      
+      function getBadgeText (status) {
+    	  if (status==="BASIC") {
+    		  return 'Basic';
+    	  }
+    	  if (status==="BRONZE") {
+    		  return 'Bronze';
+    	  }
+    	  if (status==="SILVER") {
+    		  return 'Silver';
+    	  }
+    	  if (status==="GOLD") {
+    		  return 'Gold';
+    	  }
+    	  return 'None';
       }
 
       function customIcon (status) {
@@ -1170,19 +1366,6 @@
           	onText: 'Yes',
           	offText: 'No'
           });
-          $('#badger-opt-save').on('click', function (e) {
-          	var lastRaid = "";
-          	var date = $('#badger-opt-date').data("datetimepicker").getDate();
-          	var time = $('#badger-opt-time').data("datetimepicker").getDate();
-          	if (time!=null) {
-          		lastRaid = time;
-          	} else {
-          		lastRaid = date;
-          	}
-          	var pokemonId = parseInt($('#poke-search').val(), 10);
-          	var isCaught = $('#caught-switch').bootstrapSwitch('state');
-          	saveAdvanced(lastRaid, pokemonId, isCaught);
-          });
           if (currentProps.pokemonId!=null) {
               $('#poke-search').val(currentProps.pokemonId.toString());
               $('#poke-search').trigger('change');
@@ -1365,6 +1548,34 @@
     	  }
     	  return "badger-rank-other";
       }
+      
+      function initAnnouncementsAdmin() {
+       	  // Setup callbacks
+       	  $('#announcementAdminPage').on('hidden.bs.modal', function() {
+       	      $('#announce-message').val(''); 
+       	  });
+  	      $('#postAnnouncement').on('click', function(e) {
+  	        var messageVal = $('#announce-message').val();
+  		    $.ajax({
+  	            type: "PUT",
+  	            contentType: "application/json; charset=utf-8",
+  	            url: "api/users/announcements/1/",
+  	            data: messageVal,
+  	            success: function (data) {
+  	                $('#announcementAdminPage').modal('hide');  
+  	            },
+  	            error: function (result) {
+  	              alert("Failed to post announcement", result);
+  	            }
+  	    	  });
+          });
+      }
+      
+      function showAnnouncementsAdmin() {
+          // Show the window
+          $('#announcementAdminPage').modal('show');
+      }
+
     </script>
   </body>
 </html>

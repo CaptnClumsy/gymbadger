@@ -3,7 +3,6 @@ package com.clumsy.gymbadger.data;
 import java.util.Date;
 
 import com.clumsy.gymbadger.entities.AreaEntity;
-import com.clumsy.gymbadger.entities.GymBadgeStatus;
 import com.clumsy.gymbadger.entities.GymEntity;
 
 import lombok.Data;

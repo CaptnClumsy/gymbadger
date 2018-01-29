@@ -2,7 +2,6 @@ package com.clumsy.gymbadger.data;
 
 import java.text.SimpleDateFormat;
 
-import com.clumsy.gymbadger.entities.GymBadgeStatus;
 import com.opencsv.bean.CsvBindByPosition;
 
 import lombok.Data;

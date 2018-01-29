@@ -134,7 +134,7 @@ body {
     margin-right: 20px;
 }
 .badger-info-title-container {
-	display: table;	
+	display: flex;	
 }
 .badger-info-title-placeholder {
 	display: table-cell;
@@ -681,6 +681,63 @@ body {
 	z-index: -1;
 	background-repeat: no-repeat;
 	background-size: contain;
+}
+#leadersTableBody td {
+    padding: 8px !important;
+    text-align: left;
+}
+.badger-lead-medal1 {
+    background-image: url('../images/GoldMedal.png');
+    width: 28px;
+    height: 50px;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.badger-lead-medal2 {
+    background-image: url('../images/SilverMedal.png');
+    width: 28px;
+    height: 40px;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.badger-lead-medal3 {
+    background-image: url('../images/BronzeMedal.png');
+    width: 28px;
+    height: 38px;
+    display: block;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+.badger-lead-total {
+	text-align: center;
+}
+.badger-hidden-item {
+	display: none;
+}
+#announcementAlert p {
+	margin: 0px;
+}
+.badger-announce-input {
+    width: 100%;
+    height: 100%;
+}
+.badger-tab-container {
+	margin-top: 8px;
+	margin-left: 8px;
+}
+.badger-tab-label {
+	padding-top: 8px;
+	padding-bottom: 6px;
+	font-size: 12px;
+}
+.badger-history-container {
+	max-height: 191px;
+	overflow: auto;
+}
+.badger-history-text {
+	font-size: 12px;
 }
 #leadersTableBody td {
     padding: 8px !important;

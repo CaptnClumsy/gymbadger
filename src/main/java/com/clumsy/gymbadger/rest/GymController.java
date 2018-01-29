@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clumsy.gymbadger.data.GymHistoryDao;
 import com.clumsy.gymbadger.data.GymSummaryDao;
 import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.services.AccessControlException;
@@ -16,6 +17,7 @@ import com.clumsy.gymbadger.services.ExportException;
 import com.clumsy.gymbadger.services.ExportService;
 import com.clumsy.gymbadger.services.GymNotFoundException;
 import com.clumsy.gymbadger.services.GymService;
+import com.clumsy.gymbadger.services.PokemonNotFoundException;
 import com.clumsy.gymbadger.services.UserNotFoundException;
 import com.clumsy.gymbadger.services.UserService;
 
@@ -90,6 +92,8 @@ public class GymController {
 			throw new ObjectNotFoundException(e);
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException(e);
+		} catch (PokemonNotFoundException e) {
+			throw new ObjectNotFoundException(e);
 		}
     }
     
@@ -118,6 +122,22 @@ public class GymController {
 			throw new ObjectNotFoundException(e);
 		} catch (ExportException e) {
 			throw new ExportFailedException(e);
+		}
+    }
+    
+    @RequestMapping(value = "/{id}/history", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public List<GymHistoryDao> getGymHistory(@PathVariable("id") Long gymId, Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			final UserEntity user = userService.getCurrentUser(principal);
+    	    return gymService.getGymHistory(gymId, user);
+		} catch (GymNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException(e);
 		}
     }
 }

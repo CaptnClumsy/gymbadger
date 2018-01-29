@@ -1,4 +1,4 @@
-package com.clumsy.gymbadger.entities;
+package com.clumsy.gymbadger.data;
 
 public enum GymBadgeStatus {
     NONE(0x0000),

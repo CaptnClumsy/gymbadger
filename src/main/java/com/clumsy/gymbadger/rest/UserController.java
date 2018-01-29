@@ -7,14 +7,19 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clumsy.gymbadger.data.AnnouncementDao;
+import com.clumsy.gymbadger.data.AnnouncementType;
 import com.clumsy.gymbadger.data.LeadersDao;
 import com.clumsy.gymbadger.data.UserDao;
 import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.repos.UserRepo;
+import com.clumsy.gymbadger.services.AccessControlException;
+import com.clumsy.gymbadger.services.AnnouncementNotFoundException;
 import com.clumsy.gymbadger.services.UserNotFoundException;
 import com.clumsy.gymbadger.services.UserService;
 
 import java.security.Principal;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -34,7 +39,7 @@ public class UserController {
     public UserDao getCurrentUser(Principal principal) {
 		try {
 			UserEntity user = userService.getCurrentUser(principal);
-			return new UserDao(user.getId(), user.getName(), user.getDisplayName());
+			return new UserDao(user.getId(), user.getName(), user.getDisplayName(), user.getAdmin());
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("Current user not found");
 		}
@@ -47,7 +52,7 @@ public class UserController {
         if (user == null) {
         	throw new ObjectNotFoundException("User "+id+" not found");
         }
-        return new UserDao(user.getId(), user.getName(), user.getDisplayName());
+        return new UserDao(user.getId(), user.getName(), user.getDisplayName(), user.getAdmin());
     }
     
     @RequestMapping(value = "/leaderboard", method = RequestMethod.GET)
@@ -75,4 +80,55 @@ public class UserController {
     		throw new ObjectNotFoundException("Current user not found");
     	}
 	}
+    
+    @RequestMapping(value = "/announcements", method = RequestMethod.GET)
+    public List<AnnouncementDao> getAnnouncements(Principal principal) {
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.getAnnouncements(user);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	}
+	}
+
+    @RequestMapping(value = "/announcements/{type}", method = RequestMethod.PUT)
+    public AnnouncementDao newAnnouncement(Principal principal, 
+    		@PathVariable("type") Integer type, @RequestBody String message) {
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.postAnnouncement(user, AnnouncementType.fromInt(type), message, true);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (AccessControlException e) {
+    	    throw new ForbiddenException(e);
+		}
+	}
+
+    @RequestMapping(value = "/announcements", method = RequestMethod.DELETE)
+    public void deleteAnnouncement(Principal principal) {
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    userService.deleteUserAnnouncement(user);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (AnnouncementNotFoundException e) {
+			throw new ObjectNotFoundException("Announcement not found");
+		}
+	}
+
+    @RequestMapping(value = "/announcements/admin/{id}", method = RequestMethod.DELETE)
+    public void deleteWholeAnnouncement(Principal principal, 
+    		@PathVariable("id") Long id) {
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    userService.deleteAnnouncement(user, id);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	} catch (AnnouncementNotFoundException e) {
+			throw new ObjectNotFoundException("Announcement not found");
+		} catch (AccessControlException e) {
+			throw new ForbiddenException(e);
+		}
+	}
+
 }

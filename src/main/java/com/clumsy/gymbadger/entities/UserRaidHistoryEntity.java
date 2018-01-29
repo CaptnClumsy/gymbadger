@@ -4,45 +4,31 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-
-import com.clumsy.gymbadger.data.GymBadgeStatus;
 
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "user_gym_props")
-public class GymPropsEntity {
+@Table(name = "user_raid_history")
+public class UserRaidHistoryEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Long id;
 	
-	@Column(name = "gymid")
-	private Long gymId;
-
-	@Column(name = "userid")
-	private Long userId;
-
-	@Column(name = "badge_status")
-	@Enumerated(EnumType.ORDINAL)
-    private GymBadgeStatus badgeStatus;
-	
-	@Column(name = "badge_percent")
-	private Integer badgePercent;
-	
 	@Column(name = "last_raid")
 	private Date lastRaid;
-
-	@Column(name = "pokemonid")
-	private Long pokemonId;
+	
+	@JoinColumn(name = "pokemonid")
+	@ManyToOne
+	private PokemonEntity pokemon;
 	
 	@Column(name = "caught")
 	private Boolean caught;

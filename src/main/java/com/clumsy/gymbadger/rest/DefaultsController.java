@@ -6,7 +6,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.clumsy.gymbadger.data.DefaultsDao;
-import com.clumsy.gymbadger.entities.DefaultsEntity;
 import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.services.DefaultsService;
 import com.clumsy.gymbadger.services.UserNotFoundException;
@@ -32,8 +31,7 @@ public class DefaultsController {
     public DefaultsDao getDefaults(Principal principal) {
 		try {
 			final UserEntity user = userService.getCurrentUser(principal);
-			final DefaultsEntity defaults = defaultsService.getDefaults(user.getId());
-			return new DefaultsDao(defaults.getZoom(), defaults.getLatitude(), defaults.getLongitude());
+			return defaultsService.getDefaults(user.getId());
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException(e);
 		}
