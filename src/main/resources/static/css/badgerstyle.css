@@ -640,6 +640,7 @@ body {
 	display: flex;
     align-items: center;
     padding: 8px;
+    margin-bottom: 6px;
 }
 .badger-share-switch {
 	margin-right: 8px;
@@ -772,4 +773,16 @@ body {
 }
 .badger-history-table-body td {
     padding: 6px;
+}
+.badger-leader-tab-container {
+	margin: 0px;
+}
+.badger-leader-tab-label {
+    padding-top: 8px;
+    padding-bottom: 6px;
+    font-size: 14px;
+}
+#totalTableBody td {
+    padding: 8px !important;
+    text-align: left;
 }

@@ -2,8 +2,11 @@ package com.clumsy.gymbadger.services;
 
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.clumsy.gymbadger.data.AnnouncementDao;
 import com.clumsy.gymbadger.data.AnnouncementType;
+import com.clumsy.gymbadger.data.GymBadgeStatus;
 import com.clumsy.gymbadger.data.LeaderDao;
 import com.clumsy.gymbadger.data.LeadersDao;
 import com.clumsy.gymbadger.data.UserDao;
@@ -28,6 +32,10 @@ import com.clumsy.gymbadger.repos.UserRepo;
 public class UserService {
 
 	private static final Long DEFAULT_USERID = 0L;
+    private static final int BASIC_BADGE_POINTS = 1;
+    private static final int BRONZE_BADGE_POINTS = 3;
+    private static final int SILVER_BADGE_POINTS = 7;
+    private static final int GOLD_BADGE_POINTS = 21;
 
 	private final UserRepo userRepo;
 	private final AnnouncementRepo announcementRepo;
@@ -80,14 +88,58 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public LeadersDao getLeaderboard(final UserEntity user) {
-		List<LeaderEntity> leaderEntities = userRepo.findLeaders();
+	public LeadersDao getGoldLeaderboard(final UserEntity user) {
+		List<LeaderEntity> leaderEntities = null;
+		leaderEntities = userRepo.findLeaders();
 		LeadersDao leaders = new LeadersDao();
 		leaders.setShare(user.getShareData());
 		int rank = 1;
 		for (LeaderEntity leaderEntity : leaderEntities) {
 			LeaderDao leader = new LeaderDao(rank++, leaderEntity.getdisplayName(), leaderEntity.getBadges());
 			leaders.add(leader);
+		}
+		return leaders;
+	}
+	
+	@Transactional(readOnly = true)
+	public LeadersDao getTotalLeaderboard(final UserEntity user) {
+		// Query the number of badges by type for the users participating in the leaderboard
+		List<LeaderEntity> leaderEntities = null;
+		leaderEntities = userRepo.findTotals();
+		LeadersDao leaders = new LeadersDao();
+		leaders.setShare(user.getShareData());
+		// Work out their total score by multiplying number of badges at each state by some constants
+		Map<Long,Integer> userTotalMap = new HashMap<Long,Integer>();
+		Map<Long,LeaderEntity> userMap = new HashMap<Long,LeaderEntity>();
+		for (LeaderEntity leaderEntity : leaderEntities) {
+			Integer currentTotal = userTotalMap.get(leaderEntity.getId());
+			if (currentTotal==null) {
+				currentTotal=0;
+			}
+			if (leaderEntity.getStatus().equals(GymBadgeStatus.BASIC)) {
+				currentTotal += leaderEntity.getBadges()*BASIC_BADGE_POINTS;
+			} else if (leaderEntity.getStatus().equals(GymBadgeStatus.BRONZE)) {
+				currentTotal += leaderEntity.getBadges()*BRONZE_BADGE_POINTS;
+			} else if (leaderEntity.getStatus().equals(GymBadgeStatus.SILVER)) {
+				currentTotal += leaderEntity.getBadges()*SILVER_BADGE_POINTS;
+			} else if (leaderEntity.getStatus().equals(GymBadgeStatus.GOLD)) {
+				currentTotal += leaderEntity.getBadges()*GOLD_BADGE_POINTS;
+			}
+			userTotalMap.put(leaderEntity.getId(), currentTotal);
+			userMap.put(leaderEntity.getId(), leaderEntity);
+		}
+		// Build the list of dao objects based on totals above
+		for (Long key :userTotalMap.keySet()) {
+			LeaderEntity leaderEntity = userMap.get(key);
+			LeaderDao leader = new LeaderDao(0, leaderEntity.getdisplayName(), userTotalMap.get(key));
+			leaders.add(leader);
+		}
+		// Sort it by total
+		Collections.sort(leaders.getLeaders());
+		// Give them each a rank
+		int rank = 1;
+		for (LeaderDao leaderDao : leaders.getLeaders()) {
+			leaderDao.setRank(rank++);
 		}
 		return leaders;
 	}

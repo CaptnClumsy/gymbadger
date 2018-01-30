@@ -62,7 +62,20 @@ public class UserController {
     	}
     	try {
     	    UserEntity user = userService.getCurrentUser(principal);
-		    return userService.getLeaderboard(user);
+		    return userService.getGoldLeaderboard(user);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	}
+	}
+    
+    @RequestMapping(value = "/leaderboard/totals", method = RequestMethod.GET)
+    public LeadersDao getTotalsLeaderboard(Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.getTotalLeaderboard(user);
     	} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");
     	}
