@@ -770,3 +770,6 @@ body {
 .badger-lead-total {
 	text-align: center;
 }
+.badger-history-table-body td {
+    padding: 6px;
+}

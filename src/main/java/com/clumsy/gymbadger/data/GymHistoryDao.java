@@ -24,8 +24,9 @@ public class GymHistoryDao implements Comparable<GymHistoryDao> {
 		}
 		final GymHistoryDao dao = new GymHistoryDao();
 		dao.setId(((UserGymHistoryEntity)historyEntry).getId());
-		dao.setDateTime(((UserGymHistoryEntity)historyEntry).getDateTime());
+		
 		if ((historyData instanceof UserRaidHistoryEntity)) {
+			dao.setDateTime(((UserRaidHistoryEntity)historyData).getLastRaid());
 			dao.setType(HistoryType.RAID);
 			final PokemonEntity pokemonEntity = ((UserRaidHistoryEntity)historyData).getPokemon();
 			if (pokemonEntity!=null) {
@@ -35,6 +36,7 @@ public class GymHistoryDao implements Comparable<GymHistoryDao> {
 			dao.setCaught(((UserRaidHistoryEntity)historyData).getCaught());
 			return dao;
 		} else if ((historyData instanceof UserBadgeHistoryEntity)) {
+			dao.setDateTime(((UserGymHistoryEntity)historyEntry).getDateTime());
 			dao.setType(HistoryType.BADGE);
 			dao.setStatus(((UserBadgeHistoryEntity)historyData).getBadgeStatus());
 			return dao;
