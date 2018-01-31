@@ -709,7 +709,6 @@
 	  $('#navReportButton').on("click", showReports);
 	  $('#navLeaderButton').on("click", showLeaderboard);
 	  initRaidBosses();
-  	  showGymFromUrl();
       resetPercentage();
 	  updateVisibleGyms();
   }
@@ -1086,6 +1085,7 @@
           url: "api/bosses/",
           success: function (data) {
       	    raidBossData = data;
+      	    showGymFromUrl();
           },
           error: function (result) {
       	    errorPage("Failed to query raid boss data", result);
