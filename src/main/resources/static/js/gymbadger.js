@@ -357,7 +357,7 @@
                    getBadgeDropdownHtml(data) +
                    getTabHeadingHtml() +
               "</div>" +
-              "<span class=\"badger-info-title-placeholder\"><span class=\"badger-info-title-text\">" + data.name + "</span></span>" +
+              "<span id=\"gymTitle\" class=\"badger-info-title-placeholder\"><a href=\"#\" class=\"badger-info-title-text\">" + data.name + "</a></span>" +
           "</div>" +
         "</div>" +
         "<div class=\"tab-content\">" +
@@ -524,6 +524,11 @@
   		$('#advancedOptions').modal('show');
     });
 
+    $('#gymTitle').click(function() {
+    	initGymInfoPage(currentProps);
+  		$('#gymInfoPage').modal('show');
+    });
+    
     $(document).on("click", ".popover .close" , function(){
     	$(this).parents(".popover").popover('hide');
     });
@@ -578,6 +583,12 @@
           }
       });
     });
+  }
+
+  function initGymInfoPage(data) {
+	  $("#gymInfoBody").html('');
+      $('#gymInfoTitle').text(data.name);
+      $("#gymInfoBody").append("<img class=\"badger-gym-info-image\" src=\"" + data.imageUrl + "\"/>");
   }
 
   function getLastRaid(data) {

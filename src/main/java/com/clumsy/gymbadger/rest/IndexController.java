@@ -27,12 +27,12 @@ public class IndexController {
 				model.addAttribute("gymName", gym.getName());
 				model.addAttribute("gymDescription", "Gym in the "+gym.getArea().getName()+" area.");
 				model.addAttribute("gymUrl", request.getRequestURL().toString() + "?" + request.getQueryString());
-				model.addAttribute("gymImageUrl", "https://lh6.ggpht.com/X5vm_RyxK0AfoGWiinqPWJEwydJE2Gt0WxlayEQOExIP1dfSUbt3jHhORqrGoF2MyVcaWwYQcPDjP3ixThNx");
+				model.addAttribute("gymImageUrl", gym.getImageUrl());
     		} else {
     			model.addAttribute("gymName", "Gymbadger");
 				model.addAttribute("gymDescription", "");
 				model.addAttribute("gymUrl", request.getRequestURL().toString());
-				model.addAttribute("gymImageUrl", "images/badger.png");
+				model.addAttribute("gymImageUrl", "https://www.gymbadger.com/images/badger.png");
     		}
 		} catch (GymNotFoundException e) {
 			throw new ObjectNotFoundException(e);

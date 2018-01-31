@@ -21,4 +21,5 @@
     <include file="db/changelogs/user-table-update-15012018.xml"/>
     <include file="db/changelogs/gym-update-25012018.sql"/>
     <include file="db/changelogs/schema-updates-26012018.sql"/>
+    <include file="db/changelogs/schema-updates-30012018.sql"/>
 </databaseChangeLog>

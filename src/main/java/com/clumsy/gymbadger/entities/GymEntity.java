@@ -39,4 +39,7 @@ public class GymEntity {
 	
 	@Column(name = "deleted")
 	private Boolean deleted;
+	
+	@Column(name = "image_url")
+	private String imageUrl;
 }

@@ -146,6 +146,7 @@ body {
 	font-weight: bold;
 	font-size: 14px;
 	vertical-align: middle;
+	color: black;
 }
 .badger-no-raid {
     margin-top: 5px;
@@ -785,4 +786,13 @@ body {
 #totalTableBody td {
     padding: 8px !important;
     text-align: left;
+}
+.badger-gym-info-image {
+    max-width: 100%;
+    max-height: 250px;
+}
+#gymInfoBody {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
