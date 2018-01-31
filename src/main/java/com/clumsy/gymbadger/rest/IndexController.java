@@ -19,7 +19,7 @@ public class IndexController {
 	private GymService gymService;
 
     @RequestMapping("/")
-    public String hello(Model model, HttpServletRequest request, @RequestParam(value="gymid", required=false) Long gymId) {
+    public String getIndex(Model model, HttpServletRequest request, @RequestParam(value="gymid", required=false) Long gymId) {
     	model.addAttribute("googleMapsAPIKey", "AIzaSyA9OSRLuuH3o7YhJ6bRUVtD9TxhlSDqSDU");
     	try {
     		if (gymId!=null) {
