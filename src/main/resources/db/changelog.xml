@@ -22,4 +22,5 @@
     <include file="db/changelogs/gym-update-25012018.sql"/>
     <include file="db/changelogs/schema-updates-26012018.sql"/>
     <include file="db/changelogs/schema-updates-30012018.sql"/>
+    <include file="db/changelogs/gym-data-updates-02022018.sql"/>
 </databaseChangeLog>
