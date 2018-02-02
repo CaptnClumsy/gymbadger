@@ -67,6 +67,7 @@
                 complete: function (res) {
                     initAdvancedPage();
             	    initMarkers();
+            	    initUpload();
                 }
     	    });
   		}
@@ -706,6 +707,7 @@
 	      map.setCenter({ lat: e.params.data.lat, lng: e.params.data.lng});
 	      google.maps.event.trigger(e.params.data.marker, 'click');
       });
+	  $('#navUploadButton').on("click", showUpload);
 	  $('#navReportButton').on("click", showReports);
 	  $('#navLeaderButton').on("click", showLeaderboard);
 	  initRaidBosses();
@@ -1392,6 +1394,33 @@
   }
   
   function showAnnouncementsAdmin() {
+	  closeAnyInfoWindows();
       // Show the window
       $('#announcementAdminPage').modal('show');
+  }
+  
+  function initUpload() {
+      $('#fileUploadButton').on('click', function() {
+    	 alert("Feature still under development...comming soon"); 
+      });  
+  }
+
+  function showUpload() {
+      closeAnyInfoWindows();
+      // Show the window
+      $('#uploadPage').modal('show');
+  }
+
+  function fileSelected() { 
+	  $('#fileDetails').html("");
+	  var count = document.getElementById('fileToUpload').files.length;
+      var detailsDiv = document.getElementById('fileDetails');
+      for (var i = 0; i<count; i++)
+      {
+          var file = document.getElementById('fileToUpload').files[i];
+          var image = document.createElement('img');
+          image.src = window.URL.createObjectURL(file);
+          image.className = "badger-upload-preview";
+          detailsDiv.appendChild(image);
+      }
   }

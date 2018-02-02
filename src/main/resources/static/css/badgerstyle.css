@@ -796,3 +796,21 @@ body {
     align-items: center;
     justify-content: center;
 }
+.badger-upload-text-area {
+	font-size: 11px;
+	padding: 4px;
+}
+.badger-upload-text-area p {
+	margin: 0px;
+}
+.badger-file-pill {
+	margin-right: 4px;
+}
+input[type="file"] {
+    display: none;
+}
+.badger-upload-preview {
+	width: 50px;
+	height: 50px;
+	margin: 4px;
+}

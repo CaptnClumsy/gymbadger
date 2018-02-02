@@ -49,6 +49,7 @@
           </li>
           <li class="nav-item nav-link">
             <div class="badger-button-bar">
+              <span><button id="navUploadButton" class="btn btn-primary badger-btn-item"><i class="fa fa-camera"></i></button></span>
               <span><button id="navReportButton" class="btn btn-primary badger-btn-item"><i class="fa fa-th-list"></i></button></span>
               <span><button id="navLeaderButton" class="btn btn-primary badger-btn-item"><i class="fa fa-trophy"></i></button></span>
               <span>
@@ -62,6 +63,7 @@
                     <span class="badger-user-container"><span id="user"></span></span>
                   </button>
                   <ul id="actionMenu" class="dropdown-menu dropdown-menu-right badger-user-menu" aria-labelledby="userMenuButton">
+                    <li><a id="upload" class="dropdown-item badger-user-item" onclick="return showUpload();">Upload Badges</a></li>
                     <li><a id="reports" class="dropdown-item badger-user-item" onclick="return showReports();">Reports</a></li>
                     <li><a id="leaderBoard" class="dropdown-item badger-user-item" onclick="return showLeaderboard();">Leaderboard</a></li>
                     <li><a id="announcements" class="dropdown-item badger-user-item badger-hidden-item" onclick="return showAnnouncementsAdmin();">Announcements</a></li>
@@ -280,6 +282,32 @@
         <div id="gymInfoBody" class="modal-body">
         </div>
         <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <div class="modal fade" id="uploadPage" role="dialog">
+    <div class="modal-dialog modal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="uploadPageTitle" class="modal-title">Upload Badges</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div id="uploadPageBody" class="modal-body">
+           <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Upload screenshots of your Pokemon Go Gym Badge list.  
+           You may need multiple screenshots scrolling down your gym badge list.  Based on these screenshots Gymbadger will attempt to automatically identify the gyms and your current badge.</p></span></div>
+           <label for="fileToUpload" class="btn btn-secondary badger-file-upload">
+              Select Screenshots...
+           </label>
+           <input id="fileToUpload" type="file" name="fileToUpload" onchange="fileSelected();" accept="image/*" multiple="true"/>
+           <div id="fileDetails"></div>
+        </div>
+        <div class="modal-footer">
+          <button id="fileUploadButton" type="button" class="btn btn-primary">Upload</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>

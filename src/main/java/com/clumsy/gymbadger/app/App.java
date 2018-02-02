@@ -28,7 +28,7 @@ public class App extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
           .antMatchers("/", "/login**", "/api/areas/**", "/api/defaults/**", 
         		  "/api/users/leaderboard/**", "/api/gyms/**", "/api/bosses/**", "/api/comments/**", 
-        		  "/tos**", "/kyogre**")
+        		  "/tos**", "/kyogre**", "/api/upload/**")
           .permitAll()
         .anyRequest()
           .authenticated()
