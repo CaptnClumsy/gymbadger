@@ -297,19 +297,48 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <div id="uploadPageBody" class="modal-body">
-           <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Upload screenshots of your Pokemon Go Gym Badge list.  
-           You may need multiple screenshots scrolling down your gym badge list.  Based on these screenshots Gymbadger will attempt to automatically identify the gyms and your current badge.</p></span></div>
-           <label for="fileToUpload" class="btn btn-secondary badger-file-upload">
+        <form id="fileUploadData" method="post" enctype="multipart/form-data">
+          <div id="uploadPageBody" class="modal-body">
+            <div class="alert alert-danger badger-upload-text-area" role="alert">
+              <span><p>This feature is still under development, it does not work yet but is coming soon.</p></span>
+            </div>
+            <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Upload screenshots of your Pokemon Go Gym Badge list.  
+            You may need multiple screenshots scrolling down your gym badge list.  Based on these screenshots Gymbadger will attempt to automatically identify the gyms and your current badge.</p></span></div>
+            <label for="fileToUpload" class="btn btn-secondary badger-file-upload">
               Select Screenshots...
-           </label>
-           <input id="fileToUpload" type="file" name="fileToUpload" onchange="fileSelected();" accept="image/*" multiple="true"/>
-           <div id="fileDetails"></div>
+            </label>
+            <input id="fileToUpload" type="file" name="fileToUpload" onchange="fileSelected();" accept="image/*" multiple="true"/>
+            <div id="fileDetails"></div>
+          </div>
+          <div class="modal-footer">
+            <button id="fileUploadButton" type="button" class="btn btn-primary">Upload</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    </div>
+
+    <div class="modal fade" id="uploadResultsPage" role="dialog">
+    <div class="modal-dialog modal-md" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 id="uploadPageTitle" class="modal-title">Upload Results</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
-        <div class="modal-footer">
-          <button id="fileUploadButton" type="button" class="btn btn-primary">Upload</button>
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        </div>
+          <div id="uploadResultsBody" class="modal-body">
+            <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Your screenshots were analysed and detected the following gym badges.  
+            You can check or correct these results before saving.</p></span>
+            </div>
+            <div id="uploadResultDetails" class="badger-upload-results">
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button id="saveButton" type="button" class="btn btn-success">Save</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          </div>
       </div>
     </div>
     </div>

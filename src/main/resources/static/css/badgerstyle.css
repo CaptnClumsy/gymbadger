@@ -814,3 +814,46 @@ input[type="file"] {
 	height: 50px;
 	margin: 4px;
 }
+.badger-upload-results {
+    max-height: 250px;
+    overflow: auto;
+}
+.badger-gym-result {
+    margin: 4px;
+    display: inline-block;
+    border: 1px solid #d0d0d0;
+    border-radius: .25rem;
+    vertical-align: top;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 4px;
+}
+.badger-gym-result-box {
+    display: flex;
+    padding-right: 4px;
+}
+.badger-result-row {
+    display: table-row;
+}
+.badger-gym-result-label {
+    text-align: center;
+    font-size: 11px;
+    display: table-row;
+    max-width: 81px;
+}
+.badger-gym-result-close-btn {
+    padding-left: 3px;
+}
+.badger-gym-result-close {
+    display: inline-block;
+    vertical-align: top;
+    height: .65em;
+    line-height: .65em;
+    font-size: 18px;
+    position: relative;
+    top: -3px;
+}
+.badger-gym-result-grid {
+    display: grid;
+    padding-right: 4px;
+}

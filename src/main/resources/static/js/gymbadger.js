@@ -416,8 +416,7 @@
         "<a id=\"select-silver\" class=\""+ getDropdownBadgeClass(data.status, "SILVER") + "\" href=\"#\">Silver</a>" +
         "<a id=\"select-bronze\" class=\""+ getDropdownBadgeClass(data.status, "BRONZE") + "\" href=\"#\">Bronze</a>" +
         "<a id=\"select-basic\" class=\""+ getDropdownBadgeClass(data.status, "BASIC") + "\" href=\"#\">Basic</a>" +
-        "<a id=\"select-none\" class=\""+ getDropdownBadgeClass(data.status, "NONE") + "\" href=\"#\">None</a>" +
-        "</div>";
+        "<a id=\"select-none\" class=\""+ getDropdownBadgeClass(data.status, "NONE") + "\" href=\"#\">None</a>";
       return html;
   }
 
@@ -1401,13 +1400,35 @@
   
   function initUpload() {
       $('#fileUploadButton').on('click', function() {
-    	 alert("Feature still under development...comming soon"); 
-      });  
+        var formData = new FormData();
+        var form = $('#fileUploadData').get(0);
+        var files = form[0].files;
+        $.each(files, function() {
+          var file = $(this);
+          formData.append("files[]", file[0], file[0].name);
+        });
+    
+        $.ajax({
+          type: "POST",
+          url: "/api/upload/badges",
+          data: formData,
+          async: false,
+          success: function (data) {
+            $('#uploadPage').modal('hide');
+            showUploadResults(data);
+          },
+          cache: false,
+          contentType: false,
+          processData: false
+        });
+      });
+      initUploadResults();
   }
 
   function showUpload() {
       closeAnyInfoWindows();
       // Show the window
+      $('#fileDetails').html("");
       $('#uploadPage').modal('show');
   }
 
@@ -1423,4 +1444,51 @@
           image.className = "badger-upload-preview";
           detailsDiv.appendChild(image);
       }
+  }
+  
+  function initUploadResults() {
+  }
+  
+  function showUploadResults(data) {
+      $('#uploadResultDetails').html("");
+      if (data.gyms==null || data.gyms==undefined || data.gyms.length==0) {
+          $('#uploadResultDetails').html("<div class=\"alert alert-warn badger-upload-text-area\" role=\"alert\">" + 
+              "<span><p>No gyms or badges detected, try a different screenshot.</p></span></div>");
+          return;
+      }
+      var html="";
+      for (var i=0; i<data.gyms.length; i++) {
+          html+= "<div id=\"gymResult-" + i + "\" class=\"badger-gym-result\">" + 
+              "<div class=\"badger-gym-result-box\">" +
+                "<div class=\"badger-gym-result-div\">" + 
+                  "<span class=\"badger-result-row\">" + getBadgeHtml(data.gyms[i]) + "</span>" + 
+                "</div>" +
+                "<div id=\"gymClose-" + i + "\" class=\"badger-gym-result-close-btn\"><button type=\"button\" class=\"close\" aria-label=\"Close\">" +
+                  "<span class=\"badger-gym-result-close\">×</span></button>" +
+                "</div>" + 
+              "</div>" + 
+              "<div class=\"badger-gym-result-grid\">" +
+                  "<span class=\"badger-gym-result-label\">" + data.gyms[i].name + "</span>" + 
+              "</div>" +
+            "</div>";
+      }
+      $('#uploadResultDetails').html(html);
+      for (var i=0; i<data.gyms.length; i++) {
+          $("#gymClose-"+i).click({index: i}, function(event) {
+              $("#gymResult-"+event.data.index).remove();
+          });
+      }
+      $('#uploadResultsPage').modal('show');
+      
+      alert("Feature still under development...coming soon");
+  }
+  
+  function getBadgeHtml(data) {
+      var html="<button class=\"btn btn-default badger-small-button\" type=\"button\" id=\"dropdownMenuButton" + data.id + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
+        "<span class=\"badger-badge-container\"><span id=\"infoBadge" + data.id + "\" class=\"badger-badge " + getBadgeClass(data.status) + "\"></span></span>" +
+        "</button>" +
+        "<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton" + data.id + "\" id=\"badgeDropdown" + data.id + "\">" +
+          getBadgeDropdownHtml(data) +
+        "</div>";
+      return html;
   }
