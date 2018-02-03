@@ -1301,6 +1301,14 @@
   }
   
   function queryTotalLeaderboardData() {
+  if (leadersTable != null) {
+	  leadersTable.destroy();
+	  leadersTable = null;
+  }
+  if (totalTable != null) {
+	  totalTable.destroy();
+	  totalTable = null;
+  }
   $.ajax({
       type: "GET",
       contentType: "application/json; charset=utf-8",
