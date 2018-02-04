@@ -7,10 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class TermsOfService {
 	@RequestMapping("/tos")
 	public String handler() {
-	    return "terms.html";
-	}
-	@RequestMapping("/Kyogre")
-	public String kyogre() {
-	    return "kyogre.html";
+	    return "terms";
 	}
 }

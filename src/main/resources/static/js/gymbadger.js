@@ -1207,14 +1207,7 @@
 	  queryTotalLeaderboardData();
    	  // Setup callbacks
    	  $('#leadersPage').on('hidden.bs.modal', function() {
-       	  if (leadersTable != null) {
-       		  leadersTable.destroy();
-       		  leadersTable = null;
-       	  }
-          if (totalTable != null) {
-        	  totalTable.destroy();
-        	  totalTable = null;
-     	  }
+       	  resetLeaderTables();
        	  $('#share-switch').bootstrapSwitch('destroy');
    	      $('#leadersTableBody').html("");
    	      $('#totalTableBody').html("");
@@ -1235,16 +1228,9 @@
             data: JSON.stringify(e.target.checked),
             success: function (data) {
               // Update the UI by removing table and requerying everything
-               if (leadersTable != null) {
-       		       leadersTable.destroy();
-       		       leadersTable = null;
-       	       }
-               if (totalTable != null) {
-     		       totalTable.destroy();
-     		       totalTable = null;
-     	       }
-               queryLeaderboardData();
-               queryTotalLeaderboardData();
+              resetLeaderTables();
+              queryLeaderboardData();
+              queryTotalLeaderboardData();
             },
             error: function (result) {
               alert("Failed to update leaderboard status", result);
@@ -1301,15 +1287,8 @@
   }
   
   function queryTotalLeaderboardData() {
-  if (leadersTable != null) {
-	  leadersTable.destroy();
-	  leadersTable = null;
-  }
-  if (totalTable != null) {
-	  totalTable.destroy();
-	  totalTable = null;
-  }
-  $.ajax({
+    resetLeaderTables();
+    $.ajax({
       type: "GET",
       contentType: "application/json; charset=utf-8",
       url: "api/users/leaderboard/totals",
@@ -1378,6 +1357,17 @@
 	  return "badger-rank-other";
   }
   
+  function resetLeaderTables() {
+      if (leadersTable != null) {
+        leadersTable.destroy();
+        leadersTable = null;
+      }
+      if (totalTable != null) {
+        totalTable.destroy();
+        totalTable = null;
+      }
+  }
+
   function initAnnouncementsAdmin() {
    	  // Setup callbacks
    	  $('#announcementAdminPage').on('hidden.bs.modal', function() {
@@ -1415,28 +1405,57 @@
           var file = $(this);
           formData.append("files[]", file[0], file[0].name);
         });
-    
+        $('#uploadProgressArea').show();
         $.ajax({
           type: "POST",
           url: "/api/upload/badges",
           data: formData,
-          async: false,
+          xhr: function() {
+            var myXhr = $.ajaxSettings.xhr();
+            if(myXhr.upload){
+                myXhr.upload.addEventListener('progress', progress, false);
+            }
+            return myXhr;
+          },
           success: function (data) {
             $('#uploadPage').modal('hide');
             showUploadResults(data);
+          },
+          error: function (result) {
+            alert("Failed to upload screenshots to server");
+            $('#uploadProgress').text("");
+          },
+          complete: function () {
+            $('#uploadProgressArea').hide();
           },
           cache: false,
           contentType: false,
           processData: false
         });
       });
-      initUploadResults();
   }
 
+  function progress(e) {
+    if (e.lengthComputable) {
+      var max = e.total;
+      var current = e.loaded;
+      var percentage = Math.floor((current * 100)/max);
+      var percentText = ""+percentage+"%";
+      $('#uploadProgress').text(percentText);
+      $('#uploadProgressBar').width(percentText);
+      if(percentage >= 100) {
+        // process completed
+        $('#uploadProgress').text("");  
+      }
+    }  
+  }
+ 
   function showUpload() {
       closeAnyInfoWindows();
       // Show the window
       $('#fileDetails').html("");
+      $('#uploadProgress').text("");
+      $('#uploadProgressArea').hide();
       $('#uploadPage').modal('show');
   }
 
@@ -1452,9 +1471,6 @@
           image.className = "badger-upload-preview";
           detailsDiv.appendChild(image);
       }
-  }
-  
-  function initUploadResults() {
   }
   
   function showUploadResults(data) {
@@ -1499,4 +1515,13 @@
           getBadgeDropdownHtml(data) +
         "</div>";
       return html;
+  }
+  
+  function getNavColor(data) {
+      if (data=="VALOR") {
+          return "#c80000";
+      } else if (data=="INSTINCT") {
+          return "#f4f400";
+      }
+      return "#007bff";
   }

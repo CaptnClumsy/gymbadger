@@ -27,7 +27,7 @@
   </head>
   <body>
 
-    <nav class="navbar navbar-expand-md navbar-static-top navbar-dark bg-primary badger-navbar">
+    <nav class="navbar navbar-expand-lg navbar-static-top navbar-dark badger-navbar">
       <a class="navbar-brand" href="/tos">
         <img src="/images/badger.png" width="48" height="48" class="d-inline-block" alt=""/>
         <span class="badger-navbar-title">GymBadger</span>
@@ -36,18 +36,18 @@
         <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse badger-list-row" id="navbarNavDropdown">
-        <ul class="navbar-nav ml-auto">
-          <li class="badger-authenticated" style="display: none;">
+        <ul class="navbar-nav ml-auto badger-align-middle">
+          <li class="badger-authenticated badger-nav-percent" style="display: none;">
               <span id="badger-gold-percent" class="badger-navbar-label badger-percent badger-percent-small"></span>
           </li>
-          <li class="nav-item nav-link">
+          <li class="nav-item nav-link badger-nav-link">
             <select id="filterButton" class="badger-filtericon-hidden" multiple="multiple">
             </select>
           </li>
-          <li class="nav-item nav-link">
+          <li class="nav-item nav-link badger-nav-link">
             <select id="search" name="search" class="form-control"><option></option></select>
           </li>
-          <li class="nav-item nav-link">
+          <li class="nav-item nav-link badger-nav-link">
             <div class="badger-button-bar">
               <span><button id="navUploadButton" class="btn btn-primary badger-btn-item"><i class="fa fa-camera"></i></button></span>
               <span><button id="navReportButton" class="btn btn-primary badger-btn-item"><i class="fa fa-th-list"></i></button></span>
@@ -297,24 +297,31 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-        <form id="fileUploadData" method="post" enctype="multipart/form-data">
+        
           <div id="uploadPageBody" class="modal-body">
             <div class="alert alert-danger badger-upload-text-area" role="alert">
               <span><p>This feature is still under development, it does not work yet but is coming soon.</p></span>
             </div>
             <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Upload screenshots of your Pokemon Go Gym Badge list.  
-            You may need multiple screenshots scrolling down your gym badge list.  Based on these screenshots Gymbadger will attempt to automatically identify the gyms and your current badge.</p></span></div>
-            <label for="fileToUpload" class="btn btn-secondary badger-file-upload">
-              Select Screenshots...
-            </label>
-            <input id="fileToUpload" type="file" name="fileToUpload" onchange="fileSelected();" accept="image/*" multiple="true"/>
+            You may need multiple screenshots scrolling down your gym badge list.  Based on these screenshots Gymbadger will attempt to automatically identify the gyms and your current badge.</p></span>
+            </div>
+            <form id="fileUploadData" method="post" enctype="multipart/form-data">
+              <label for="fileToUpload" class="btn btn-secondary badger-file-upload">
+                Select Screenshots...
+              </label>
+              <input id="fileToUpload" type="file" name="fileToUpload" onchange="fileSelected();" accept="image/*" multiple="true"/>
+            </form>
             <div id="fileDetails"></div>
+            <div id="uploadProgressArea" class="badger-upload-progress">
+              <div id="uploadProgress" class="badger-upload-progress-text"></div>
+              <div id="uploadProgressBar" class="badger-upload-progress-bar"></div>
+            </div>
           </div>
           <div class="modal-footer">
             <button id="fileUploadButton" type="button" class="btn btn-primary">Upload</button>
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
           </div>
-        </form>
+        
       </div>
     </div>
     </div>
@@ -328,17 +335,17 @@
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
-          <div id="uploadResultsBody" class="modal-body">
-            <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Your screenshots were analysed and detected the following gym badges.  
-            You can check or correct these results before saving.</p></span>
-            </div>
-            <div id="uploadResultDetails" class="badger-upload-results">
-            </div>
+        <div id="uploadResultsBody" class="modal-body">
+          <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Your screenshots were analysed and detected the following gym badges.  
+          You can check or correct these results before saving.</p></span>
           </div>
-          <div class="modal-footer">
-            <button id="saveButton" type="button" class="btn btn-success">Save</button>
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <div id="uploadResultDetails" class="badger-upload-results">
           </div>
+        </div>
+        <div class="modal-footer">
+          <button id="saveButton" type="button" class="btn btn-success">Save</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
       </div>
     </div>
     </div>
