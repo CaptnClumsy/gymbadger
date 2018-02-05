@@ -35,45 +35,49 @@
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse badger-list-row" id="navbarNavDropdown">
-        <ul class="navbar-nav ml-auto badger-align-middle">
-          <li class="badger-authenticated badger-nav-percent" style="display: none;">
-              <span id="badger-gold-percent" class="badger-navbar-label badger-percent badger-percent-small"></span>
-          </li>
-          <li class="nav-item nav-link badger-nav-link">
-            <select id="filterButton" class="badger-filtericon-hidden" multiple="multiple">
-            </select>
-          </li>
-          <li class="nav-item nav-link badger-nav-link">
-            <select id="search" name="search" class="form-control"><option></option></select>
-          </li>
-          <li class="nav-item nav-link badger-nav-link">
-            <div class="badger-button-bar">
-              <span><button id="navUploadButton" class="btn btn-primary badger-btn-item"><i class="fa fa-camera"></i></button></span>
-              <span><button id="navReportButton" class="btn btn-primary badger-btn-item"><i class="fa fa-th-list"></i></button></span>
-              <span><button id="navLeaderButton" class="btn btn-primary badger-btn-item"><i class="fa fa-trophy"></i></button></span>
-              <span>
-                <div class="badger-unauthenticated">
+      <div id="navbarNavDropdown" class="collapse navbar-collapse badger-list-row">
+        <span class="badger-authenticated badger-nav-percent" style="display: none;">
+          <span id="badger-gold-percent" class="badger-navbar-label badger-percent badger-percent-small"></span>
+        </span>
+        <span class="badger-nav-block">
+          <ul class="navbar-nav ml-2">
+            <li class="nav-item nav-link badger-nav-link">
+              <div class="badger-align-middle">
+                <select id="filterButton" class="badger-filtericon-hidden" multiple="multiple">
+                </select>
+              </div>
+            </li>
+            <li class="nav-item nav-link badger-nav-link ml-1">
+              <div class="badger-align-middle">
+                <select id="search" name="search" class="form-control"><option></option></select>
+              </div>
+            </li>
+            <li class="nav-item nav-link badger-nav-link">
+              <div class="badger-button-bar">
+                <span><button id="navUploadButton" class="btn btn-primary badger-btn-item"><i class="fa fa-camera"></i></button></span>
+                <span><button id="navReportButton" class="btn btn-primary badger-btn-item"><i class="fa fa-th-list"></i></button></span>
+                <span><button id="navLeaderButton" class="btn btn-primary badger-btn-item"><i class="fa fa-trophy"></i></button></span>
+                <span class="badger-unauthenticated">
                   <a href="/login" class="btn btn-primary badger-login-button"><i class="fa fa-facebook badger-login-icon"></i>Sign In</a>
-                </div>
-              </span>
-              <span>
-                <div class="badger-authenticated btn-group" style="display: none;">
-                  <button class="dropdown-toggle btn btn-primary badger-user-button" type="button" id="userMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="badger-user-container"><span id="user"></span></span>
-                  </button>
-                  <ul id="actionMenu" class="dropdown-menu dropdown-menu-right badger-user-menu" aria-labelledby="userMenuButton">
-                    <li><a id="upload" class="dropdown-item badger-user-item" onclick="return showUpload();">Upload Badges</a></li>
-                    <li><a id="reports" class="dropdown-item badger-user-item" onclick="return showReports();">Reports</a></li>
-                    <li><a id="leaderBoard" class="dropdown-item badger-user-item" onclick="return showLeaderboard();">Leaderboard</a></li>
-                    <li><a id="announcements" class="dropdown-item badger-user-item badger-hidden-item" onclick="return showAnnouncementsAdmin();">Announcements</a></li>
-                    <li><a id="logout" class="dropdown-item badger-user-item" onclick="return logout();">Logout</a></li>
-                  </ul>
-                </div>
-              </span>
-            </div>
-          </li>
-        </ul>
+                </span>
+                <span class="badger-authenticated" style="display: none;">
+                  <div class="badger-nav-dropdown">
+                    <button class="dropdown-toggle btn btn-primary badger-user-button badger-nav-dropdown" type="button" id="userMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <span class="badger-user-container"><span id="user"></span></span>
+                    </button>
+                    <ul id="actionMenu" class="dropdown-menu dropdown-menu-right badger-user-menu" aria-labelledby="userMenuButton">
+                      <li><a id="upload" class="dropdown-item badger-user-item" onclick="return showUpload();">Upload Badges</a></li>
+                      <li><a id="reports" class="dropdown-item badger-user-item" onclick="return showReports();">Reports</a></li>
+                      <li><a id="leaderBoard" class="dropdown-item badger-user-item" onclick="return showLeaderboard();">Leaderboard</a></li>
+                      <li><a id="announcements" class="dropdown-item badger-user-item badger-hidden-item" onclick="return showAnnouncementsAdmin();">Announcements</a></li>
+                      <li><a id="logout" class="dropdown-item badger-user-item" onclick="return logout();">Logout</a></li>
+                    </ul>
+                  </div>
+                </span>
+              </div>
+            </li>
+          </ul>
+        </span>
       </div>
     </nav>
     

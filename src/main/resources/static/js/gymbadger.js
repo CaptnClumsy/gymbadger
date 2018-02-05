@@ -146,7 +146,7 @@
           },
           complete: function (res) {
             $('#filterButton').multiselect({
-              buttonClass: 'btn btn-primary',
+              buttonClass: 'btn btn-primary badger-select',
               buttonContainer: '<div id="badger-dropdown-list" class="btn-group" />',
               enableClickableOptGroups: true,
               nonSelectedText: 'No areas',
