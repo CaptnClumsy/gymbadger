@@ -1019,12 +1019,12 @@
 		  if (query == "") {
 			  // no query so use gyms from all areas
     	      var areaIds="";
-    	      for (let item of areaSet.values()) {
-    		      if (areaIds != "") {
-    			      areaIds+=",";
-    		      }
-    		      areaIds+=item;
-    	      }
+    	      areaSet.forEach(function(item) {
+    		    if (areaIds != "") {
+    			    areaIds+=",";
+    		    }
+    		    areaIds+=item;
+    	      });
     	      $('#exportButton').prop('href',"/api/gyms/export?areas="+areaIds);
 		  } else {
 			  var gymIds = "";
@@ -1042,12 +1042,12 @@
 	  
 	  // search will not be filled in yet so all gyms for all areas are shown
 	  var areaIds="";
-	  for (let item of areaSet.values()) {
-		  if (areaIds != "") {
-			  areaIds+=",";
-		  }
-		  areaIds+=item;
-	  }
+	  areaSet.forEach(function(item) {
+		if (areaIds != "") {
+		  areaIds+=",";
+		}
+		areaIds+=item;
+	  });
 	  $('#exportButton').prop('href',"/api/gyms/export?areas="+areaIds);
 	  
 	  // Show the percentage reports

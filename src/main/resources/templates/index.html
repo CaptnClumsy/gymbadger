@@ -28,26 +28,28 @@
   <body>
 
     <nav class="navbar navbar-expand-lg navbar-static-top navbar-dark badger-navbar">
-      <a class="navbar-brand" href="/tos">
-        <img src="/images/badger.png" width="48" height="48" class="d-inline-block" alt=""/>
-        <span class="badger-navbar-title">GymBadger</span>
-      </a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div id="navbarNavDropdown" class="collapse navbar-collapse badger-list-row">
+      <div class="badger-nav-sticky">
+        <a class="navbar-brand" href="/tos">
+          <img src="/images/badger.png" width="48" height="48" class="d-inline-block" alt=""/>
+          <span class="badger-navbar-title">GymBadger</span>
+        </a>
         <span class="badger-authenticated badger-nav-percent" style="display: none;">
           <span id="badger-gold-percent" class="badger-navbar-label badger-percent badger-percent-small"></span>
         </span>
+        <button class="navbar-toggler badger-nav-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+      </div>
+      <div id="navbarNavDropdown" class="collapse navbar-collapse badger-list-row">
         <span class="badger-nav-block">
-          <ul class="navbar-nav ml-2">
+          <ul class="navbar-nav ml-1">
             <li class="nav-item nav-link badger-nav-link">
               <div class="badger-align-middle">
                 <select id="filterButton" class="badger-filtericon-hidden" multiple="multiple">
                 </select>
               </div>
             </li>
-            <li class="nav-item nav-link badger-nav-link ml-1">
+            <li class="nav-item nav-link badger-nav-link">
               <div class="badger-align-middle">
                 <select id="search" name="search" class="form-control"><option></option></select>
               </div>

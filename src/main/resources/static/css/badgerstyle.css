@@ -41,8 +41,8 @@ body {
 .badger-navbar {
 	padding-top: 4px;
 	padding-bottom: 4px;
-	padding-left: 8px;
-    padding-right: 8px;
+	padding-left: 4px;
+    padding-right: 4px;
     box-shadow: 0 2px 5px 0 rgba(0,0,0,0.16),0 2px 10px 0 rgba(0,0,0,0.12);
     color: white;
     z-index: 3;
@@ -64,6 +64,10 @@ body {
 .badger-nav-percent {
     height: 56px;
 }
+.badger-nav-toggler {
+    height: 40px;
+    align-self: center;
+}
 .badger-nav-dropdown {
 	display: inline-block;
 	position: relative;
@@ -71,6 +75,12 @@ body {
 .badger-nav-block {
 	display: inline-flex;
 	vertical-align: top;
+}
+.badger-nav-sticky {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    vertical-align: middle;
 }
 .badger-align-middle {
 	display: flex;
@@ -441,6 +451,7 @@ body {
 	max-height: 200px;
     overflow-y: auto;
     overflow-x: hidden;
+    position: absolute !important;
 }
 .badger-user-item {
 	padding-left: 8px;
