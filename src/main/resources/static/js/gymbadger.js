@@ -709,6 +709,7 @@
 	  $('#navUploadButton').on("click", showUpload);
 	  $('#navReportButton').on("click", showReports);
 	  $('#navLeaderButton').on("click", showLeaderboard);
+	  $('#navTeamButton').on("click", showTeamOptions);
 	  initRaidBosses();
       resetPercentage();
 	  updateVisibleGyms();
@@ -1515,6 +1516,12 @@
           getBadgeDropdownHtml(data) +
         "</div>";
       return html;
+  }
+  
+  function showTeamOptions() {
+      closeAnyInfoWindows();
+      // Show the window
+      $('#teamPage').modal('show');
   }
   
   function getNavColor(data) {

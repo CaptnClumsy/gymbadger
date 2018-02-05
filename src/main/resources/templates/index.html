@@ -56,9 +56,10 @@
             </li>
             <li class="nav-item nav-link badger-nav-link">
               <div class="badger-button-bar">
-                <span><button id="navUploadButton" class="btn btn-primary badger-btn-item"><i class="fa fa-camera"></i></button></span>
+                <span><button id="navUploadButton" class="btn btn-primary badger-btn-item badger-authenticated" style="display: none;"><i class="fa fa-camera"></i></button></span>
                 <span><button id="navReportButton" class="btn btn-primary badger-btn-item"><i class="fa fa-th-list"></i></button></span>
-                <span><button id="navLeaderButton" class="btn btn-primary badger-btn-item"><i class="fa fa-trophy"></i></button></span>
+                <span><button id="navLeaderButton" class="btn btn-primary badger-btn-item badger-authenticated" style="display: none;"><i class="fa fa-trophy"></i></button></span>
+                <span><button id="navTeamButton" class="btn btn-primary badger-btn-item badger-authenticated" style="display: none;"><i class="fa fa-users"></i></button></span>
                 <span class="badger-unauthenticated">
                   <a href="/login" class="btn btn-primary badger-login-button"><i class="fa fa-facebook badger-login-icon"></i>Sign In</a>
                 </span>
@@ -72,6 +73,7 @@
                       <li><a id="reports" class="dropdown-item badger-user-item" onclick="return showReports();">Reports</a></li>
                       <li><a id="leaderBoard" class="dropdown-item badger-user-item" onclick="return showLeaderboard();">Leaderboard</a></li>
                       <li><a id="announcements" class="dropdown-item badger-user-item badger-hidden-item" onclick="return showAnnouncementsAdmin();">Announcements</a></li>
+                      <li><a id="team" class="dropdown-item badger-user-item" onclick="return showTeamOptions();">Team</a></li>
                       <li><a id="logout" class="dropdown-item badger-user-item" onclick="return logout();">Logout</a></li>
                     </ul>
                   </div>
@@ -356,6 +358,31 @@
     </div>
     </div>
 
+    <div class="modal fade" id="teamPage" role="dialog">
+    <div class="modal-dialog modeal-sm" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Team</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+            <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Select your team to change Gymbadger colours and style accordingly</p></span></div>
+            <div class="badger-team-container">
+                <button id="mysticTeam" class="btn badger-team-btn"><span class="badger-team-btn-img badger-mystic-team"></span></button>
+                <button id="valorTeam" class="btn badger-team-btn"><span class="badger-team-btn-img badger-valor-team"></span></button>
+                <button id="instinctTeam" class="btn badger-team-btn"><span class="badger-team-btn-img badger-instinct-team"></span></button>
+            </div>
+        </div>
+        <div class="modal-footer">
+          <button id="postTeam" type="button" class="btn btn-info">Save</button>
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>

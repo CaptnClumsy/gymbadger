@@ -890,3 +890,27 @@ input[type="file"] {
     position: relative;
     top: -2px;
 }
+.badger-team-container {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
+}
+.badger-team-btn {
+    display: flex;
+    padding: 8px;
+}
+.badger-team-btn-img {
+    min-width: 70px;
+    min-height: 70px;
+    background-repeat: space;
+    background-size: contain;
+}
+.badger-mystic-team {
+    background-image: url('../images/mystic.png');
+}
+.badger-valor-team {
+    background-image: url('../images/valor.png');
+}
+.badger-instinct-team {
+    background-image: url('../images/instinct.png');
+}
