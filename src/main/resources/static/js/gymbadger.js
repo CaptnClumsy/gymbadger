@@ -356,10 +356,10 @@
               "</button>" +
               "<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\" id=\"badgeDropdown\">" +
                    getBadgeDropdownHtml(data) +
-                   getTabHeadingHtml() +
               "</div>" +
-              "<span id=\"gymTitle\" class=\"badger-info-title-placeholder\"><a href=\"#\" class=\"badger-info-title-text\">" + data.name + "</a></span>" +
+              getTabHeadingHtml() +
           "</div>" +
+          "<span id=\"gymTitle\" class=\"badger-info-title-placeholder\"><a href=\"#\" class=\"badger-info-title-text\">" + data.name + "</a></span>" +
         "</div>" +
         "<div class=\"tab-content\">" +
             getGeneralTabHtml(data) +
