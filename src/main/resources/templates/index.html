@@ -369,10 +369,16 @@
         </div>
         <div class="modal-body">
             <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Select your team to change Gymbadger colours and style accordingly</p></span></div>
-            <div class="badger-team-container">
-                <button id="mysticTeam" class="btn badger-team-btn"><span class="badger-team-btn-img badger-mystic-team"></span></button>
-                <button id="valorTeam" class="btn badger-team-btn"><span class="badger-team-btn-img badger-valor-team"></span></button>
-                <button id="instinctTeam" class="btn badger-team-btn"><span class="badger-team-btn-img badger-instinct-team"></span></button>
+            <div class="btn-group badger-team-container" data-toggle="buttons">
+                <label class="btn badger-team-btn-img badger-mystic-team">
+                  <input type="radio" id="mysticTeam" class="badger-team-btn" autocomplete="off"/>
+                </label>
+                <label class="btn badger-team-btn-img badger-valor-team">
+                  <input type="radio"  id="valorTeam" class="badger-team-btn" autocomplete="off"/>
+                </label>
+                <label class="btn badger-team-btn-img badger-instinct-team">
+                  <input type="radio" id="instinctTeam" class="badger-team-btn" autocomplete="off"/>
+                </label>
             </div>
         </div>
         <div class="modal-footer">

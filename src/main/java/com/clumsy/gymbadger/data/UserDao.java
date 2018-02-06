@@ -9,8 +9,9 @@ public class UserDao {
 	private String name;
 	private String displayName;
 	private boolean admin;
-	
-	public UserDao(final Long id, final String name, final String displayName, final boolean admin) {
+	private Team team;
+
+	public UserDao(final Long id, final String name, final String displayName, final boolean admin, final Team team) {
 		this.id=id;
 		this.name=name;
 		this.displayName=displayName;

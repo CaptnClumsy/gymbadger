@@ -902,15 +902,44 @@ input[type="file"] {
 .badger-team-btn-img {
     min-width: 70px;
     min-height: 70px;
+    width: 70px;
+    height: 70px;
     background-repeat: space;
     background-size: contain;
 }
 .badger-mystic-team {
     background-image: url('../images/mystic.png');
 }
+.badger-mystic-team.active {
+	  background-image: url('../images/mystic.png') !important;
+}
+.badger-mystic-team.active::after {
+    content: "\f00c";
+    font-size: 72px;
+    font-family: FontAwesome;
+    color: rgba(190, 230, 79, 0.8);
+}
 .badger-valor-team {
     background-image: url('../images/valor.png');
 }
+.badger-valor-team.active {
+	  background-image: url('../images/valor.png') !important;
+}
+.badger-valor-team.active::after {
+    content: "\f00c";
+    font-size: 72px;
+    font-family: FontAwesome;
+    color: rgba(190, 230, 79, 0.8);
+}
 .badger-instinct-team {
     background-image: url('../images/instinct.png');
+}
+.badger-instinct-team.active {
+	  background-image: url('../images/instinct.png') !important;
+}
+.badger-instinct-team.active::after {
+    content: "\f00c";
+    font-size: 72px;
+    font-family: FontAwesome;
+    color: rgba(190, 230, 79, 0.8);
 }

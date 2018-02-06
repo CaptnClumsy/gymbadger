@@ -5,22 +5,10 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    <include file="db/changelogs/schema-22112017.sql"/>
-    <include file="db/changelogs/data-22112017.sql"/>
-    <include file="db/changelogs/area-data-28112017.sql"/>
-    <include file="db/changelogs/gym-data-23112017.sql"/>
-    <include file="db/changelogs/gym-data-updates-18122017.xml"/>
-    <include file="db/changelogs/pokemon-table-18122017.xml"/>
-    <include file="db/changelogs/extra-user-gym-props-18122017.xml"/>
-    <include file="db/changelogs/comments-table-27122017.xml"/>
-    <include file="db/changelogs/pokemon-update-29122017.xml"/>
-    <include file="db/changelogs/gym-data-updates-02012018.xml"/>
-    <include file="db/changelogs/gym-data-updates-04012018.xml"/>
-    <include file="db/changelogs/gym-data-updates-06012018.xml"/>
-    <include file="db/changelogs/gym-data-updates-12012018.xml"/>
-    <include file="db/changelogs/user-table-update-15012018.xml"/>
-    <include file="db/changelogs/gym-update-25012018.sql"/>
-    <include file="db/changelogs/schema-updates-26012018.sql"/>
-    <include file="db/changelogs/schema-updates-30012018.sql"/>
-    <include file="db/changelogs/gym-data-updates-02022018.sql"/>
+    <include file="db/changelogs/schema.sql"/>
+    <include file="db/changelogs/default-data.sql"/>
+    <include file="db/changelogs/area-data.sql"/>
+    <include file="db/changelogs/gym-data.sql"/>
+    <include file="db/changelogs/gym-url-data.sql"/>
+    <include file="db/changelogs/pokemon-data.sql"/>
 </databaseChangeLog>

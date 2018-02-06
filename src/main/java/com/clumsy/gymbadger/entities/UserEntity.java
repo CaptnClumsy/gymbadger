@@ -2,10 +2,14 @@ package com.clumsy.gymbadger.entities;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+
+import com.clumsy.gymbadger.data.Team;
 
 import lombok.Data;
 
@@ -31,4 +35,7 @@ public class UserEntity {
 	@Column(name = "sharedata")
 	private Boolean shareData;
 
+	@Column(name = "team")
+	@Enumerated(EnumType.ORDINAL)
+	private Team team;
 }

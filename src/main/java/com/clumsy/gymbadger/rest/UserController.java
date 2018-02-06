@@ -39,7 +39,7 @@ public class UserController {
     public UserDao getCurrentUser(Principal principal) {
 		try {
 			UserEntity user = userService.getCurrentUser(principal);
-			return new UserDao(user.getId(), user.getName(), user.getDisplayName(), user.getAdmin());
+			return new UserDao(user.getId(), user.getName(), user.getDisplayName(), user.getAdmin(), user.getTeam());
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("Current user not found");
 		}
@@ -52,7 +52,7 @@ public class UserController {
         if (user == null) {
         	throw new ObjectNotFoundException("User "+id+" not found");
         }
-        return new UserDao(user.getId(), user.getName(), user.getDisplayName(), user.getAdmin());
+        return new UserDao(user.getId(), user.getName(), user.getDisplayName(), user.getAdmin(), user.getTeam());
     }
     
     @RequestMapping(value = "/leaderboard", method = RequestMethod.GET)

@@ -1,9 +1,5 @@
 BEGIN;
 
-insert into pokemon (id, name, raidboss) values (nextval('hibernate_sequence'), 'Aggron', true);
-
-alter table gyms add image_url varchar(400);
-
  UPDATE gyms SET image_url='https://lh3.googleusercontent.com/orGP_VBSXwgnXNKxE8n6U7eCmW3LM6RgNUXD1TJvMMmHFE4mDKlPpHqMJGvmda5mPm799vSgGybtn9Yrv1fxzQ' WHERE name='Ver Valley Walk 5';
  UPDATE gyms SET image_url='https://lh3.googleusercontent.com/7oAn1qsEQHoSZD80I_TDKeNRy9Qy_X2PaLcsjtpjhW3Z4R5ZrkF9Z0B-dqbHeCl2pcP7rUdGXMgll5AiM47h' WHERE name='Pitch 4';
  UPDATE gyms SET image_url='https://lh3.googleusercontent.com/JzIZbW_O_9gjSArV6_LPpm5bJetRfEr6FmtB7VFStILsYoKYHNhW-eb_DswGNIAGGhaap_HP-M_E2F5PlUE' WHERE name='Bernard''s Heath';

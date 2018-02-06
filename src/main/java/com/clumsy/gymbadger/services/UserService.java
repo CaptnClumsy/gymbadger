@@ -135,11 +135,13 @@ public class UserService {
 			leaders.add(leader);
 		}
 		// Sort it by total
-		Collections.sort(leaders.getLeaders());
-		// Give them each a rank
-		int rank = 1;
-		for (LeaderDao leaderDao : leaders.getLeaders()) {
-			leaderDao.setRank(rank++);
+		if (leaders.getLeaders()!=null && !leaders.getLeaders().isEmpty()) {
+			Collections.sort(leaders.getLeaders());
+			// Give them each a rank
+			int rank = 1;
+			for (LeaderDao leaderDao : leaders.getLeaders()) {
+				leaderDao.setRank(rank++);
+			}
 		}
 		return leaders;
 	}
@@ -147,11 +149,11 @@ public class UserService {
 	@Transactional
 	public UserDao setLeaderboard(final UserEntity user, final Boolean share) {
 		if (user.getShareData()==share) {
-			return new UserDao(user.getId(), user.getName(), user.getDisplayName(), user.getAdmin());
+			return new UserDao(user.getId(), user.getName(), user.getDisplayName(), user.getAdmin(), user.getTeam());
 		}
 		user.setShareData(share);
 		UserEntity savedUser = userRepo.save(user);
-		return new UserDao(savedUser.getId(), savedUser.getName(), savedUser.getDisplayName(), user.getAdmin());
+		return new UserDao(savedUser.getId(), savedUser.getName(), savedUser.getDisplayName(), user.getAdmin(), user.getTeam());
 	}
 
 	@Transactional(readOnly = true)
