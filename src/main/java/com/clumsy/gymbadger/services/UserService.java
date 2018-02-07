@@ -149,11 +149,11 @@ public class UserService {
 	@Transactional
 	public UserDao setLeaderboard(final UserEntity user, final Boolean share) {
 		if (user.getShareData()==share) {
-			return new UserDao(user.getId(), user.getName(), user.getDisplayName(), user.getAdmin(), user.getTeam());
+			return UserDao.fromEntity(user);
 		}
 		user.setShareData(share);
 		UserEntity savedUser = userRepo.save(user);
-		return new UserDao(savedUser.getId(), savedUser.getName(), savedUser.getDisplayName(), user.getAdmin(), user.getTeam());
+		return UserDao.fromEntity(savedUser);
 	}
 
 	@Transactional(readOnly = true)
@@ -229,5 +229,16 @@ public class UserService {
 		List<UserAnnouncementEntity> userAnnouncements = userAnnouncementRepo.findAllByAnnouncementId(id);
 		userAnnouncementRepo.deleteInBatch(userAnnouncements);
 		announcementRepo.delete(announcement);
+	}
+
+	@Transactional
+	public UserEntity updateUser(UserEntity user, UserDao updatedUser) {
+		if (updatedUser.getDisplayName()!=null && !user.getDisplayName().equals(updatedUser.getDisplayName())) {
+			user.setDisplayName(updatedUser.getDisplayName());
+		}
+		if (user.getTeam()!=updatedUser.getTeam()) {
+			user.setTeam(updatedUser.getTeam());
+		}
+		return userRepo.save(user);
 	}
 }

@@ -10,9 +10,11 @@ import org.springframework.stereotype.Service;
 
 import com.clumsy.gymbadger.data.AnnouncementDao;
 import com.clumsy.gymbadger.data.DefaultsDao;
+import com.clumsy.gymbadger.data.UserDao;
 import com.clumsy.gymbadger.entities.AnnouncementEntity;
 import com.clumsy.gymbadger.entities.DefaultsEntity;
 import com.clumsy.gymbadger.entities.UserAnnouncementEntity;
+import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.repos.AnnouncementRepo;
 import com.clumsy.gymbadger.repos.DefaultsRepo;
 import com.clumsy.gymbadger.repos.UserAnnouncementRepo;
@@ -39,10 +41,11 @@ public class DefaultsService {
 	}
 
 	@Transactional(readOnly = true) 
-	public DefaultsDao getDefaults(Long userId) {
-		DefaultsEntity defaults = defaultsRepo.findOneByUserid(userId);
+	public DefaultsDao getDefaults(final UserEntity user) {
+		DefaultsEntity defaults = defaultsRepo.findOneByUserid(user.getId());
 		DefaultsDao dao = new DefaultsDao(defaults.getZoom(), defaults.getLatitude(), defaults.getLongitude());
-		List<UserAnnouncementEntity> announcementEntities = userAnnouncementRepo.findAllByUserId(userId);
+		dao.setUser(UserDao.fromEntity(user));
+		List<UserAnnouncementEntity> announcementEntities = userAnnouncementRepo.findAllByUserId(user.getId());
 		if (announcementEntities!=null) {
 			List<AnnouncementDao> announcements = new ArrayList<AnnouncementDao>();
 			for (UserAnnouncementEntity entity : announcementEntities) {

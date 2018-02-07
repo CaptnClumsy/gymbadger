@@ -27,7 +27,7 @@
   </head>
   <body>
 
-    <nav class="navbar navbar-expand-lg navbar-static-top navbar-dark badger-navbar">
+    <nav id="badgerTopNav" class="navbar navbar-expand-lg navbar-static-top navbar-dark badger-navbar badger-navbar-mystic">
       <div class="badger-nav-sticky">
         <a class="navbar-brand" href="/tos">
           <img src="/images/badger.png" width="48" height="48" class="d-inline-block" alt=""/>
@@ -44,7 +44,7 @@
         <span class="badger-nav-block">
           <ul class="navbar-nav ml-1">
             <li class="nav-item nav-link badger-nav-link">
-              <div class="badger-align-middle">
+              <div id="areaFilter" class="badger-align-middle">
                 <select id="filterButton" class="badger-filtericon-hidden" multiple="multiple">
                 </select>
               </div>
@@ -369,20 +369,20 @@
         </div>
         <div class="modal-body">
             <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Select your team to change Gymbadger colours and style accordingly</p></span></div>
-            <div class="btn-group badger-team-container" data-toggle="buttons">
-                <label class="btn badger-team-btn-img badger-mystic-team">
-                  <input type="radio" id="mysticTeam" class="badger-team-btn" autocomplete="off"/>
+            <div id="teamButtons" class="btn-group badger-team-container" data-toggle="buttons">
+                <label id="mysticTeam" class="btn badger-team-btn-img badger-mystic-team">
+                  <input type="radio" class="badger-team-btn" value="MYSTIC" autocomplete="off"/>
                 </label>
-                <label class="btn badger-team-btn-img badger-valor-team">
-                  <input type="radio"  id="valorTeam" class="badger-team-btn" autocomplete="off"/>
+                <label id="valorTeam" class="btn badger-team-btn-img badger-valor-team">
+                  <input type="radio" class="badger-team-btn" value="VALOR" autocomplete="off"/>
                 </label>
-                <label class="btn badger-team-btn-img badger-instinct-team">
-                  <input type="radio" id="instinctTeam" class="badger-team-btn" autocomplete="off"/>
+                <label id="instinctTeam" class="btn badger-team-btn-img badger-instinct-team">
+                  <input type="radio" class="badger-team-btn" value="INSTINCT" autocomplete="off"/>
                 </label>
             </div>
         </div>
         <div class="modal-footer">
-          <button id="postTeam" type="button" class="btn btn-info">Save</button>
+          <button id="saveTeam" type="button" class="btn btn-info">Save</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>

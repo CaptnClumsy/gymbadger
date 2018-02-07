@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 public class DefaultsDao {
 
+	private UserDao user;
 	private Integer zoom;
 	private Double lat;
 	private Double lng;

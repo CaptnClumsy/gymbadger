@@ -39,7 +39,7 @@ public class UserController {
     public UserDao getCurrentUser(Principal principal) {
 		try {
 			UserEntity user = userService.getCurrentUser(principal);
-			return new UserDao(user.getId(), user.getName(), user.getDisplayName(), user.getAdmin(), user.getTeam());
+			return UserDao.fromEntity(user);
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException("Current user not found");
 		}
@@ -52,9 +52,27 @@ public class UserController {
         if (user == null) {
         	throw new ObjectNotFoundException("User "+id+" not found");
         }
-        return new UserDao(user.getId(), user.getName(), user.getDisplayName(), user.getAdmin(), user.getTeam());
+        return UserDao.fromEntity(user);
     }
     
+    @RequestMapping(value = "/currentUser", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
+    public UserDao updateUser(Principal principal, @RequestBody UserDao updatedUser) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    		final UserEntity user = userService.getCurrentUser(principal);
+    		if (updatedUser.getId()!=user.getId()) {
+    			throw new ForbiddenException("You can only update your own user details");
+    		}
+    		final UserEntity savedUser = userService.updateUser(user, updatedUser);
+    		return UserDao.fromEntity(savedUser);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	}
+    }
+
     @RequestMapping(value = "/leaderboard", method = RequestMethod.GET)
     public LeadersDao getLeaderboard(Principal principal) {
     	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {

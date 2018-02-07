@@ -5,6 +5,7 @@
   var gymData;
   var selectedAreaIds = [];
   var parksOnly = false;
+  var currentUser = null;
   var currentInfoWindow = null;
   var currentMarker = null;
   var currentProps = null;
@@ -60,14 +61,17 @@
                     gestureHandling: 'greedy'
                     });
                     showAnnouncements(data.announcements);
+                    currentUser=data.user;
                 },
                 error: function (result) {
             	    errorPage("Failed to query default data", result);
+            	    currentUser = null;
                 },
                 complete: function (res) {
                     initAdvancedPage();
             	    initMarkers();
             	    initUpload();
+            	    initTeamOptions();
                 }
     	    });
   		}
@@ -671,13 +675,14 @@
   }
 
   function resetPercentage() {
+      var colors = getPercentageColors();
 	  // Calculate the percentage
 	  var data = getPercentGold();
 	  // Clear previous percentage
 	  $('#badger-gold-percent').html('');
 	  // Draw the new percentage
 	  var el = document.getElementById('badger-gold-percent');
-	  drawPercentage(el, 42, 5, data.amount, data.total, '#efefef', '#f0f000', true, false);
+	  drawPercentage(el, 42, 5, data.amount, data.total, colors.background, colors.gold, true, false);
   }
 
   function getSearchData() {
@@ -713,6 +718,7 @@
 	  initRaidBosses();
       resetPercentage();
 	  updateVisibleGyms();
+	  updateColors(currentUser.team);
   }
 
   // Show any gym specified in the URL
@@ -1518,17 +1524,82 @@
       return html;
   }
   
+  function initTeamOptions() {
+      $('#saveTeam').on('click', function() {
+        var team = $('#teamButtons label.active input').val();
+        var updatedUser = currentUser;
+        updatedUser.team = team;
+        $.ajax({
+          type: "PUT",
+          contentType: "application/json; charset=utf-8",
+          url: "api/users/currentUser/",
+          data: JSON.stringify(updatedUser),
+          success: function (data) {
+            currentUser = data;
+            $('#teamPage').modal('hide');
+            updateColors(data.team);
+          },
+          error: function () {
+            alert("Failed to update team selection");
+          }
+	    }); 	  
+      });
+  }
+  
   function showTeamOptions() {
       closeAnyInfoWindows();
+      setCurrentTeam();
       // Show the window
       $('#teamPage').modal('show');
   }
   
-  function getNavColor(data) {
-      if (data=="VALOR") {
-          return "#c80000";
-      } else if (data=="INSTINCT") {
-          return "#f4f400";
+  function setCurrentTeam() {
+      $(".badger-team-container .active").removeClass("active");
+      if (currentUser==null || currentUser.team==null) {
+          return;
       }
-      return "#007bff";
+      if (currentUser.team=="MYSTIC") {
+          $("#mysticTeam").addClass("active");
+      } else if (currentUser.team=="VALOR") {
+          $("#valorTeam").addClass("active");
+      } else if (currentUser.team=="INSTINCT") {
+          $("#instinctTeam").addClass("active");
+      }
+  }
+  
+  function updateColors(team) {
+      if (team=="INSTINCT") {
+         $('#badgerTopNav').removeClass("navbar-dark badger-navbar-mystic badger-navbar-valor");
+         $('#badgerTopNav').addClass("navbar-light badger-navbar-instinct");
+         $('#badgerTopNav .badger-btn-item').addClass("btn-warning").removeClass("btn-primary btn-danger");
+         $('#userMenuButton').addClass("btn-warning").removeClass("btn-danger btn-primary");
+         $('#areaFilter :button').addClass("btn-warning").removeClass("btn-danger btn-primary");
+      } else if (team=="VALOR") {
+         $('#badgerTopNav').removeClass("navbar-light badger-navbar-mystic badger-navbar-instinct");
+         $('#badgerTopNav').addClass("navbar-dark badger-navbar-valor");
+         $('#badgerTopNav .badger-btn-item').addClass("btn-danger").removeClass("btn-primary btn-warning");
+         $('#userMenuButton').addClass("btn-danger").removeClass("btn-primary btn-warning");
+         $('#areaFilter :button').addClass("btn-danger").removeClass("btn-primary btn-warning");
+      } else {
+         $('#badgerTopNav').removeClass("navbar-light badger-navbar-valor badger-navbar-instinct");
+         $('#badgerTopNav').addClass("navbar-dark badger-navbar-mystic");
+         $('#badgerTopNav .badger-btn-item').addClass("btn-primary").removeClass("btn-danger btn-warning");
+         $('#userMenuButton').addClass("btn-primary").removeClass("btn-danger btn-warning");
+         $('#areaFilter :button').addClass("btn-primary").removeClass("btn-danger btn-warning");
+      }
+      resetPercentage();     
+  }
+  
+  function getPercentageColors() {
+    var backColor = '#efefef';
+    var goldColor = '#f0f000';
+    if (currentUser.team=="INSTINCT") {
+        backColor = '#535559';
+        goldColor = '#f9c004';
+    }
+    var retData = {
+        background: backColor,
+        gold: goldColor
+    };
+    return retData;
   }

@@ -31,7 +31,7 @@ public class DefaultsController {
     public DefaultsDao getDefaults(Principal principal) {
 		try {
 			final UserEntity user = userService.getCurrentUser(principal);
-			return defaultsService.getDefaults(user.getId());
+			return defaultsService.getDefaults(user);
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException(e);
 		}
