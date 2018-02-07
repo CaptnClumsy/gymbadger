@@ -15,10 +15,14 @@
   var totalTable = null;
 
   function initPage() {
-	// Load snazzy info window script
+	// Load snazzy info window and marker cluster scripts
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
 	script.src = 'js/snazzy-info-window-hacked.js';
+	document.body.appendChild(script);
+	var script = document.createElement('script');
+	script.type = 'text/javascript';
+	script.src = 'js/markerclusterer.js';
 	document.body.appendChild(script);
 	// Setup CSRF token
 	$.ajaxSetup({
@@ -234,6 +238,11 @@
           url: "api/gyms/",
           success: function (data) {
         	  gymData = data;
+        	  var goldMarkers = [];
+        	  var silverMarkers = [];
+        	  var bronzeMarkers = [];
+        	  var basicMarkers = [];
+        	  var noMarkers = [];
               for (var i = 0; i < gymData.length; i++) {
             	  // Add the marker
                   var marker = new google.maps.Marker({
@@ -243,6 +252,17 @@
                     map: map
                   });
             	  gymData[i].marker = marker;
+            	  if (gymData[i].status=="GOLD") {
+            	      goldMarkers.push(marker);
+            	  } else if (gymData[i].status=="SILVER") {
+            		  silverMarkers.push(marker);
+            	  } else if (gymData[i].status=="BRONZE") {
+            		  bronzeMarkers.push(marker);
+            	  } else if (gymData[i].status=="BASIC") {
+            		  basicMarkers.push(marker);
+            	  } else {
+            		  noMarkers.push(marker);
+            	  }
                   // Add a callback to create an info window for each marker if clicked
                   (function (marker, i) {
                     google.maps.event.addListener(marker, 'click', function () {
@@ -250,7 +270,22 @@
                         createInfoWindow(gymData[i], marker);
                     });
                   })(marker, i);
-              } 
+              }
+              if (goldMarkers.length>0) {
+                  var markerCluster = new MarkerClusterer(map, goldMarkers, {maxZoom: 15, imagePath: 'images/goldmarkers/m'});
+              }
+              if (silverMarkers.length>0) {
+                  var markerCluster = new MarkerClusterer(map, silverMarkers, {maxZoom: 15, imagePath: 'images/silvermarkers/m'});
+              }
+              if (bronzeMarkers.length>0) {
+                  var markerCluster = new MarkerClusterer(map, bronzeMarkers, {maxZoom: 15, imagePath: 'images/bronzemarkers/m'});
+              }
+              if (basicMarkers.length>0) {
+                  var markerCluster = new MarkerClusterer(map, basicMarkers, {maxZoom: 15, imagePath: 'images/basicmarkers/m'});
+              }
+              if (noMarkers.length>0) {
+                  var markerCluster = new MarkerClusterer(map, noMarkers, {maxZoom: 15, imagePath: 'images/nomarkers/m'});
+              }
           },
           complete: function (result) {
         	  initAreas();
