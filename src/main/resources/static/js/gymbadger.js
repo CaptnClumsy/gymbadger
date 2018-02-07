@@ -1532,7 +1532,7 @@
         $.ajax({
           type: "PUT",
           contentType: "application/json; charset=utf-8",
-          url: "api/users/currentUser/",
+          url: "api/users/me",
           data: JSON.stringify(updatedUser),
           success: function (data) {
             currentUser = data;

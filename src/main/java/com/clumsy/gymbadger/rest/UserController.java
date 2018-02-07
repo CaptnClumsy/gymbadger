@@ -55,7 +55,7 @@ public class UserController {
         return UserDao.fromEntity(user);
     }
     
-    @RequestMapping(value = "/currentUser", method = RequestMethod.PUT)
+    @RequestMapping(value = "/me", method = RequestMethod.PUT)
     @ResponseStatus(HttpStatus.OK)
     public UserDao updateUser(Principal principal, @RequestBody UserDao updatedUser) {
     	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
@@ -63,7 +63,7 @@ public class UserController {
     	}
     	try {
     		final UserEntity user = userService.getCurrentUser(principal);
-    		if (updatedUser.getId()!=user.getId()) {
+    		if (!updatedUser.getId().equals(user.getId())) {
     			throw new ForbiddenException("You can only update your own user details");
     		}
     		final UserEntity savedUser = userService.updateUser(user, updatedUser);
