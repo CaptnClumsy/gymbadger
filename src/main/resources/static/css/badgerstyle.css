@@ -55,7 +55,7 @@ body {
     background-color: #c80000;
 }
 .badger-navbar-instinct {
-    background-color: #f9fb0b;
+    background-color: #e7e922;
     color: black;
 }
 .badger-navbar-title {
@@ -90,6 +90,14 @@ body {
     justify-content: space-between;
     width: 100%;
     vertical-align: middle;
+}
+.badger-area-btn {
+  padding-right: 4px;
+  font-size: 22px;
+  padding-left: 4px;
+  line-height: 24px;
+  margin-top: 2px;
+  height: 38px;
 }
 .badger-align-middle {
 	display: flex;
@@ -951,4 +959,16 @@ input[type="file"] {
     font-size: 72px;
     font-family: FontAwesome;
     color: rgba(190, 230, 79, 0.8);
+}
+#badgerTopNav .btn-warning {
+    background-color: #e8cb10 !important;
+    border-color: #ccb104 !important;
+}
+#badgerTopNav .btn-warning:hover, body .btn-warning:focus {
+    border-color: #b29a01 !important;
+    background-color: #c9b00e !important;
+}
+#badgerTopNav .btn-warning: active, body .btn-warning:visited, body .btn-warning:active:focus, body .btn-warning:active:hover {
+    border-color: #639d34 !important;
+    background-color: #e9cc20 !important;   
 }
