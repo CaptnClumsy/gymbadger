@@ -44,6 +44,8 @@
   		contentType: "application/json; charset=utf-8",
   		url: "/api/users/currentUser", 
   		success: function (data) {
+  			currentUser=data;
+            updateColors(currentUser.team);
   	        $('#user').html(data.displayName);
   	        $('.badger-unauthenticated').hide();
   	        $('.badger-authenticated').show();
@@ -65,8 +67,6 @@
                     gestureHandling: 'greedy'
                     });
                     showAnnouncements(data.announcements);
-                    currentUser=data.user;
-                    updateColors(currentUser.team);
                 },
                 error: function (result) {
             	    errorPage("Failed to query default data", result);
@@ -1634,6 +1634,9 @@
   }
   
   function getButtonClass() {
+	  if (currentUser==null) {
+		  return "btn-primary";
+	  }
 	  if (currentUser.team=="INSTINCT") {
 	      return "btn-warning";
 	  } else if (currentUser.team=="VALOR") {
