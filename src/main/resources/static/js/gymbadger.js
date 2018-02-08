@@ -1707,7 +1707,11 @@
          $('#badgerTopNav .badger-btn-item').addClass("btn-primary").removeClass("btn-danger btn-warning");
          $('#userMenuButton').addClass("btn-primary").removeClass("btn-danger btn-warning");
          $('#areaFilter :button').addClass("btn-primary").removeClass("btn-danger btn-warning");
-         $('#badgerTeamTabLogo').addClass("badger-mystic-team").removeClass("badger-instinct-team badger-valor-team");
+         if (team==null || team=="NONE") {
+           $('#badgerTeamTabLogo').removeClass("badger-instinct-team badger-valor-team badger-mystic-team");
+         } else {
+           $('#badgerTeamTabLogo').addClass("badger-mystic-team").removeClass("badger-instinct-team badger-valor-team");
+         }
       }     
   }
   
