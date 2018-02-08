@@ -66,6 +66,7 @@
                     });
                     showAnnouncements(data.announcements);
                     currentUser=data.user;
+                    updateColors(currentUser.team);
                 },
                 error: function (result) {
             	    errorPage("Failed to query default data", result);
@@ -153,8 +154,9 @@
           	errorPage("Failed to query area data", result);
           },
           complete: function (res) {
+        	var btnClass = "btn " + getButtonClass()+ " badger-select";
             $('#filterButton').multiselect({
-              buttonClass: 'btn btn-primary badger-select',
+              buttonClass: btnClass,
               buttonContainer: '<div id="badger-dropdown-list" class="btn-group" />',
               enableClickableOptGroups: true,
               nonSelectedText: 'No areas',
@@ -753,12 +755,10 @@
 	  initRaidBosses();
       resetPercentage();
 	  updateVisibleGyms();
-	  updateColors(currentUser.team);
   }
 
   // Show any gym specified in the URL
   function showGymFromUrl() {
-      ;
       var gymIdStr = new URLSearchParams(window.location.search).get("gymid");
   	  if (gymIdStr !== null) {
   	      var urlGymId = parseInt(gymIdStr, 10);
@@ -1249,7 +1249,8 @@
 	  queryTotalLeaderboardData();
    	  // Setup callbacks
    	  $('#leadersPage').on('hidden.bs.modal', function() {
-       	  resetLeaderTables();
+       	  resetLeadersTable();
+       	  resetTotalTable();
        	  $('#share-switch').bootstrapSwitch('destroy');
    	      $('#leadersTableBody').html("");
    	      $('#totalTableBody').html("");
@@ -1270,7 +1271,8 @@
             data: JSON.stringify(e.target.checked),
             success: function (data) {
               // Update the UI by removing table and requerying everything
-              resetLeaderTables();
+              resetLeadersTable();
+              resetTotalTable();
               queryLeaderboardData();
               queryTotalLeaderboardData();
             },
@@ -1289,6 +1291,7 @@
           contentType: "application/json; charset=utf-8",
           url: "api/users/leaderboard",
           success: function (data) {
+        	  resetLeadersTable();
         	  $('#leadersTableBody').html("");
         	  $('#share-switch').bootstrapSwitch('state', data.share, false);
         	  if (data.leaders == null || data.leaders.length==0) {
@@ -1312,6 +1315,7 @@
               }
        	  },
           error: function (result) {
+        	  resetLeadersTable();
         	  $('#leadersTableBody').html("");
         	  var errorHtml = "<tr><td><div class=\"alert alert-danger\" role=\"alert\">Failed to query leaderboard.";
         	  if (result.responseJSON !== undefined) {
@@ -1329,12 +1333,12 @@
   }
   
   function queryTotalLeaderboardData() {
-    resetLeaderTables();
     $.ajax({
       type: "GET",
       contentType: "application/json; charset=utf-8",
       url: "api/users/leaderboard/totals",
       success: function (data) {
+    	  resetTotalTable();
     	  $('#totalTableBody').html("");
     	  if (data.leaders == null || data.leaders.length==0) {
     		  $('#totalTableBody').append("<tr><td><div class=\"alert alert-warning\" role=\"alert\">No gym badge leaders to display.</div></td></tr>");
@@ -1357,6 +1361,7 @@
           }
    	  },
       error: function (result) {
+    	  resetTotalTable();
     	  $('#totalTableBody').html("");
     	  var errorHtml = "<tr><td><div class=\"alert alert-danger\" role=\"alert\">Failed to query total leaderboard.";
     	  if (result.responseJSON !== undefined) {
@@ -1399,11 +1404,14 @@
 	  return "badger-rank-other";
   }
   
-  function resetLeaderTables() {
+  function resetLeadersTable() {
       if (leadersTable != null) {
         leadersTable.destroy();
         leadersTable = null;
       }
+  }
+
+  function resetTotalTable() {
       if (totalTable != null) {
         totalTable.destroy();
         totalTable = null;
@@ -1573,6 +1581,7 @@
             currentUser = data;
             $('#teamPage').modal('hide');
             updateColors(data.team);
+            resetPercentage();
           },
           error: function () {
             alert("Failed to update team selection");
@@ -1621,10 +1630,19 @@
          $('#badgerTopNav .badger-btn-item').addClass("btn-primary").removeClass("btn-danger btn-warning");
          $('#userMenuButton').addClass("btn-primary").removeClass("btn-danger btn-warning");
          $('#areaFilter :button').addClass("btn-primary").removeClass("btn-danger btn-warning");
-      }
-      resetPercentage();     
+      }     
   }
   
+  function getButtonClass() {
+	  if (currentUser.team=="INSTINCT") {
+	      return "btn-warning";
+	  } else if (currentUser.team=="VALOR") {
+	      return "btn-danger";
+	  } else {
+	      return "btn-primary";
+      }
+  }
+
   function getPercentageColors() {
     var backColor = '#efefef';
     var goldColor = '#f0f000';
