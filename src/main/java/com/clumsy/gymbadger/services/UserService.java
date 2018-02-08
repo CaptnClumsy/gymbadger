@@ -19,6 +19,7 @@ import com.clumsy.gymbadger.data.AnnouncementType;
 import com.clumsy.gymbadger.data.GymBadgeStatus;
 import com.clumsy.gymbadger.data.LeaderDao;
 import com.clumsy.gymbadger.data.LeadersDao;
+import com.clumsy.gymbadger.data.Team;
 import com.clumsy.gymbadger.data.UserDao;
 import com.clumsy.gymbadger.entities.AnnouncementEntity;
 import com.clumsy.gymbadger.entities.LeaderEntity;
@@ -240,5 +241,22 @@ public class UserService {
 			user.setTeam(updatedUser.getTeam());
 		}
 		return userRepo.save(user);
+	}
+
+	public LeadersDao getTeamLeaderboard(final UserEntity user, final String teamName) throws TeamNotFoundException {
+		List<LeaderEntity> leaderEntities = null;
+		Team team = Team.fromStringIgnoreCase(teamName);
+		if (team==null) {
+			throw new TeamNotFoundException("Cannot find team "+teamName);
+		}
+		leaderEntities = userRepo.findTeamLeaders(team);
+		LeadersDao leaders = new LeadersDao();
+		leaders.setShare(user.getShareData());
+		int rank = 1;
+		for (LeaderEntity leaderEntity : leaderEntities) {
+			LeaderDao leader = new LeaderDao(rank++, leaderEntity.getdisplayName(), leaderEntity.getBadges());
+			leaders.add(leader);
+		}
+		return leaders;
 	}
 }

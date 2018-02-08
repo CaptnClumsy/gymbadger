@@ -13,6 +13,7 @@
   var raidBossData = null;
   var leadersTable = null;
   var totalTable = null;
+  var teamTable = null;
 
   function initPage() {
 	// Load snazzy info window and marker cluster scripts
@@ -1245,15 +1246,15 @@
   function showLeaderboard() {
 	  closeAnyInfoWindows();
 	  $('#leadersTableBody').html("Loading...");
-	  queryLeaderboardData();
-	  queryTotalLeaderboardData();
    	  // Setup callbacks
    	  $('#leadersPage').on('hidden.bs.modal', function() {
        	  resetLeadersTable();
        	  resetTotalTable();
+       	  resetTeamTable();
        	  $('#share-switch').bootstrapSwitch('destroy');
    	      $('#leadersTableBody').html("");
    	      $('#totalTableBody').html("");
+   	      $('#teamTableBody').html("");
    	  });
       $('#share-switch').bootstrapSwitch({
       	state: false,
@@ -1264,6 +1265,16 @@
       	offText: 'No'
       });
       $('#share-switch').on('switchChange.bootstrapSwitch', function(e) {
+    	var changed = false;
+    	if (currentUser!=null) {
+    		if (e.target.checked != currentUser.share) {
+    			changed = true;
+    		}
+    	}
+    	if (!changed) {
+    		$('#leadersPage').modal('show');
+    		return;
+    	}
 	    $.ajax({
             type: "PUT",
             contentType: "application/json; charset=utf-8",
@@ -1273,14 +1284,20 @@
               // Update the UI by removing table and requerying everything
               resetLeadersTable();
               resetTotalTable();
+              resetTeamTable();
               queryLeaderboardData();
               queryTotalLeaderboardData();
+              queryTeamLeaderboardData();
+              currentUser.share = data.share;
             },
             error: function (result) {
               alert("Failed to update leaderboard status", result);
             }
     	  });
       });
+      queryLeaderboardData();
+	  queryTotalLeaderboardData();
+	  queryTeamLeaderboardData();
       // Show the window
       $('#leadersPage').modal('show');
   }
@@ -1378,6 +1395,57 @@
     });
   }
 
+  function queryTeamLeaderboardData() {
+	  if (currentUser==null || currentUser.team==null) {
+		  resetTeamTable();
+		  $('#teamTableBody').append("<tr><td><div class=\"alert alert-warning\" role=\"alert\">You have not chosen your team.</div></td></tr>");
+		  return;
+	  }
+	  $.ajax({
+          type: "GET",
+          contentType: "application/json; charset=utf-8",
+          url: "api/users/leaderboard/team/"+currentUser.team,
+          success: function (data) {
+        	  resetTeamTable();
+        	  $('#teamTableBody').html("");
+        	  if (data.leaders == null || data.leaders.length==0) {
+        		  $('#teamTableBody').append("<tr><td><div class=\"alert alert-warning\" role=\"alert\">No gym badge leaders to display.</div></td></tr>");
+        	  } else {
+        	      for (var i = 0; i < data.leaders.length; i++) {
+        		      var rankClass = getRankClass(data.leaders[i].rank);
+        		      $('#teamTableBody').append("<tr>" +
+        	              "<td class=\"" + rankClass + "\">" + getRankHtml(data.leaders[i].rank) + "</td>" +
+        	              "<td class=\"" + rankClass + "\">"  + data.leaders[i].name + "</td>" +
+        	              "<td class=\"" + rankClass + " badger-lead-total\">"  + data.leaders[i].badges + "</td>");
+        	      }
+        	      // Initialize the table
+            	  teamTable = $('#teamTable').DataTable({
+            	    "autoWidth": true,
+            		"scrollY": 300,
+            	    "scrollX": true,
+            	    "searching": false,
+            	    "lengthChange": false
+            	  });
+              }
+       	  },
+          error: function (result) {
+        	  resetTeamTable();
+        	  $('#teamTableBody').html("");
+        	  var errorHtml = "<tr><td><div class=\"alert alert-danger\" role=\"alert\">Failed to query leaderboard.";
+        	  if (result.responseJSON !== undefined) {
+        		  errorHtml += "<br>" + result.responseJSON.message;
+        	  }
+        	  errorHtml += "</div></td></tr>";
+        	  $('#teamTableBody').append(errorHtml);
+          },
+          complete: function() {
+        	  if (teamTable != null) {
+       		      teamTable.columns.adjust().draw();
+       		  }
+          }
+	  });
+  }
+
   function getRankHtml(rank) {
 	  if (rank==1) {
 		  return "<span class=\"badger-lead-medal1\"></span>";
@@ -1415,6 +1483,13 @@
       if (totalTable != null) {
         totalTable.destroy();
         totalTable = null;
+      }
+  }
+
+  function resetTeamTable() {
+      if (teamTable != null) {
+        teamTable.destroy();
+        teamTable = null;
       }
   }
 
@@ -1618,18 +1693,21 @@
          $('#badgerTopNav .badger-btn-item').addClass("btn-warning").removeClass("btn-primary btn-danger");
          $('#userMenuButton').addClass("btn-warning").removeClass("btn-danger btn-primary");
          $('#areaFilter :button').addClass("btn-warning").removeClass("btn-danger btn-primary");
+         $('#badgerTeamTabLogo').addClass("badger-instinct-team").removeClass("badger-valor-team badger-mystic-team");
       } else if (team=="VALOR") {
          $('#badgerTopNav').removeClass("navbar-light badger-navbar-mystic badger-navbar-instinct");
          $('#badgerTopNav').addClass("navbar-dark badger-navbar-valor");
          $('#badgerTopNav .badger-btn-item').addClass("btn-danger").removeClass("btn-primary btn-warning");
          $('#userMenuButton').addClass("btn-danger").removeClass("btn-primary btn-warning");
          $('#areaFilter :button').addClass("btn-danger").removeClass("btn-primary btn-warning");
+         $('#badgerTeamTabLogo').addClass("badger-valor-team").removeClass("badger-instinct-team badger-mystic-team");
       } else {
          $('#badgerTopNav').removeClass("navbar-light badger-navbar-valor badger-navbar-instinct");
          $('#badgerTopNav').addClass("navbar-dark badger-navbar-mystic");
          $('#badgerTopNav .badger-btn-item').addClass("btn-primary").removeClass("btn-danger btn-warning");
          $('#userMenuButton').addClass("btn-primary").removeClass("btn-danger btn-warning");
          $('#areaFilter :button').addClass("btn-primary").removeClass("btn-danger btn-warning");
+         $('#badgerTeamTabLogo').addClass("badger-mystic-team").removeClass("badger-instinct-team badger-valor-team");
       }     
   }
   

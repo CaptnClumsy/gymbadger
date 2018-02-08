@@ -17,6 +17,9 @@ public enum Team {
     }
 
     public static Team fromStringIgnoreCase(final String string) {
+    	if (string==null) {
+    		return Team.NONE;
+    	}
         for (final Team value : Team.values()) {
             if (string.equalsIgnoreCase(value.name())) {
                 return value;
@@ -24,4 +27,5 @@ public enum Team {
         }
         throw new IllegalArgumentException("Unknown value " + string);
     }
+
 }

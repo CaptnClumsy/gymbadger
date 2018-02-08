@@ -221,6 +221,10 @@
                   <li class="nav-item">
                     <a id="totalTab" class="nav-link badger-leader-tab-label" data-toggle="tab" href="#totalLeaderboard" role="tab" aria-selected="false">Total</a>
                   </li>
+                  <li class="nav-item">
+                    <a id="teamTab" class="nav-link badger-leader-tab-label" data-toggle="tab" href="#teamLeaderboard" role="tab" aria-selected="false">Team
+                    <div id="badgerTeamTabLogo" class="badger-tab-logo"></div></a>
+                  </li>
                 </ul>
               </span>
               <div class="tab-content">
@@ -246,6 +250,18 @@
                       </tr>
                     </thead>
                     <tbody id="totalTableBody" class="badger-lead-table-body"></tbody>
+                  </table>
+                </div>
+                <div class="tab-pane" id="teamLeaderboard" role="tabpanel">
+                  <table id="teamTable" class="table badger-lead-table scrollable" style="width: 100%;">
+                    <thead style="display:none;">
+                      <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Badges</th>
+                      </tr>
+                    </thead>
+                    <tbody id="teamTableBody" class="badger-lead-table-body"></tbody>
                   </table>
                 </div>
               </div>

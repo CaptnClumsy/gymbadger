@@ -15,6 +15,7 @@ import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.repos.UserRepo;
 import com.clumsy.gymbadger.services.AccessControlException;
 import com.clumsy.gymbadger.services.AnnouncementNotFoundException;
+import com.clumsy.gymbadger.services.TeamNotFoundException;
 import com.clumsy.gymbadger.services.UserNotFoundException;
 import com.clumsy.gymbadger.services.UserService;
 
@@ -99,6 +100,21 @@ public class UserController {
     	}
 	}
     
+    @RequestMapping(value = "/leaderboard/team/{team}", method = RequestMethod.GET)
+    public LeadersDao getTeamLeaderboard(Principal principal, @PathVariable("team") String team) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+    	try {
+    	    UserEntity user = userService.getCurrentUser(principal);
+		    return userService.getTeamLeaderboard(user, team);
+    	} catch (UserNotFoundException e) {
+    		throw new ObjectNotFoundException("Current user not found");
+    	}  catch (TeamNotFoundException e) {
+    		throw new ObjectNotFoundException("Team not found");
+    	}
+	}
+
     @RequestMapping(value = "/leaderboard", method = RequestMethod.PUT)
     public UserDao setLeaderboard(Principal principal, @RequestBody Boolean share) {
     	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {

@@ -807,6 +807,18 @@ body {
     padding-top: 8px;
     padding-bottom: 6px;
     font-size: 14px;
+    padding-bottom: 1px;
+}
+.badger-tab-logo {
+    position: relative;
+    top: -2px;
+    width: 30px;
+    height: 30px;
+    background-repeat: space;
+    background-size: contain;
+    margin-left: 4px;
+    padding: 0px;
+    margin-top: 0px;
 }
 #totalTableBody td {
     padding: 8px !important;
@@ -971,4 +983,7 @@ input[type="file"] {
 #badgerTopNav .btn-warning: active, body .btn-warning:visited, body .btn-warning:active:focus, body .btn-warning:active:hover {
     border-color: #639d34 !important;
     background-color: #e9cc20 !important;   
+}
+#teamTab {
+	display: flex;
 }
