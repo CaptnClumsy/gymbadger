@@ -116,14 +116,7 @@ public class GymService {
 	public GymSummaryDao getGymSummary(final Long userId, final Long gymId) throws GymPropsNotFoundException, GymNotFoundException {
 		final GymEntity gym = getGym(gymId);
 		final GymPropsEntity props = getGymProps(userId, gymId);
-		final GymSummaryDao dao = GymSummaryDao.fromGymEntity(gym);
-		if (props != null) {
-			dao.setStatus(props.getBadgeStatus());
-		    dao.setLastRaid(props.getLastRaid());
-		    dao.setPokemonId(props.getPokemonId());
-		    dao.setCaught(props.getCaught());
-		}
-		return dao;
+		return GymSummaryDao.fromGymEntity(gym, props);
 	}
 
 	public List<GymSummaryDao> getAllGymSummaries(final Long userId) throws GymNotFoundException {
@@ -163,20 +156,13 @@ public class GymService {
 			// Fill in the user-specific data
 			return Lists.newArrayList(Lists.transform(gyms, gym -> {
 				final GymPropsEntity gymProps = gymPropsMap.get(gym.getId());
-				final GymSummaryDao dao = GymSummaryDao.fromGymEntity(gym);
-				if (gymProps != null) {
-					dao.setStatus(gymProps.getBadgeStatus());
-				    dao.setLastRaid(gymProps.getLastRaid());
-				    dao.setPokemonId(gymProps.getPokemonId());
-				    dao.setCaught(gymProps.getCaught());
-				} 
-				return dao;
+				return GymSummaryDao.fromGymEntity(gym, gymProps);
 	        }));
 		} catch (GymPropsNotFoundException e) {
 			// This is expected if the user has never used the system before
 			// So just return the gyms with default user data
 			return Lists.newArrayList(Lists.transform(gyms, gym -> {
-	            return GymSummaryDao.fromGymEntity(gym);
+	            return GymSummaryDao.fromGymEntity(gym, null);
 	        }));
 		}
 
@@ -203,12 +189,19 @@ public class GymService {
 		boolean hasRaidChanged = false;
 		try {
 			props = getGymProps(user.getId(), gymId);
-			if (lastRaid!=props.getLastRaid() || pokemonId != props.getPokemonId() ||
-				caught!=props.getCaught()) {
-				hasRaidChanged = true;
-			}
 			if (status!=props.getBadgeStatus()) {
 				hasBadgeChanged = true;
+			}
+			if (props.getLastRaid() != null) {
+			    if (lastRaid!=props.getLastRaid().getLastRaid() ||
+			    	caught!=props.getLastRaid().getCaught()) {
+				    hasRaidChanged = true;
+			    }
+			    if (props.getLastRaid().getPokemon()!=null) {
+			    	if (pokemonId != props.getLastRaid().getPokemon().getId()) {
+			    		hasRaidChanged = true;
+			    	}
+			    }
 			}
 		} catch (GymPropsNotFoundException e) {
 			// Expected if user has never edited this gym before
@@ -223,13 +216,7 @@ public class GymService {
 				hasRaidChanged=true;
 			}
 		}
-		// Now update the per-user properties of the gym
-		props.setLastRaid(lastRaid);
-		props.setPokemonId(pokemonId);
-		props.setCaught(caught);
-		props.setBadgeStatus(status);
-		gymPropsRepo.save(props);
-		// And write history records
+		// Write history records
 		if (hasRaidChanged) {
 			PokemonEntity pokemon = null;
 			if (pokemonId!=null) {
@@ -238,22 +225,22 @@ public class GymService {
 					throw new PokemonNotFoundException("Pokemon "+pokemonId+" not found");
 				}
 			}
-			writeGymRaidHistory(new Date(), user.getId(), gymId,
-				lastRaid, pokemon, caught);	
+			final UserRaidHistoryEntity raidHistory = writeGymRaidHistory(new Date(), user.getId(), gymId,
+				lastRaid, pokemon, caught);
+			props.setLastRaid(raidHistory);
 		}
 		if (hasBadgeChanged) {
 			writeGymBadgeHistory(new Date(), user.getId(), gymId, status);
 		}
+		// Now update the per-user properties of the gym
+		props.setBadgeStatus(status);
+		gymPropsRepo.save(props);
 		// Create a summary object with the gym details and per-user gym details
-		final GymSummaryDao dao = GymSummaryDao.fromGymEntity(gym);
-		dao.setStatus(props.getBadgeStatus());
-		dao.setLastRaid(props.getLastRaid());
-		dao.setPokemonId(props.getPokemonId());
-		dao.setCaught(props.getCaught());
+		final GymSummaryDao dao = GymSummaryDao.fromGymEntity(gym, props);
 		return dao;
 	}
 
-	private UserGymHistoryEntity writeGymRaidHistory(final Date date, final Long userId, final Long gymId,
+	private UserRaidHistoryEntity writeGymRaidHistory(final Date date, final Long userId, final Long gymId,
 			final Date lastRaid, final PokemonEntity pokemon, final Boolean caught) {
 		// Write raid history
 		UserRaidHistoryEntity raidHistory = new UserRaidHistoryEntity();
@@ -268,7 +255,8 @@ public class GymService {
 		history.setUserId(userId);
 		history.setGymId(gymId);
 		history.setHistoryId(savedRaidHistory.getId());
-		return gymHistoryRepo.save(history);
+		gymHistoryRepo.save(history);
+		return savedRaidHistory;
 	}
 	
 	private UserGymHistoryEntity writeGymBadgeHistory(final Date date, final Long userId, final Long gymId,
@@ -304,7 +292,7 @@ public class GymService {
 		newGym.setArea(area);
 		newGym.setPark(park);
 		final GymEntity savedGym = gymRepo.save(newGym);
-		return GymSummaryDao.fromGymEntity(savedGym);
+		return GymSummaryDao.fromGymEntity(savedGym, null);
 	}
 	
 	@Transactional

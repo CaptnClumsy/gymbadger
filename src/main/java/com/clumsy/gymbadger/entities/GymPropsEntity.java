@@ -1,7 +1,5 @@
 package com.clumsy.gymbadger.entities;
 
-import java.util.Date;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -9,6 +7,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.clumsy.gymbadger.data.GymBadgeStatus;
@@ -24,7 +24,7 @@ public class GymPropsEntity {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id")
 	private Long id;
-	
+
 	@Column(name = "gymid")
 	private Long gymId;
 
@@ -34,17 +34,12 @@ public class GymPropsEntity {
 	@Column(name = "badge_status")
 	@Enumerated(EnumType.ORDINAL)
     private GymBadgeStatus badgeStatus;
-	
+
 	@Column(name = "badge_percent")
 	private Integer badgePercent;
-	
-	@Column(name = "last_raid")
-	private Date lastRaid;
 
-	@Column(name = "pokemonid")
-	private Long pokemonId;
-	
-	@Column(name = "caught")
-	private Boolean caught;
+	@JoinColumn(name = "lastraidid")
+	@OneToOne
+	UserRaidHistoryEntity lastRaid;
 
 }

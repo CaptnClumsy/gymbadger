@@ -4,6 +4,7 @@ import java.util.Date;
 
 import com.clumsy.gymbadger.entities.AreaEntity;
 import com.clumsy.gymbadger.entities.GymEntity;
+import com.clumsy.gymbadger.entities.GymPropsEntity;
 
 import lombok.Data;
 
@@ -46,8 +47,19 @@ public class GymSummaryDao {
 		this.imageUrl=imageUrl;
 	}
 
-	public static GymSummaryDao fromGymEntity(final GymEntity gym) {
-		return new GymSummaryDao(gym.getId(), gym.getName(), gym.getLatitude(), gym.getLongitude(), gym.getPark(),
-				gym.getArea(), gym.getImageUrl());
+	public static GymSummaryDao fromGymEntity(final GymEntity gym, final GymPropsEntity props) {
+		GymSummaryDao dao = new GymSummaryDao(gym.getId(), gym.getName(), gym.getLatitude(), gym.getLongitude(), 
+			gym.getPark(), gym.getArea(), gym.getImageUrl());
+		if (props != null) {
+			dao.setStatus(props.getBadgeStatus());
+			if (props.getLastRaid()!=null) {
+		        dao.setLastRaid(props.getLastRaid().getLastRaid());
+		        dao.setCaught(props.getLastRaid().getCaught());
+		        if (props.getLastRaid().getPokemon()!=null) {
+		            dao.setPokemonId(props.getLastRaid().getPokemon().getId());
+		        }
+			}
+		}
+		return dao;
 	}
 }
