@@ -193,7 +193,7 @@ public class GymService {
 				hasBadgeChanged = true;
 			}
 			if (props.getLastRaid() != null) {
-			    if (lastRaid!=props.getLastRaid().getLastRaid() ||
+			    if (!lastRaid.equals(props.getLastRaid().getLastRaid()) ||
 			    	caught!=props.getLastRaid().getCaught()) {
 				    hasRaidChanged = true;
 			    }
@@ -209,7 +209,7 @@ public class GymService {
 			props = new GymPropsEntity();
 			props.setUserId(user.getId());
 			props.setGymId(gymId);
-			if (status!=null) {
+			if (status!=null && !status.is(GymBadgeStatus.NONE)) {
 				hasBadgeChanged = true;
 			}
 			if (lastRaid!=null || pokemonId!=null || caught!=null) {
@@ -225,12 +225,19 @@ public class GymService {
 					throw new PokemonNotFoundException("Pokemon "+pokemonId+" not found");
 				}
 			}
-			final UserRaidHistoryEntity raidHistory = writeGymRaidHistory(new Date(), user.getId(), gymId,
+			final UserRaidHistoryEntity raidHistory = writeGymRaidHistory(user.getId(), gymId,
 				lastRaid, pokemon, caught);
-			props.setLastRaid(raidHistory);
+			if (props.getLastRaid()!=null) {
+				if (raidHistory.getLastRaid().after(props.getLastRaid().getLastRaid())) {
+					props.setLastRaid(raidHistory);
+				}
+			} else {
+				props.setLastRaid(raidHistory);
+			}
+			
 		}
 		if (hasBadgeChanged) {
-			writeGymBadgeHistory(new Date(), user.getId(), gymId, status);
+			writeGymBadgeHistory(user.getId(), gymId, status);
 		}
 		// Now update the per-user properties of the gym
 		props.setBadgeStatus(status);
@@ -240,7 +247,7 @@ public class GymService {
 		return dao;
 	}
 
-	private UserRaidHistoryEntity writeGymRaidHistory(final Date date, final Long userId, final Long gymId,
+	private UserRaidHistoryEntity writeGymRaidHistory(final Long userId, final Long gymId,
 			final Date lastRaid, final PokemonEntity pokemon, final Boolean caught) {
 		// Write raid history
 		UserRaidHistoryEntity raidHistory = new UserRaidHistoryEntity();
@@ -259,8 +266,7 @@ public class GymService {
 		return savedRaidHistory;
 	}
 	
-	private UserGymHistoryEntity writeGymBadgeHistory(final Date date, final Long userId, final Long gymId,
-			final GymBadgeStatus status) {
+	private UserGymHistoryEntity writeGymBadgeHistory(final Long userId, final Long gymId, final GymBadgeStatus status) {
 		// Write the badge history
 		UserBadgeHistoryEntity badgeHistory = new UserBadgeHistoryEntity();
 		badgeHistory.setBadgeStatus(status);
