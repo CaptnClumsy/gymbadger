@@ -23,7 +23,7 @@ public class PokemonService {
 
 	@Transactional(readOnly = true)
 	public List<BossDao> getAllRaidBosses() {
-		List<PokemonEntity> pokemonList = bossRepo.findAllByRaidBoss(true);
+		List<PokemonEntity> pokemonList = bossRepo.findAllByRaidBossOrderByName(true);
 		return Lists.newArrayList(Lists.transform(pokemonList, pokemon -> {
 			final BossDao dao = BossDao.fromPoekmonEntity(pokemon);
 			return dao;

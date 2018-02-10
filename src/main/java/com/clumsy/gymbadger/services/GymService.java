@@ -189,19 +189,26 @@ public class GymService {
 		boolean hasRaidChanged = false;
 		try {
 			props = getGymProps(user.getId(), gymId);
-			if (status!=props.getBadgeStatus()) {
+			if (status!=null && !status.is(props.getBadgeStatus())) {
 				hasBadgeChanged = true;
 			}
-			if (props.getLastRaid() != null) {
-			    if (!lastRaid.equals(props.getLastRaid().getLastRaid()) ||
-			    	caught!=props.getLastRaid().getCaught()) {
-				    hasRaidChanged = true;
+			if (props.getLastRaid() == null) {
+				// No last recorded raid and now one is specified
+				if (lastRaid!=null || caught!=null || pokemonId!=null) {
+				    hasRaidChanged=true;
 			    }
-			    if (props.getLastRaid().getPokemon()!=null) {
-			    	if (pokemonId != props.getLastRaid().getPokemon().getId()) {
-			    		hasRaidChanged = true;
-			    	}
-			    }
+			} else {
+				// Last raid was recorded but date or pokemon or caught flag has changed
+				if (lastRaid!=null && (props.getLastRaid()==null || !lastRaid.equals(props.getLastRaid().getLastRaid()))) {
+					hasRaidChanged=true;
+				}
+				if (pokemonId!=null && (props.getLastRaid().getPokemon()==null ||
+						pokemonId!=props.getLastRaid().getPokemon().getId())) {
+					hasRaidChanged=true;
+				}
+				if (caught!=props.getLastRaid().getCaught()) {
+					hasRaidChanged = true;
+				}
 			}
 		} catch (GymPropsNotFoundException e) {
 			// Expected if user has never edited this gym before

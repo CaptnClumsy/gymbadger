@@ -9,5 +9,5 @@ import com.clumsy.gymbadger.entities.PokemonEntity;
 
 @Repository
 public interface BossRepo extends JpaRepository<PokemonEntity, Long> {
-	List<PokemonEntity> findAllByRaidBoss(Boolean isBoss);
+	List<PokemonEntity> findAllByRaidBossOrderByName(Boolean isBoss);
 }
