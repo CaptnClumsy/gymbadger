@@ -355,4 +355,83 @@ public class GymService {
         
 		return daoList;
 	}
+
+	@Transactional
+	public GymHistoryDao updateGymHistory(Long gymId, UserEntity user, GymHistoryDao dao)
+		throws GymHistoryNotFoundException, GymNotFoundException,
+		PokemonNotFoundException, UnknownHistoryTypeException, AccessControlException {
+		final GymEntity gym = gymRepo.findOne(gymId);
+		if (gym==null) {
+			throw new GymNotFoundException("Gym not found");
+		}
+		final UserGymHistoryEntity history = gymHistoryRepo.findOneById(dao.getId());
+		if (history==null) {
+			throw new GymHistoryNotFoundException("History entry not found");
+		}
+		if (!history.getUserId().equals(user.getId())) {
+			throw new AccessControlException("Current user cannot update history for another user");
+		}
+		if (history.getType().equals(HistoryType.BADGE)) {
+			final UserBadgeHistoryEntity badgeHistory = badgeHistoryRepo.findOne(history.getHistoryId());
+			if (badgeHistory==null) {
+				throw new GymHistoryNotFoundException("Badge history entry not found");
+			}
+			badgeHistory.setBadgeStatus(dao.getStatus());
+			final UserBadgeHistoryEntity savedBadgeHistory = badgeHistoryRepo.save(badgeHistory);
+			return GymHistoryDao.fromEntities(history, savedBadgeHistory);
+		} else if (history.getType().equals(HistoryType.RAID)) {
+			final UserRaidHistoryEntity raidHistory = raidHistoryRepo.findOne(history.getHistoryId());
+			if (raidHistory==null) {
+				throw new GymHistoryNotFoundException("Raid history entry not found");
+			}
+			raidHistory.setLastRaid(dao.getDateTime());
+			if (dao.getPokemon()!=null) {
+				PokemonEntity pokemon = pokemonRepo.findOne(dao.getPokemon().getId());
+				if (pokemon==null) {
+					throw new PokemonNotFoundException("Pokemon not found");
+				}
+				raidHistory.setPokemon(pokemon);
+			} else {
+				raidHistory.setPokemon(null);
+			}
+			raidHistory.setCaught(dao.getCaught());
+			final UserRaidHistoryEntity savedRaidHistory = raidHistoryRepo.save(raidHistory);
+			return GymHistoryDao.fromEntities(history, savedRaidHistory);
+		}
+		throw new UnknownHistoryTypeException("Unknown history type "+history.getType());
+	}
+	
+	@Transactional
+	public void deleteGymHistory(Long gymId, UserEntity user, GymHistoryDao dao)
+		throws GymHistoryNotFoundException, GymNotFoundException,
+		UnknownHistoryTypeException, AccessControlException {
+		final GymEntity gym = gymRepo.findOne(gymId);
+		if (gym==null) {
+			throw new GymNotFoundException("Gym not found");
+		}
+		final UserGymHistoryEntity history = gymHistoryRepo.findOneById(dao.getId());
+		if (history==null) {
+			throw new GymHistoryNotFoundException("History entry not found");
+		}
+		if (!history.getUserId().equals(user.getId())) {
+			throw new AccessControlException("Current user cannot delete history for another user");
+		}
+		gymHistoryRepo.delete(history);
+		if (history.getType().equals(HistoryType.BADGE)) {
+			final UserBadgeHistoryEntity badgeHistory = badgeHistoryRepo.findOne(history.getHistoryId());
+			if (badgeHistory==null) {
+				throw new GymHistoryNotFoundException("Badge history entry not found");
+			}
+			badgeHistoryRepo.delete(badgeHistory);
+			return;
+		} else if (history.getType().equals(HistoryType.RAID)) {
+			final UserRaidHistoryEntity raidHistory = raidHistoryRepo.findOne(history.getHistoryId());
+			if (raidHistory==null) {
+				throw new GymHistoryNotFoundException("Raid history entry not found");
+			}
+			raidHistoryRepo.delete(raidHistory);
+			return;
+		}
+		throw new UnknownHistoryTypeException("Unknown history type "+history.getType());
+	}
 }

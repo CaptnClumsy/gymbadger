@@ -403,7 +403,7 @@
           "</div>" +
           "<span id=\"gymTitle\" class=\"badger-info-title-placeholder\"><a href=\"#\" class=\"badger-info-title-text\">" + data.name + "</a></span>" +
         "</div>" +
-        "<div class=\"tab-content\">" +
+        "<div id=\"gymTabContent\" class=\"tab-content badger-gym-content scrollable\">" +
             getGeneralTabHtml(data) +
             getHistoryTabHtml(data) +
         "</div>";
@@ -586,10 +586,11 @@
               "<th>Date</th>" +
               "<th>Event</th>" +
               "<th>Comment</th>" +
+              "<th>Edit</th>"+
               "</tr></thead><tbody id=\"historyTableBody\" class=\"badger-history-table-body\">";
             for (var i=0; i<data.length; i++) {
                 var raidDate = new Date(data[i].dateTime);
-      	        html += "<tr><td style=\"display:none;\">" + data[i].id + "</td><td class=\"badger-history-text\">" + raidDate.toLocaleString('en-GB') + "</td>";
+      	        html += "<tr><td data-type=\"" + data[i].type + "\" style=\"display:none;\">" + data[i].id + "</td><td class=\"badger-history-text\">" + raidDate.toLocaleString('en-GB') + "</td>";
       	        if (data[i].type=='BADGE') {
       	            html += "<td><div id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(data[i].status) + "\"></div></td>";
       	            if (data[i].status!="NONE") {
@@ -615,16 +616,95 @@
       	                pillClass + " badger-pokemon-badge\">" + pokemonName + "</span></div></td>";
       	            html += "<td class=\"badger-history-text\">" + comment + "</td>";
       	        }
+      	        html+="<td><button class=\"btn btn-primary badger-edit-button\"><i class=\"fa fa-pencil\"></i></button></td>";
       	        html+="</tr>";
       	    }
       	    html += "</tbody></table>";
       	    $('#historyBody').html(html);
+      	    $('.badger-edit-button').on('click', function() {
+      	       var id = $('td:first', $(this).parents('tr')).text();
+               var histype = $('td:first', $(this).parents('tr')).data("type");
+      	      showHistoryEdit(id, histype);
+      	    });
           },
           error: function (result) {
       	    errorPage("Failed to query gym history", result);
           }
       });
     });
+  }
+
+  function initHistoryEdit() {
+      $('#deleteRaid').on('click', function() {
+        var histid = $('#editRaidContent').data("historyid");
+        $.ajax({
+          type: "DELETE",
+          contentType: "application/json; charset=utf-8",
+          url: "api/gyms/"+currentProps.id+"/history/"+histid,
+          success: function (data) {
+            // Update the UI 
+          },
+          error: function (result) {
+            errorPage("Failed to delete raid", result);
+          }
+	    });     
+        closeRaid();
+      });
+      $('#saveRaid').on('click', function() {
+        closeRaid();
+      });
+      $('#closeRaid').on('click', function() {
+        closeRaid();
+      });
+      $('#deleteBadge').on('click', function() {
+        var histid = $('#editBadgeContent').data("historyid");
+        $.ajax({
+          type: "DELETE",
+          contentType: "application/json; charset=utf-8",
+          url: "api/gyms/"+currentProps.id+"/history/"+histid,
+          success: function (data) {
+            // Update the UI 
+          },
+          error: function (result) {
+            errorPage("Failed to delete raid", result);
+          }
+	    });
+        closeBadge();
+      });
+      $('#saveBadge').on('click', function() {
+        closeBadge();
+      });
+      $('#closeBadge').on('click', function() {
+        closeBadge();
+      });
+  }
+  
+  function closeRaid() {
+    $('#editRaidContent').animate(
+      { width: 0 }, 
+      { complete: function() { $('#editRaidContent').detach().appendTo('body'); }}
+    );
+  }
+  
+  function closeBadge() {
+    $('#editBadgeContent').animate(
+      { width: 0 }, 
+      { complete: function() { $('#editBadgeContent').detach().appendTo('body'); }}
+    );
+  }
+  
+  function showHistoryEdit(id, histype) {
+    if (histype==="RAID") {
+      $('#editRaidContent').data("historyid", id);
+      $('#editRaidContent').detach().appendTo('#gymTabContent').delay(500).animate(
+        { width: "100%" }
+      );
+    } else if (histype==="BADGE") {
+      $('#editBadgeContent').data("historyid", id);
+      $('#editBadgeContent').detach().appendTo('#gymTabContent').delay(500).animate(
+        { width: "100%" }
+      );
+    }
   }
 
   function initGymInfoPage(data) {
@@ -756,6 +836,7 @@
 	  initRaidBosses();
       resetPercentage();
 	  updateVisibleGyms();
+	  initHistoryEdit();
   }
 
   // Show any gym specified in the URL

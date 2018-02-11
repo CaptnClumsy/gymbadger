@@ -15,9 +15,11 @@ import com.clumsy.gymbadger.services.AccessControlException;
 import com.clumsy.gymbadger.services.AreaNotFoundException;
 import com.clumsy.gymbadger.services.ExportException;
 import com.clumsy.gymbadger.services.ExportService;
+import com.clumsy.gymbadger.services.GymHistoryNotFoundException;
 import com.clumsy.gymbadger.services.GymNotFoundException;
 import com.clumsy.gymbadger.services.GymService;
 import com.clumsy.gymbadger.services.PokemonNotFoundException;
+import com.clumsy.gymbadger.services.UnknownHistoryTypeException;
 import com.clumsy.gymbadger.services.UserNotFoundException;
 import com.clumsy.gymbadger.services.UserService;
 
@@ -124,7 +126,7 @@ public class GymController {
 			throw new ExportFailedException(e);
 		}
     }
-    
+
     @RequestMapping(value = "/{id}/history", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public List<GymHistoryDao> getGymHistory(@PathVariable("id") Long gymId, Principal principal) {
@@ -138,6 +140,54 @@ public class GymController {
 			throw new ObjectNotFoundException(e);
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException(e);
+		}
+    }
+    
+    @RequestMapping(value = "/{id}/history/{historyid}", method = RequestMethod.PUT)
+    @ResponseStatus(HttpStatus.OK)
+    public GymHistoryDao updateGymHistory(@PathVariable("id") Long gymId, @PathVariable("historyid") Long historyId,
+    		@RequestBody GymHistoryDao dao, Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			final UserEntity user = userService.getCurrentUser(principal);
+    	    return gymService.updateGymHistory(gymId, user, dao);
+		} catch (GymNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (GymHistoryNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (PokemonNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (UnknownHistoryTypeException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (AccessControlException e) {
+			throw new ForbiddenException(e);
+		}
+    }
+
+    @RequestMapping(value = "/{id}/history/{historyid}", method = RequestMethod.DELETE)
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteGymHistory(@PathVariable("id") Long gymId, @PathVariable("historyid") Long historyId,
+    		@RequestBody GymHistoryDao dao, Principal principal) {
+    	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
+    		throw new NotLoggedInException();
+    	}
+		try {
+			final UserEntity user = userService.getCurrentUser(principal);
+    	    gymService.deleteGymHistory(gymId, user, dao);
+		} catch (GymNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (GymHistoryNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (UnknownHistoryTypeException e) {
+			throw new ObjectNotFoundException(e);
+		} catch (AccessControlException e) {
+			throw new ForbiddenException(e);
 		}
     }
 }

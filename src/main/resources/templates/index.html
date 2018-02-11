@@ -404,7 +404,43 @@
       </div>
     </div>
     </div>
-    
+
+    <div id="editRaidContent" class="badger-edit-panel">
+      <div class="badger-edit-title">Edit Raid</div>
+      <div id="badger-opt-date" class="input-group date badger-opt-date"> 
+        <input type="text" class="form-control badger-opt-date-text" placeholder="Date of the raid"/> 
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+      </div>
+      <div id="badger-opt-time" class="input-group date badger-opt-item"> 
+        <input type="text" class="form-control badger-opt-date-text" placeholder="Time of the raid"/> 
+        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+      </div>
+      <div class="badger-opt-item"><select id="poke-search" name="poke-search" class="form-control"><option></option></select></div>
+      <div class="badger-opt-item"><input type="checkbox" id="caught-switch" name="caught"/></div>
+      <div class="modal-footer">
+        <button id="deleteRaid" class="btn btn-danger badger-history-button">Delete</button>
+        <button id="saveRaid" class="btn btn-success badger-history-button">Save</button>
+        <button id="closeRaid" class="btn btn-primary badger-history-button">Close</button>
+      </div>
+    </div>
+
+    <div id="editBadgeContent" class="badger-edit-panel">
+      <div class="badger-edit-title">Edit Badge</div>
+      <div id="badger-opt-date" class="input-group date badger-opt-date"> 
+        <input type="text" class="form-control badger-opt-date-text" placeholder="Date"/> 
+        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+      </div>
+      <div id="badger-opt-time" class="input-group date badger-opt-item"> 
+        <input type="text" class="form-control badger-opt-date-text" placeholder="Time"/> 
+        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+      </div>
+      <div class="modal-footer">
+        <button id="deleteBadge" class="btn btn-danger badger-history-button">Delete</button>
+        <button id="saveBadge" class="btn btn-success badger-history-button">Save</button>
+        <button id="closeBadge" class="btn btn-primary badger-history-button">Close</button>
+      </div>
+    </div>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
