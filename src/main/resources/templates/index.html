@@ -405,39 +405,63 @@
     </div>
     </div>
 
-    <div id="editRaidContent" class="badger-edit-panel">
-      <div class="badger-edit-title">Edit Raid</div>
-      <div id="badger-opt-date" class="input-group date badger-opt-date"> 
-        <input type="text" class="form-control badger-opt-date-text" placeholder="Date of the raid"/> 
-        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-      </div>
-      <div id="badger-opt-time" class="input-group date badger-opt-item"> 
-        <input type="text" class="form-control badger-opt-date-text" placeholder="Time of the raid"/> 
-        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
-      </div>
-      <div class="badger-opt-item"><select id="poke-search" name="poke-search" class="form-control"><option></option></select></div>
-      <div class="badger-opt-item"><input type="checkbox" id="caught-switch" name="caught"/></div>
-      <div class="modal-footer">
-        <button id="deleteRaid" class="btn btn-danger badger-history-button">Delete</button>
-        <button id="saveRaid" class="btn btn-success badger-history-button">Save</button>
-        <button id="closeRaid" class="btn btn-primary badger-history-button">Close</button>
+    <div class="modal fade" id="editRaidPage" role="dialog">
+      <div id="editRaidDialog" class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header badger-opt-header">
+            <h5 class="modal-title">Edit Raid</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body badger-options-page-body">
+            <div id="badger-opt-date" class="input-group date badger-opt-date"> 
+              <input type="text" class="form-control badger-opt-date-text" placeholder="Date of the raid"/> 
+              <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            </div>
+            <div id="badger-opt-time" class="input-group date badger-opt-item"> 
+              <input type="text" class="form-control badger-opt-date-text" placeholder="Time of the raid"/> 
+              <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+            </div>
+            <div class="badger-opt-item"><select id="poke-search" name="poke-search" class="form-control"><option></option></select></div>
+            <div class="badger-opt-item"><input type="checkbox" id="caught-switch" name="caught"/></div>
+            <div class="modal-footer badger-opt-footer">
+              <div class="badger-opt-item badger-opt-btn-div">
+                <button id="deleteRaid" class="btn btn-danger">Delete</button>
+                <button id="saveRaid" class="btn btn-success">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div id="editBadgeContent" class="badger-edit-panel">
-      <div class="badger-edit-title">Edit Badge</div>
-      <div id="badger-opt-date" class="input-group date badger-opt-date"> 
-        <input type="text" class="form-control badger-opt-date-text" placeholder="Date"/> 
-        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
-      </div>
-      <div id="badger-opt-time" class="input-group date badger-opt-item"> 
-        <input type="text" class="form-control badger-opt-date-text" placeholder="Time"/> 
-        <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
-      </div>
-      <div class="modal-footer">
-        <button id="deleteBadge" class="btn btn-danger badger-history-button">Delete</button>
-        <button id="saveBadge" class="btn btn-success badger-history-button">Save</button>
-        <button id="closeBadge" class="btn btn-primary badger-history-button">Close</button>
+    <div class="modal fade" id="editBadgePage" role="dialog">
+      <div id="editBadgeDialog" class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header badger-opt-header">
+            <h5 class="modal-title">Edit Gym Badge</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body badger-options-page-body">
+            <div id="badger-opt-date" class="input-group date badger-opt-date"> 
+              <input type="text" class="form-control badger-opt-date-text" placeholder="Date of the raid"/> 
+              <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            </div>
+            <div id="badger-opt-time" class="input-group date badger-opt-item"> 
+              <input type="text" class="form-control badger-opt-date-text" placeholder="Time of the raid"/> 
+              <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
+            </div>
+            <div class="modal-footer badger-opt-footer">
+              <div class="badger-opt-item badger-opt-btn-div">
+                <button id="deleteBadge" class="btn btn-danger">Delete</button>
+                <button id="saveBadge" class="btn btn-success">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 

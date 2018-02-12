@@ -178,7 +178,6 @@ body {
 }
 .badger-info {
 	min-width: 200px;
-	min-height: 200px;
 }
 .badger-info-title {
 	padding-bottom: 8px;
@@ -532,6 +531,7 @@ body {
 }
 .badger-opt-btn-div button {
 	padding-top: 0px;
+	margin-left: 6px;
 }
 .badger-opt-footer {
     margin-top: 8px;
@@ -998,21 +998,5 @@ input[type="file"] {
 .badger-gym-content {
     position: relative;
     overflow: auto;
-}
-.badger-edit-panel {
-    position: absolute;
-    top: 0px;
-    width: 0px;
-    background: #ffffff;
-    overflow: hidden;
-}
-.badger-history-button {
-    font-size: 11px;
-    padding-left: 4px;
-    padding-top: 1px;
-    padding-bottom: 2px;
-    padding-right: 4px;
-}
-.badger-edit-title {
-   font-size: 14px;
+    height: 194px;
 }

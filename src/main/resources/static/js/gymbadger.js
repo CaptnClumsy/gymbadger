@@ -646,15 +646,14 @@
           },
           error: function (result) {
             errorPage("Failed to delete raid", result);
+          },
+          complete: function () {
+        	  $('#editRaidPage').modal('hide');
           }
 	    });     
-        closeRaid();
       });
       $('#saveRaid').on('click', function() {
-        closeRaid();
-      });
-      $('#closeRaid').on('click', function() {
-        closeRaid();
+    	  $('#editRaidPage').modal('hide');
       });
       $('#deleteBadge').on('click', function() {
         var histid = $('#editBadgeContent').data("historyid");
@@ -667,43 +666,24 @@
           },
           error: function (result) {
             errorPage("Failed to delete raid", result);
+          },
+          complete: function() {
+        	  $('#editBadgePage').modal('hide');
           }
 	    });
-        closeBadge();
       });
       $('#saveBadge').on('click', function() {
-        closeBadge();
+    	  $('#editBadgePage').modal('hide');
       });
-      $('#closeBadge').on('click', function() {
-        closeBadge();
-      });
-  }
-  
-  function closeRaid() {
-    $('#editRaidContent').animate(
-      { width: 0 }, 
-      { complete: function() { $('#editRaidContent').detach().appendTo('body'); }}
-    );
-  }
-  
-  function closeBadge() {
-    $('#editBadgeContent').animate(
-      { width: 0 }, 
-      { complete: function() { $('#editBadgeContent').detach().appendTo('body'); }}
-    );
   }
   
   function showHistoryEdit(id, histype) {
     if (histype==="RAID") {
       $('#editRaidContent').data("historyid", id);
-      $('#editRaidContent').detach().appendTo('#gymTabContent').delay(500).animate(
-        { width: "100%" }
-      );
+      $('#editRaidPage').modal('show');
     } else if (histype==="BADGE") {
       $('#editBadgeContent').data("historyid", id);
-      $('#editBadgeContent').detach().appendTo('#gymTabContent').delay(500).animate(
-        { width: "100%" }
-      );
+      $('#editBadgePage').modal('show');
     }
   }
 
