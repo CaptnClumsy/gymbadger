@@ -17,6 +17,7 @@ import com.clumsy.gymbadger.services.ExportException;
 import com.clumsy.gymbadger.services.ExportService;
 import com.clumsy.gymbadger.services.GymHistoryNotFoundException;
 import com.clumsy.gymbadger.services.GymNotFoundException;
+import com.clumsy.gymbadger.services.GymPropsNotFoundException;
 import com.clumsy.gymbadger.services.GymService;
 import com.clumsy.gymbadger.services.PokemonNotFoundException;
 import com.clumsy.gymbadger.services.UnknownHistoryTypeException;
@@ -188,6 +189,8 @@ public class GymController {
 			throw new ObjectNotFoundException(e);
 		} catch (AccessControlException e) {
 			throw new ForbiddenException(e);
+		} catch (GymPropsNotFoundException e) {
+			throw new ObjectNotFoundException(e);
 		}
     }
 }

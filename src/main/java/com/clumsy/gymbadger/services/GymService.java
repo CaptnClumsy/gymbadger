@@ -404,7 +404,7 @@ public class GymService {
 	@Transactional
 	public void deleteGymHistory(Long gymId, UserEntity user, GymHistoryDao dao)
 		throws GymHistoryNotFoundException, GymNotFoundException,
-		UnknownHistoryTypeException, AccessControlException {
+		UnknownHistoryTypeException, AccessControlException, GymPropsNotFoundException {
 		final GymEntity gym = gymRepo.findOne(gymId);
 		if (gym==null) {
 			throw new GymNotFoundException("Gym not found");
@@ -429,7 +429,24 @@ public class GymService {
 			if (raidHistory==null) {
 				throw new GymHistoryNotFoundException("Raid history entry not found");
 			}
+			// Set latestRaid to null in user_gym_props
+			final GymPropsEntity props = gymPropsRepo.findOneByUserIdAndGymId(history.getUserId(), history.getGymId());
+			if (props==null) {
+				throw new GymPropsNotFoundException("No properites found for this gym and user");
+			}
+			props.setLastRaid(null);
+			final GymPropsEntity savedProps = gymPropsRepo.save(props);
+			// Delete the raid data
 			raidHistoryRepo.delete(raidHistory);
+			Long newLatest = raidHistoryRepo.findLatestRaid(history.getUserId(), history.getGymId());
+			// Set latestRaid to the new one
+			if (newLatest!=null) {
+				final UserRaidHistoryEntity newLatestRaid = raidHistoryRepo.findOne(newLatest);
+				if (newLatestRaid!=null) {
+					savedProps.setLastRaid(newLatestRaid);
+					gymPropsRepo.save(savedProps);
+				}
+			}
 			return;
 		}
 		throw new UnknownHistoryTypeException("Unknown history type "+history.getType());

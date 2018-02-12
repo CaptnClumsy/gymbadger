@@ -14,6 +14,7 @@
   var leadersTable = null;
   var totalTable = null;
   var teamTable = null;
+  var currentHistory = null;
 
   function initPage() {
 	// Load snazzy info window and marker cluster scripts
@@ -588,7 +589,9 @@
               "<th>Comment</th>" +
               "<th>Edit</th>"+
               "</tr></thead><tbody id=\"historyTableBody\" class=\"badger-history-table-body\">";
+            currentHistory = new Map();
             for (var i=0; i<data.length; i++) {
+                currentHistory.set(data[i].id, data[i]);
                 var raidDate = new Date(data[i].dateTime);
       	        html += "<tr><td data-type=\"" + data[i].type + "\" style=\"display:none;\">" + data[i].id + "</td><td class=\"badger-history-text\">" + raidDate.toLocaleString('en-GB') + "</td>";
       	        if (data[i].type=='BADGE') {
@@ -636,11 +639,13 @@
 
   function initHistoryEdit() {
       $('#deleteRaid').on('click', function() {
-        var histid = $('#editRaidContent').data("historyid");
+        var histid = $('#editRaidPage').data("historyid");
+        var data = currentHistory.get(parseInt(histid,10));
         $.ajax({
           type: "DELETE",
           contentType: "application/json; charset=utf-8",
           url: "api/gyms/"+currentProps.id+"/history/"+histid,
+          data: JSON.stringify(data),
           success: function (data) {
             // Update the UI 
           },
@@ -656,11 +661,13 @@
     	  $('#editRaidPage').modal('hide');
       });
       $('#deleteBadge').on('click', function() {
-        var histid = $('#editBadgeContent').data("historyid");
+        var histid = $('#editBadgePage').data("historyid");
+        var data = currentHistory.get(parseInt(histid,10));
         $.ajax({
           type: "DELETE",
           contentType: "application/json; charset=utf-8",
           url: "api/gyms/"+currentProps.id+"/history/"+histid,
+          data: JSON.stringify(data),
           success: function (data) {
             // Update the UI 
           },
@@ -679,10 +686,10 @@
   
   function showHistoryEdit(id, histype) {
     if (histype==="RAID") {
-      $('#editRaidContent').data("historyid", id);
+      $('#editRaidPage').data("historyid", id);
       $('#editRaidPage').modal('show');
     } else if (histype==="BADGE") {
-      $('#editBadgeContent').data("historyid", id);
+      $('#editBadgePage').data("historyid", id);
       $('#editBadgePage').modal('show');
     }
   }
