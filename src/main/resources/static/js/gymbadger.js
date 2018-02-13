@@ -503,10 +503,10 @@
       return html;
   }
   
-  function resetBadgeDropdown(data) {
+  function resetBadgeDropdown(status) {
       $('#badgeDropdown a').removeClass("badger-dropdownitem-checked");
       $('#badgeDropdown a').each(function( index ) {
-          if (data.status==getStatusFromId($(this).attr("id"))) {
+          if (status==getStatusFromId($(this).attr("id"))) {
               $(this).addClass("badger-dropdownitem-checked");
           }
       });
@@ -576,64 +576,66 @@
     	$(this).parents(".popover").popover('hide');
     });
     
-    $('#historyTab').on('shown.bs.tab', function(e) {
-        $.ajax({
-          type: "GET",
-          contentType: "application/json; charset=utf-8",
-          url: "api/gyms/"+currentProps.id+"/history/",
-          success: function (data) {
-            var html = "<table id=\"historyTable\" class=\"table table-striped table-bordered badger-history-table scrollable\" style=\"width: 100%\">";
-            html += "<thead style=\"display:none;\"><tr><th style=\"display:none;\">Id</th>" +
-              "<th>Date</th>" +
-              "<th>Event</th>" +
-              "<th>Comment</th>" +
-              "<th>Edit</th>"+
-              "</tr></thead><tbody id=\"historyTableBody\" class=\"badger-history-table-body\">";
-            currentHistory = new Map();
-            for (var i=0; i<data.length; i++) {
-                currentHistory.set(data[i].id, data[i]);
-                var raidDate = new Date(data[i].dateTime);
-      	        html += "<tr><td data-type=\"" + data[i].type + "\" style=\"display:none;\">" + data[i].id + "</td><td class=\"badger-history-text\">" + raidDate.toLocaleString('en-GB') + "</td>";
-      	        if (data[i].type=='BADGE') {
-      	            html += "<td><div id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(data[i].status) + "\"></div></td>";
-      	            if (data[i].status!="NONE") {
-      	                html += "<td class=\"badger-history-text\">You earned a " + getBadgeText(data[i].status) + " badge</td>";
-      	            } else {
-      	            	html += "<td class=\"badger-history-text\">You have no badge for this gym</td>";
-      	            }
-      	        } else {
-      	            var pokemonName = "Pokemon";
-      	            if (data[i].pokemon!=null) {
-      	                pokemonName = data[i].pokemon.text;
-      	            }
-      	            var pillClass = "badge-info";
-      	            var comment = "";
-      	            if (data[i].caught) {
-      	                pillClass = "badge-success";
-      	                comment = pokemonName + " was successfully caught";
-      	            } else {
-      	                pillClass = "badge-danger";
-      	                comment = "Oh no! The wild " + pokemonName + " fled";
-      	            }
-      	            html += "<td><div class=\"badger-pokemon-container\"><span class=\"badge " + 
-      	                pillClass + " badger-pokemon-badge\">" + pokemonName + "</span></div></td>";
-      	            html += "<td class=\"badger-history-text\">" + comment + "</td>";
+    $('#historyTab').on('shown.bs.tab', showHistoryTab);
+  }
+
+  function showHistoryTab() {
+	$.ajax({
+      type: "GET",
+      contentType: "application/json; charset=utf-8",
+      url: "api/gyms/"+currentProps.id+"/history/",
+      success: function (data) {
+        var html = "<table id=\"historyTable\" class=\"table table-striped table-bordered badger-history-table scrollable\" style=\"width: 100%\">";
+        html += "<thead style=\"display:none;\"><tr><th style=\"display:none;\">Id</th>" +
+            "<th>Date</th>" +
+            "<th>Event</th>" +
+            "<th>Comment</th>" +
+            "<th>Edit</th>"+
+            "</tr></thead><tbody id=\"historyTableBody\" class=\"badger-history-table-body\">";
+        currentHistory = new Map();
+        for (var i=0; i<data.length; i++) {
+            currentHistory.set(data[i].id, data[i]);
+            var raidDate = new Date(data[i].dateTime);
+            html += "<tr><td data-type=\"" + data[i].type + "\" style=\"display:none;\">" + data[i].id + "</td><td class=\"badger-history-text\">" + raidDate.toLocaleString('en-GB') + "</td>";
+            if (data[i].type=='BADGE') {
+                html += "<td><div id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(data[i].status) + "\"></div></td>";
+                if (data[i].status!="NONE") {
+                    html += "<td class=\"badger-history-text\">You earned a " + getBadgeText(data[i].status) + " badge</td>";
+                } else {
+                    html += "<td class=\"badger-history-text\">You have no badge for this gym</td>";
       	        }
-      	        html+="<td><button class=\"btn btn-primary badger-edit-button\"><i class=\"fa fa-pencil\"></i></button></td>";
-      	        html+="</tr>";
+      	    } else {
+      	        var pokemonName = "Pokemon";
+      	        if (data[i].pokemon!=null) {
+      	            pokemonName = data[i].pokemon.text;
+      	        }
+      	        var pillClass = "badge-info";
+      	        var comment = "";
+      	        if (data[i].caught) {
+      	            pillClass = "badge-success";
+      	            comment = pokemonName + " was successfully caught";
+      	        } else {
+      	            pillClass = "badge-danger";
+      	            comment = "Oh no! The wild " + pokemonName + " fled";
+      	        }
+      	        html += "<td><div class=\"badger-pokemon-container\"><span class=\"badge " + 
+      	            pillClass + " badger-pokemon-badge\">" + pokemonName + "</span></div></td>";
+      	        html += "<td class=\"badger-history-text\">" + comment + "</td>";
       	    }
-      	    html += "</tbody></table>";
-      	    $('#historyBody').html(html);
-      	    $('.badger-edit-button').on('click', function() {
-      	       var id = $('td:first', $(this).parents('tr')).text();
-               var histype = $('td:first', $(this).parents('tr')).data("type");
-      	      showHistoryEdit(id, histype);
-      	    });
-          },
-          error: function (result) {
-      	    errorPage("Failed to query gym history", result);
-          }
-      });
+      	    html+="<td><button class=\"btn btn-primary badger-edit-button\"><i class=\"fa fa-pencil\"></i></button></td>";
+      	    html+="</tr>";
+      	}
+      	html += "</tbody></table>";
+      	$('#historyBody').html(html);
+      	$('.badger-edit-button').on('click', function() {
+      	   var id = $('td:first', $(this).parents('tr')).text();
+           var histype = $('td:first', $(this).parents('tr')).data("type");
+      	   showHistoryEdit(id, histype);
+      	});
+      },
+      error: function (result) {
+        errorPage("Failed to query gym history", result);
+      }
     });
   }
 
@@ -645,9 +647,18 @@
           type: "DELETE",
           contentType: "application/json; charset=utf-8",
           url: "api/gyms/"+currentProps.id+"/history/"+histid,
-          data: JSON.stringify(data),
           success: function (data) {
-            // Update the UI 
+        	var pokemonId = null;
+        	if (data.pokemon!=null) {
+        		pokemonId = data.pokemon.id;
+        	}
+        	var propsData = {
+        		id: currentProps.id,
+        		lastRaid: data.dateTime,
+        		pokemonId: pokemonId,
+        		caught: data.caught
+        	};
+        	updateRaidUI(propsData);
           },
           error: function (result) {
             errorPage("Failed to delete raid", result);
@@ -658,7 +669,9 @@
 	    });     
       });
       $('#saveRaid').on('click', function() {
+    	  // XXX Call REST service to set the raid state
     	  $('#editRaidPage').modal('hide');
+    	  updateRaidUI(null);
       });
       $('#deleteBadge').on('click', function() {
         var histid = $('#editBadgePage').data("historyid");
@@ -667,28 +680,40 @@
           type: "DELETE",
           contentType: "application/json; charset=utf-8",
           url: "api/gyms/"+currentProps.id+"/history/"+histid,
-          data: JSON.stringify(data),
           success: function (data) {
-            // Update the UI 
+        	showHistoryTab();
+        	updateBadgeUI(currentMarker, data.status);
           },
           error: function (result) {
             errorPage("Failed to delete raid", result);
           },
           complete: function() {
-        	  $('#editBadgePage').modal('hide');
+        	$('#editBadgePage').modal('hide');
           }
 	    });
       });
       $('#saveBadge').on('click', function() {
+    	  // XXX Call REST service to set the badge state
     	  $('#editBadgePage').modal('hide');
+    	  showHistoryTab();
+    	  var status = currentProps.status;
+    	  updateBadgeUI(currentMarker, status);
       });
   }
   
+  function updateRaidUI(data) {
+	  showHistoryTab();
+	  $('.badger-raid-container').remove();
+	  $('#badger-area-container').after(getLastRaid(data));
+	  registerRaidEvents();
+  }
   function showHistoryEdit(id, histype) {
     if (histype==="RAID") {
       $('#editRaidPage').data("historyid", id);
       $('#editRaidPage').modal('show');
     } else if (histype==="BADGE") {
+      var data = currentHistory.get(parseInt(id,10));
+      $('#editInfoBadge').removeClass().addClass("badger-badge "+getBadgeClass(data.status));
       $('#editBadgePage').data("historyid", id);
       $('#editBadgePage').modal('show');
     }
@@ -867,7 +892,6 @@
   }
 
   function selectBadge(marker, props, status) {
-	  var oldStatus = props.status;
 	  props.status=status;
 	  $.ajax({
         type: "PUT",
@@ -875,16 +899,26 @@
         url: "api/gyms/"+props.id,
         data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid", "pokemonId", "caught"]),
         success: function (data) {
-          marker.setIcon(customIcon(props.status));
-          $('#infoBadge').removeClass(getBadgeClass(oldStatus));
-          $('#infoBadge').addClass(getBadgeClass(props.status));
-          resetBadgeDropdown(props);
-          resetPercentage();
+          updateBadgeUI(marker, status);
+          var selectedTab = $('#gymTabContent').find('.active');
+          if (selectedTab!=null && selectedTab.length!=0) {
+              if (selectedTab[0].id=="history") {
+            	  showHistoryTab();
+              }
+          }
         },
         error: function (result) {
           errorPage("Failed to update gym data", result);
         }
 	  });
+  }
+  
+  function updateBadgeUI(marker, status) {
+	  marker.setIcon(customIcon(status));
+      $('#infoBadge').removeClass("badger-badge-basic badger-badge-bronze badger-badge-silver badger-badge-gold");
+      $('#infoBadge').addClass(getBadgeClass(status));
+      resetBadgeDropdown(status);
+      resetPercentage();
   }
 
   function closeAnyInfoWindows() {
@@ -1140,7 +1174,6 @@
 		  } else {
 			  var gymIds = "";
 			  reportTable.rows({search: 'applied'}).data().each(function(value, index) {
-			  	  console.log(value[0], index);
 			  	  if (gymIds != "") {
   			          gymIds+=",";
   		          }
@@ -1271,12 +1304,12 @@
         },
         complete: function (res) {
           $('#advancedOptions').modal('hide');
-            }
-    	  }); 	  
-      }
+        }
+      }); 	  
+  }
  
-      function resetAdvancedOptions() {
-          $('#poke-search').val("");
+  function resetAdvancedOptions() {
+      $('#poke-search').val("");
       $('#poke-search').trigger('change');
       $('#badger-opt-date').datetimepicker('remove');
       $('#badger-opt-time').datetimepicker('remove');

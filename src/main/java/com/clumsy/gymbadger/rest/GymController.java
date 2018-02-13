@@ -171,14 +171,13 @@ public class GymController {
 
     @RequestMapping(value = "/{id}/history/{historyid}", method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.OK)
-    public void deleteGymHistory(@PathVariable("id") Long gymId, @PathVariable("historyid") Long historyId,
-    		@RequestBody GymHistoryDao dao, Principal principal) {
+    public GymHistoryDao deleteGymHistory(@PathVariable("id") Long gymId, @PathVariable("historyid") Long historyId, Principal principal) {
     	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
     		throw new NotLoggedInException();
     	}
 		try {
 			final UserEntity user = userService.getCurrentUser(principal);
-    	    gymService.deleteGymHistory(gymId, user, dao);
+    	    return gymService.deleteGymHistory(gymId, user, historyId);
 		} catch (GymNotFoundException e) {
 			throw new ObjectNotFoundException(e);
 		} catch (UserNotFoundException e) {

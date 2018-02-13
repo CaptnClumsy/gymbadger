@@ -18,6 +18,9 @@ public class GymHistoryDao implements Comparable<GymHistoryDao> {
     private Boolean caught;
     private GymBadgeStatus status;
 
+    public GymHistoryDao() {
+    }
+
 	public static GymHistoryDao fromEntities(Object historyEntry, Object historyData) {
 		if (!(historyEntry instanceof UserGymHistoryEntity)) {
 			return null;
@@ -39,6 +42,11 @@ public class GymHistoryDao implements Comparable<GymHistoryDao> {
 			dao.setDateTime(((UserGymHistoryEntity)historyEntry).getDateTime());
 			dao.setType(HistoryType.BADGE);
 			dao.setStatus(((UserBadgeHistoryEntity)historyData).getBadgeStatus());
+			return dao;
+		} else if ((historyData instanceof GymBadgeStatus)) {
+			dao.setDateTime(((UserGymHistoryEntity)historyEntry).getDateTime());
+			dao.setType(HistoryType.BADGE);
+			dao.setStatus(((GymBadgeStatus)historyData));
 			return dao;
 		} else {
 			return null;

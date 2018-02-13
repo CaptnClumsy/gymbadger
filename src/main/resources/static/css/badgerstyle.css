@@ -1000,3 +1000,13 @@ input[type="file"] {
     overflow: auto;
     height: 194px;
 }
+.badger-edit-page-body {
+    padding: 8px;
+}
+.badger-edit-badge {
+	display: flex;
+	margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 0px;
+    margin-bottom: 8px;
+}

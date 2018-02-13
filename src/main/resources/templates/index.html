@@ -414,7 +414,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body badger-options-page-body">
+          <div class="modal-body badger-edit-page-body">
             <div id="badger-opt-date" class="input-group date badger-opt-date"> 
               <input type="text" class="form-control badger-opt-date-text" placeholder="Date of the raid"/> 
               <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
@@ -445,7 +445,21 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <div class="modal-body badger-options-page-body">
+          <div class="modal-body badger-edit-page-body">
+            <div class="badger-edit-badge">
+              <div>
+                <button class="btn btn-default badger-small-button" type="button" id="editInfoMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span class="badger-badge-container"><span id="editInfoBadge" class="badger-badge"></span></span>
+                </button>
+                <div class="dropdown-menu" aria-labelledby="editInfoMenuButton" id="editBadgeDropdown">
+                  <a id="edit-select-gold" class="dropdown-item badger-dropdownitem" href="#">Gold</a>
+                  <a id="edit-select-silver" class="dropdown-item badger-dropdownitem" href="#">Silver</a>
+                  <a id="edit-select-bronze" class="dropdown-item badger-dropdownitem" href="#">Bronze</a>
+                  <a id="edit-select-basic" class="dropdown-item badger-dropdownitem" href="#">Basic</a>
+                  <a id="edit-select-none" class="dropdown-item badger-dropdownitem" href="#">None</a>
+                </div>
+              </div>
+            </div>
             <div id="badger-opt-date" class="input-group date badger-opt-date"> 
               <input type="text" class="form-control badger-opt-date-text" placeholder="Date of the raid"/> 
               <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
