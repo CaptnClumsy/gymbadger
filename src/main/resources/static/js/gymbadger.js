@@ -727,8 +727,15 @@
             url: "api/gyms/"+currentProps.id+"/history/"+histid,
             data: JSON.stringify(data),
             success: function (data) {
+          	  currentProps.lastRaid=data.dateTime;
+          	  if (data.pokemon!=null) {
+          	      currentProps.pokemonId=data.pokemon.id;
+          	  }
+          	  currentProps.caught=data.caught;
           	  showHistoryTab();
-          	  // XXXXXXX update raid UI
+          	  $('.badger-raid-container').remove();
+              $('#badger-area-container').after(getLastRaid(currentProps));
+              registerRaidEvents();
             },
             error: function (result) {
               errorPage("Failed to update raid history", result);

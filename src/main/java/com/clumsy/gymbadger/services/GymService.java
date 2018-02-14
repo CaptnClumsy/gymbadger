@@ -402,6 +402,7 @@ public class GymService {
 			if (raidHistory==null) {
 				throw new GymHistoryNotFoundException("Raid history entry not found");
 			}
+			// Update the raid history record
 			raidHistory.setLastRaid(dao.getDateTime());
 			if (dao.getPokemon()!=null) {
 				PokemonEntity pokemon = pokemonRepo.findOne(dao.getPokemon().getId());
@@ -413,8 +414,20 @@ public class GymService {
 				raidHistory.setPokemon(null);
 			}
 			raidHistory.setCaught(dao.getCaught());
-			final UserRaidHistoryEntity savedRaidHistory = raidHistoryRepo.save(raidHistory);
-			return GymHistoryDao.fromEntities(history, savedRaidHistory);
+			raidHistoryRepo.save(raidHistory);
+			// Find new latest raid
+			Long newLatest = raidHistoryRepo.findLatestRaid(history.getUserId(), history.getGymId());
+			// Set latest raid to the new one
+			if (newLatest==null) {
+				throw new GymHistoryNotFoundException("Latest raid history not found");
+			}
+			final UserRaidHistoryEntity newLatestRaid = raidHistoryRepo.findOne(newLatest);
+			if (newLatestRaid==null) {
+				throw new GymHistoryNotFoundException("Latest raid history entry not found");
+			}
+			props.setLastRaid(newLatestRaid);
+			gymPropsRepo.save(props);
+			return GymHistoryDao.fromEntities(history, newLatestRaid);
 		}
 		throw new UnknownHistoryTypeException("Unknown history type "+history.getType());
 	}
