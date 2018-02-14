@@ -415,16 +415,16 @@
             </button>
           </div>
           <div class="modal-body badger-edit-page-body">
-            <div id="badger-opt-date" class="input-group date badger-opt-date"> 
+            <div id="badger-editraid-date" class="input-group date badger-opt-date"> 
               <input type="text" class="form-control badger-opt-date-text" placeholder="Date of the raid"/> 
               <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
             </div>
-            <div id="badger-opt-time" class="input-group date badger-opt-item"> 
+            <div id="badger-editraid-time" class="input-group date badger-opt-item"> 
               <input type="text" class="form-control badger-opt-date-text" placeholder="Time of the raid"/> 
               <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
             </div>
-            <div class="badger-opt-item"><select id="poke-search" name="poke-search" class="form-control"><option></option></select></div>
-            <div class="badger-opt-item"><input type="checkbox" id="caught-switch" name="caught"/></div>
+            <div class="badger-opt-item"><select id="poke-editraid-search" name="poke-search" class="form-control"><option></option></select></div>
+            <div class="badger-opt-item"><input type="checkbox" id="editraid-caught-switch" name="caught"/></div>
             <div class="modal-footer badger-opt-footer">
               <div class="badger-opt-item badger-opt-btn-div">
                 <button id="deleteRaid" class="btn btn-danger">Delete</button>
@@ -449,7 +449,11 @@
             <div class="badger-edit-badge">
               <div>
                 <button class="btn btn-default badger-small-button" type="button" id="editInfoMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <span class="badger-badge-container"><span id="editInfoBadge" class="badger-badge"></span></span>
+                  <div class="badger-badge-container">
+                    <span id="editInfoBadge" class="badger-badge"></span>
+                    <span class="badger-badge-gap"></span>
+                    <i class="fa fa-caret-down"></i>
+                  </div>
                 </button>
                 <div class="dropdown-menu" aria-labelledby="editInfoMenuButton" id="editBadgeDropdown">
                   <a id="edit-select-gold" class="dropdown-item badger-dropdownitem" href="#">Gold</a>
@@ -460,12 +464,12 @@
                 </div>
               </div>
             </div>
-            <div id="badger-opt-date" class="input-group date badger-opt-date"> 
-              <input type="text" class="form-control badger-opt-date-text" placeholder="Date of the raid"/> 
+            <div id="badger-editbadge-date" class="input-group date badger-opt-date"> 
+              <input type="text" class="form-control badger-opt-date-text" placeholder="Date you earned the badge"/> 
               <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
             </div>
-            <div id="badger-opt-time" class="input-group date badger-opt-item"> 
-              <input type="text" class="form-control badger-opt-date-text" placeholder="Time of the raid"/> 
+            <div id="badger-editbadge-time" class="input-group date badger-opt-item"> 
+              <input type="text" class="form-control badger-opt-date-text" placeholder="Time you earned the badge"/> 
               <span class="input-group-addon"><i class="fa fa-clock-o"></i></span>
             </div>
             <div class="modal-footer badger-opt-footer">

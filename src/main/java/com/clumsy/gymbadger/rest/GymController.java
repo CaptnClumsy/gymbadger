@@ -166,6 +166,8 @@ public class GymController {
 			throw new ObjectNotFoundException(e);
 		} catch (AccessControlException e) {
 			throw new ForbiddenException(e);
+		} catch (GymPropsNotFoundException e) {
+			throw new ForbiddenException(e);
 		}
     }
 

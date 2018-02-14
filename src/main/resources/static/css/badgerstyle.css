@@ -144,19 +144,17 @@ body {
     height: 38px;
 }
 .badger-badge-container {
-	border-right: solid 1px #00000040;
-	padding-bottom: 3px;
-	padding-right: 4px;
+	display: flex;
+    padding-top: 3px;
+    padding-bottom: 2px;
+}
+.badger-badge-container .fa {
+    line-height: 32px;
 }
 .badger-badge {
 	width: 32px;
 	height: 32px;
 	background-size: 100% 100%;
-	vertical-align: middle;
-}
-.badger-badge:before {
-	content: "";
-	margin-right: 32px;
 }
 .badger-badge-none {
 	background-image: url('../images/none.png');
@@ -172,6 +170,11 @@ body {
 }
 .badger-badge-gold {
 	background-image: url('../images/gold.png');
+}
+.badger-badge-gap {
+    margin-left: 4px;
+    margin-right: 4px;
+    border-right: solid 1px #00000040;
 }
 .badger-info-wrapper {
 	z-index: 2;
@@ -312,27 +315,10 @@ body {
     padding-top: 0px;
     padding-bottom: 1px;
     padding-right: 4px;
-    border-top-width: 0px;
-    border-left-width: 0px;
-    border-right-width: 0px;
-    border-bottom-width: 0px;
-    background-color:transparent;
+    background-color: transparent;
     border: 1px solid #00000080;
     font-size: 24px;
     color: #00000080;
-}
-.badger-small-button:after {
-	display: inline-block;
-    width: 0;
-	height: 0;
-	margin-left: .255em;
-	vertical-align: .255em;
-	content: "";
-	border-top: .3em solid;
-	border-right: .3em solid transparent;
-	border-bottom: 0;
-	border-left: .3em solid transparent;
-	vertical-align: middle;
 }
 .badger-dropdownitem {
 	font-size: 13px;

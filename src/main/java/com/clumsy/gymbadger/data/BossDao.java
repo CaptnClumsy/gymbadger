@@ -10,6 +10,9 @@ public class BossDao {
 	private Long id;
 	private String text;
 	
+	public BossDao() {
+	}
+
 	public BossDao(final Long id, final String name) {
 		this.id=id;
 		this.text=name;

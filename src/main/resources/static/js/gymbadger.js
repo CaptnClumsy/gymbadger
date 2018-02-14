@@ -394,12 +394,7 @@
           var content = 
             "<div class=\"badger-info-title\">" + 
           "<div class=\"dropdown badger-info-title-container\">" +
-              "<button class=\"btn btn-default badger-small-button\" type=\"button\" id=\"dropdownMenuButton\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
-                  "<span class=\"badger-badge-container\"><span id=\"infoBadge\" class=\"badger-badge " + getBadgeClass(data.status) + "\"></span></span>" +
-              "</button>" +
-              "<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton\" id=\"badgeDropdown\">" +
-                   getBadgeDropdownHtml(data) +
-              "</div>" +
+              getBadgeHtml(data) +
               getTabHeadingHtml() +
           "</div>" +
           "<span id=\"gymTitle\" class=\"badger-info-title-placeholder\"><a href=\"#\" class=\"badger-info-title-text\">" + data.name + "</a></span>" +
@@ -436,7 +431,7 @@
            },
            callbacks: {
                afterOpen: function() {
-                   $('.badger-dropdownitem').click(function() {
+                   $('.badger-info-title-container .badger-dropdownitem').click(function() {
                        selectBadge(currentMarker, currentProps, getStatusFromId(this.id));
                    });
              	   $('.badger-info-close').click(function() {
@@ -501,15 +496,6 @@
            "</div>" +
          "</div>";
       return html;
-  }
-  
-  function resetBadgeDropdown(status) {
-      $('#badgeDropdown a').removeClass("badger-dropdownitem-checked");
-      $('#badgeDropdown a').each(function( index ) {
-          if (status==getStatusFromId($(this).attr("id"))) {
-              $(this).addClass("badger-dropdownitem-checked");
-          }
-      });
   }
 
   function initAdvancedPage() {
@@ -640,6 +626,50 @@
   }
 
   function initHistoryEdit() {
+	  $('#editBadgeDropdown .badger-dropdownitem').click(function() {
+		  var histid = $('#editBadgePage').data("historyid");
+	      var data = currentHistory.get(parseInt(histid,10));
+          selectHistoryBadge(data, getStatusFromId(this.id));
+      });
+	  $('#badger-editbadge-date').datetimepicker({
+	    format: 'dd-mm-yyyy',
+	    autoclose: true,
+	    todayHighlight: true,
+	    minView: 2
+	  }).on('changeDate', function(ev) {
+	    $('#badger-editbadge-time').datetimepicker('update', ev.date);
+	  });
+	  $('#badger-editbadge-time').datetimepicker({
+	    format: 'dd-mm-yyyy hh:ii',
+	    autoclose: true,
+	    startView: 1
+	  });
+	  $('#badger-editraid-date').datetimepicker({
+        format: 'dd-mm-yyyy',
+		autoclose: true,
+		todayHighlight: true,
+		minView: 2
+      }).on('changeDate', function(ev) {
+	    $('#badger-editraid-time').datetimepicker('update', ev.date);
+	  });
+	  $('#badger-editraid-time').datetimepicker({
+	    format: 'dd-mm-yyyy hh:ii',
+		autoclose: true,
+		startView: 1
+	  });
+	  $('#poke-editraid-search').select2({
+		placeholder: "Pokemon",
+		width: '100%',
+		data: raidBossData
+	  });
+      $('#editraid-caught-switch').bootstrapSwitch({
+      	state: false,
+      	onColor: 'success',
+      	offColor: 'danger',
+      	labelText: 'Caught',
+      	onText: 'Yes',
+      	offText: 'No'
+      });
       $('#deleteRaid').on('click', function() {
         var histid = $('#editRaidPage').data("historyid");
         var data = currentHistory.get(parseInt(histid,10));
@@ -669,9 +699,44 @@
 	    });     
       });
       $('#saveRaid').on('click', function() {
-    	  // XXX Call REST service to set the raid state
-    	  $('#editRaidPage').modal('hide');
-    	  updateRaidUI(null);
+    	  var histid = $('#editRaidPage').data("historyid");
+          var data = currentHistory.get(parseInt(histid,10));
+          var date = $('#badger-editraid-date').data("datetimepicker").getDate();
+          var time = $('#badger-editraid-time').data("datetimepicker").getDate();
+          if (time!=null) {
+        	  data.dateTime = time;
+          } else {
+        	  data.dateTime = date;
+          }
+          var pokemonId = parseInt($('#poke-editraid-search').val(), 10);
+          var pokemonData = $('#poke-editraid-search').select2('data');
+          var pokemonDao = {
+        	id: null,
+        	text: null
+          };
+          if (pokemonId!=null) {
+              pokemonDao.id=pokemonId;
+              pokemonDao.text=pokemonData[0].text;
+          }
+          data.pokemon=pokemonDao;
+          data.caught = $('#editraid-caught-switch').bootstrapSwitch('state');
+          data.status = currentProps.status;
+          $.ajax({
+            type: "PUT",
+            contentType: "application/json; charset=utf-8",
+            url: "api/gyms/"+currentProps.id+"/history/"+histid,
+            data: JSON.stringify(data),
+            success: function (data) {
+          	  showHistoryTab();
+          	  // XXXXXXX update raid UI
+            },
+            error: function (result) {
+              errorPage("Failed to update raid history", result);
+            },
+            complete: function() {
+          	  $('#editRaidPage').modal('hide');
+            }
+  	    });
       });
       $('#deleteBadge').on('click', function() {
         var histid = $('#editBadgePage').data("historyid");
@@ -682,10 +747,10 @@
           url: "api/gyms/"+currentProps.id+"/history/"+histid,
           success: function (data) {
         	showHistoryTab();
-        	updateBadgeUI(currentMarker, data.status);
+        	updateBadgeUI(currentMarker, data.status, currentProps.id);
           },
           error: function (result) {
-            errorPage("Failed to delete raid", result);
+            errorPage("Failed to delete badge history", result);
           },
           complete: function() {
         	$('#editBadgePage').modal('hide');
@@ -693,11 +758,31 @@
 	    });
       });
       $('#saveBadge').on('click', function() {
-    	  // XXX Call REST service to set the badge state
-    	  $('#editBadgePage').modal('hide');
-    	  showHistoryTab();
-    	  var status = currentProps.status;
-    	  updateBadgeUI(currentMarker, status);
+    	  var histid = $('#editBadgePage').data("historyid");
+          var data = currentHistory.get(parseInt(histid,10));
+          var date = $('#badger-editbadge-date').data("datetimepicker").getDate();
+          var time = $('#badger-editbadge-time').data("datetimepicker").getDate();
+          if (time!=null) {
+        	  data.dateTime = time;
+          } else {
+        	  data.dateTime = date;
+          }
+          $.ajax({
+            type: "PUT",
+            contentType: "application/json; charset=utf-8",
+            url: "api/gyms/"+currentProps.id+"/history/"+histid,
+            data: JSON.stringify(data),
+            success: function (data) {
+          	  showHistoryTab();
+          	  updateBadgeUI(currentMarker, data.status, currentProps.id);
+            },
+            error: function (result) {
+              errorPage("Failed to update badge history", result);
+            },
+            complete: function() {
+          	  $('#editBadgePage').modal('hide');
+            }
+  	    });
       });
   }
   
@@ -707,16 +792,31 @@
 	  $('#badger-area-container').after(getLastRaid(data));
 	  registerRaidEvents();
   }
+
   function showHistoryEdit(id, histype) {
-    if (histype==="RAID") {
-      $('#editRaidPage').data("historyid", id);
-      $('#editRaidPage').modal('show');
-    } else if (histype==="BADGE") {
-      var data = currentHistory.get(parseInt(id,10));
-      $('#editInfoBadge').removeClass().addClass("badger-badge "+getBadgeClass(data.status));
-      $('#editBadgePage').data("historyid", id);
-      $('#editBadgePage').modal('show');
-    }
+	  var data = currentHistory.get(parseInt(id,10));
+	  if (histype==="RAID") {
+          $('#editRaidPage').data("historyid", id);
+          var historyDate = new Date(data.dateTime);
+	      $('#badger-editraid-date').datetimepicker('update', historyDate);
+	      $('#badger-editraid-time').datetimepicker('update', historyDate);
+          if (data.pokemon!=null) {
+              $('#poke-editraid-search').val(data.pokemon.id.toString());
+              $('#poke-editraid-search').trigger('change');
+          } else {
+        	  $("#poke-editraid-search").val(null).trigger('change'); 
+          }
+          $("#editraid-caught-switch").bootstrapSwitch('state', data.caught);
+          $('#editRaidPage').modal('show');
+      } else if (histype==="BADGE") {
+          $('#editInfoBadge').removeClass().addClass("badger-badge "+getBadgeClass(data.status));
+          $('#editBadgePage').data("historyid", id);
+          selectHistoryBadge(data, data.status);
+          var historyDate = new Date(data.dateTime);
+	      $('#badger-editbadge-date').datetimepicker('update', historyDate);
+	      $('#badger-editbadge-time').datetimepicker('update', historyDate);
+          $('#editBadgePage').modal('show');
+      }
   }
 
   function initGymInfoPage(data) {
@@ -848,7 +948,6 @@
 	  initRaidBosses();
       resetPercentage();
 	  updateVisibleGyms();
-	  initHistoryEdit();
   }
 
   // Show any gym specified in the URL
@@ -899,7 +998,7 @@
         url: "api/gyms/"+props.id,
         data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid", "pokemonId", "caught"]),
         success: function (data) {
-          updateBadgeUI(marker, status);
+          updateBadgeUI(marker, status, data.id);
           var selectedTab = $('#gymTabContent').find('.active');
           if (selectedTab!=null && selectedTab.length!=0) {
               if (selectedTab[0].id=="history") {
@@ -913,11 +1012,28 @@
 	  });
   }
   
-  function updateBadgeUI(marker, status) {
+  function selectHistoryBadge(data, status) {
+	  data.status=status;
+	  $('#editInfoBadge').removeClass("badger-badge-basic badger-badge-bronze badger-badge-silver badger-badge-gold");
+      $('#editInfoBadge').addClass(getBadgeClass(status));
+      $('#editBadgeDropdown a').removeClass("badger-dropdownitem-checked");
+      $('#editBadgeDropdown a').each(function( index ) {
+          if (status==getStatusFromId($(this).attr("id"))) {
+              $(this).addClass("badger-dropdownitem-checked");
+          }
+      });
+  }
+  
+  function updateBadgeUI(marker, status, id) {
 	  marker.setIcon(customIcon(status));
-      $('#infoBadge').removeClass("badger-badge-basic badger-badge-bronze badger-badge-silver badger-badge-gold");
-      $('#infoBadge').addClass(getBadgeClass(status));
-      resetBadgeDropdown(status);
+      $("#infoBadge"+id).removeClass("badger-badge-basic badger-badge-bronze badger-badge-silver badger-badge-gold");
+      $("#infoBadge"+id).addClass(getBadgeClass(status));
+      $("#badgeDropdown"+id+" a").removeClass("badger-dropdownitem-checked");
+      $("#badgeDropdown"+id+" a").each(function( index ) {
+          if (status==getStatusFromId($(this).attr("id"))) {
+              $(this).addClass("badger-dropdownitem-checked");
+          }
+      });
       resetPercentage();
   }
 
@@ -1049,13 +1165,13 @@
   }
   
   function getStatusFromId (id) {
-	  if (id==="select-basic")
+	  if (id==="select-basic" || id==="edit-select-basic")
 		  return "BASIC";
-	  if (id==="select-bronze")
+	  if (id==="select-bronze" || id==="edit-select-bronze")
 		  return "BRONZE";
-	  if (id==="select-silver")
+	  if (id==="select-silver" || id==="edit-select-silver")
 		  return "SILVER";
-	  if (id==="select-gold")
+	  if (id==="select-gold" || id==="edit-select-gold")
 		  return "GOLD";
 	  return "NONE";
   }
@@ -1231,6 +1347,7 @@
           success: function (data) {
       	    raidBossData = data;
       	    showGymFromUrl();
+      	    initHistoryEdit();
           },
           error: function (result) {
       	    errorPage("Failed to query raid boss data", result);
@@ -1735,7 +1852,9 @@
   
   function getBadgeHtml(data) {
       var html="<button class=\"btn btn-default badger-small-button\" type=\"button\" id=\"dropdownMenuButton" + data.id + "\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
-        "<span class=\"badger-badge-container\"><span id=\"infoBadge" + data.id + "\" class=\"badger-badge " + getBadgeClass(data.status) + "\"></span></span>" +
+          "<div class=\"badger-badge-container\"><span id=\"infoBadge" + data.id + "\" class=\"badger-badge " + getBadgeClass(data.status) + "\"></span>" +
+          "<span class=\"badger-badge-gap\"></span><i class=\"fa fa-caret-down\"></i>" +
+          "</div>" +
         "</button>" +
         "<div class=\"dropdown-menu\" aria-labelledby=\"dropdownMenuButton" + data.id + "\" id=\"badgeDropdown" + data.id + "\">" +
           getBadgeDropdownHtml(data) +

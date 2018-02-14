@@ -15,4 +15,5 @@ public interface UserGymHistoryRepo extends JpaRepository<UserGymHistoryEntity, 
 	@Query("SELECT h, b FROM UserGymHistoryEntity h, UserBadgeHistoryEntity b WHERE b.id=h.historyId AND h.userId=?1 AND h.gymId=?2 ORDER BY h.dateTime ASC")
 	List<Object> findAllBadgeHistory(Long userId, Long gymId);
 	UserGymHistoryEntity findOneById(Long id);
+	UserGymHistoryEntity findOneByHistoryId(Long id);
 }
