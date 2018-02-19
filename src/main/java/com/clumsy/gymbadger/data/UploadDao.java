@@ -8,5 +8,6 @@ import lombok.Data;
 public class UploadDao {
 	private Long userId;
 	private String directory;
+	private List<String> files;
 	private List<BadgeUploadGymDao> gyms;
 }
