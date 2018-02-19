@@ -1,0 +1,6 @@
+begin;
+update gyms set deleted=true where name='The Cock';
+insert into gyms (id, name, lat, long, park, areaid, image_url) values (nextval('gymids'), 'Heartwood Forest Map', 51.784805, -0.3084999, false, (SELECT id FROM areas WHERE name='Heartwood Forest'), 'https://lh6.ggpht.com/4vOc5hsMRoOLka1Ocz9JGKJcch7XpG2-wUwPe12NJCuBhg1oig9rdlYqYuv8wy3iehRhrbTbpGAN277Pul4r');
+insert into gyms (id, name, lat, long, park, areaid, image_url) values (nextval('gymids'), 'Magical Meander - Frog', 51.784133, -0.3089569, false, (SELECT id FROM areas WHERE name='Heartwood Forest'), 'https://lh3.googleusercontent.com/FWJ3xPiNPgRsiIIGzhNxGSkN2LacsxvZFvTjE8r6BJAhooAFO8yHpgG_rK-jCRHwAq8lVSEzaktbNSN-R15nbg');
+insert into gyms (id, name, lat, long, park, areaid, image_url) values (nextval('gymids'), 'Disney Arch', 51.789063, -0.3148469, false, (SELECT id FROM areas WHERE name='Heartwood Forest'), 'https://lh3.googleusercontent.com/IPBnm2EBbLqRHrcpey2ViJFRzC_eayMFL2QbzPo-guLzP97Jj9trDxW3cJ2tOC3tya-_QOP6fsUEmvPgcTxQ');
+commit;
