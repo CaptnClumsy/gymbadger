@@ -15,6 +15,12 @@
   var totalTable = null;
   var teamTable = null;
   var currentHistory = null;
+  
+  var markerClusterGold = null;
+  var markerClusterSilver = null;
+  var markerClusterBronze = null;
+  var markerClusterBasic = null;
+  var markerClusterNone = null;
 
   function initPage() {
 	// Load snazzy info window and marker cluster scripts
@@ -276,19 +282,19 @@
                   })(marker, i);
               }
               if (goldMarkers.length>0) {
-                  var markerCluster = new MarkerClusterer(map, goldMarkers, {maxZoom: 15, imagePath: 'images/goldmarkers/m'});
+            	  markerClusterGold = new MarkerClusterer(map, goldMarkers, {maxZoom: 15, imagePath: 'images/goldmarkers/m'});
               }
               if (silverMarkers.length>0) {
-                  var markerCluster = new MarkerClusterer(map, silverMarkers, {maxZoom: 15, imagePath: 'images/silvermarkers/m'});
+            	  markerClusterSilver = new MarkerClusterer(map, silverMarkers, {maxZoom: 15, imagePath: 'images/silvermarkers/m'});
               }
               if (bronzeMarkers.length>0) {
-                  var markerCluster = new MarkerClusterer(map, bronzeMarkers, {maxZoom: 15, imagePath: 'images/bronzemarkers/m'});
+                  markerClusterBronze = new MarkerClusterer(map, bronzeMarkers, {maxZoom: 15, imagePath: 'images/bronzemarkers/m'});
               }
               if (basicMarkers.length>0) {
-                  var markerCluster = new MarkerClusterer(map, basicMarkers, {maxZoom: 15, imagePath: 'images/basicmarkers/m'});
+                  markerClusterBasic = new MarkerClusterer(map, basicMarkers, {maxZoom: 15, imagePath: 'images/basicmarkers/m'});
               }
               if (noMarkers.length>0) {
-                  var markerCluster = new MarkerClusterer(map, noMarkers, {maxZoom: 15, imagePath: 'images/nomarkers/m'});
+                  markerClusterNone = new MarkerClusterer(map, noMarkers, {maxZoom: 15, imagePath: 'images/nomarkers/m'});
               }
           },
           complete: function (result) {
@@ -298,6 +304,20 @@
           	errorPage("Failed to query gym data", result);
           }
   	});
+  }
+
+  function getMarkerCluster(status) {
+	  if (status=="GOLD") {
+	      return markerClusterGold;
+	  } else if (status=="SILVER") {
+		  return markerClusterSilver;
+	  } else if (status=="BRONZE") {
+		  return markerClusterBronze;
+	  } else if (status=="BASIC") {
+		  return markerClusterBasic;
+	  } else {
+		  return markerClusterNone;
+	  }
   }
 
   function queryGymDataAndUpdateInfoWindow(thisGym) {
@@ -946,6 +966,15 @@
 	  });
 	  $('#search').on("select2:select", function(e) {
 	      map.setCenter({ lat: e.params.data.lat, lng: e.params.data.lng});
+	      if (e.params.data.marker.map===null) {
+	    	  var cluster = getMarkerCluster(e.params.data.status);
+	    	  if (cluster!=null) {
+	    	      cluster.removeMarker(e.params.data.marker);
+	    	      cluster.repaint();
+	    	  }
+	    	  e.params.data.marker.setVisible(true);
+	    	  e.params.data.marker.setMap(map);
+	      }
 	      google.maps.event.trigger(e.params.data.marker, 'click');
       });
 	  $('#navUploadButton').on("click", showUpload);
@@ -1958,7 +1987,7 @@
   function getPercentageColors() {
     var backColor = '#efefef';
     var goldColor = '#f0f000';
-    if (currentUser.team=="INSTINCT") {
+    if (currentUser!=null && currentUser.team=="INSTINCT") {
         backColor = '#535559';
         goldColor = '#f9c004';
     }
