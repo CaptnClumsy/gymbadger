@@ -195,8 +195,14 @@
   }
   
   // Make sure gyms in all selected areas are visible
-  function updateVisibleGyms() {   
+  function updateVisibleGyms() {
+	  markerClusterGold.clearMarkers();
+	  markerClusterSilver.clearMarkers();
+	  markerClusterBronze.clearMarkers();
+	  markerClusterBasic.clearMarkers();
+	  markerClusterNone.clearMarkers();
 	  for (var i = 0; i < gymData.length; i++) {
+		  var cluster = getMarkerCluster(gymData[i].status);
 		  var found = false;
 		  for (var j = 0; j < selectedAreaIds.length; j++) {
 			  if (gymData[i].area.id === selectedAreaIds[j]) {
@@ -205,6 +211,7 @@
 					  gymData[i].marker.setVisible(false);
 				  } else {
 					  gymData[i].marker.setVisible(true);
+					  cluster.addMarker(gymData[i].marker);
 				  }
 			  }
 		  }
@@ -212,6 +219,8 @@
 		  if (!found) {
 			  gymData[i].marker.setVisible(false);
 		  }
+		  cluster.resetViewport();
+		  cluster.repaint();
 	  }
   }
 
@@ -248,11 +257,6 @@
           url: "api/gyms/",
           success: function (data) {
         	  gymData = data;
-        	  var goldMarkers = [];
-        	  var silverMarkers = [];
-        	  var bronzeMarkers = [];
-        	  var basicMarkers = [];
-        	  var noMarkers = [];
               for (var i = 0; i < gymData.length; i++) {
             	  // Add the marker
                   var marker = new google.maps.Marker({
@@ -262,17 +266,6 @@
                     map: map
                   });
             	  gymData[i].marker = marker;
-            	  if (gymData[i].status=="GOLD") {
-            	      goldMarkers.push(marker);
-            	  } else if (gymData[i].status=="SILVER") {
-            		  silverMarkers.push(marker);
-            	  } else if (gymData[i].status=="BRONZE") {
-            		  bronzeMarkers.push(marker);
-            	  } else if (gymData[i].status=="BASIC") {
-            		  basicMarkers.push(marker);
-            	  } else {
-            		  noMarkers.push(marker);
-            	  }
                   // Add a callback to create an info window for each marker if clicked
                   (function (marker, i) {
                     google.maps.event.addListener(marker, 'click', function () {
@@ -281,21 +274,11 @@
                     });
                   })(marker, i);
               }
-              if (goldMarkers.length>0) {
-            	  markerClusterGold = new MarkerClusterer(map, goldMarkers, {maxZoom: 15, imagePath: 'images/goldmarkers/m'});
-              }
-              if (silverMarkers.length>0) {
-            	  markerClusterSilver = new MarkerClusterer(map, silverMarkers, {maxZoom: 15, imagePath: 'images/silvermarkers/m'});
-              }
-              if (bronzeMarkers.length>0) {
-                  markerClusterBronze = new MarkerClusterer(map, bronzeMarkers, {maxZoom: 15, imagePath: 'images/bronzemarkers/m'});
-              }
-              if (basicMarkers.length>0) {
-                  markerClusterBasic = new MarkerClusterer(map, basicMarkers, {maxZoom: 15, imagePath: 'images/basicmarkers/m'});
-              }
-              if (noMarkers.length>0) {
-                  markerClusterNone = new MarkerClusterer(map, noMarkers, {maxZoom: 15, imagePath: 'images/nomarkers/m'});
-              }
+              markerClusterGold = new MarkerClusterer(map, null, {maxZoom: 15, imagePath: 'images/goldmarkers/m'});   
+              markerClusterSilver = new MarkerClusterer(map, null, {maxZoom: 15, imagePath: 'images/silvermarkers/m'});
+              markerClusterBronze = new MarkerClusterer(map, null, {maxZoom: 15, imagePath: 'images/bronzemarkers/m'});
+              markerClusterBasic = new MarkerClusterer(map, null, {maxZoom: 15, imagePath: 'images/basicmarkers/m'});
+              markerClusterNone = new MarkerClusterer(map, null, {maxZoom: 15, imagePath: 'images/nomarkers/m'});
           },
           complete: function (result) {
         	  initAreas();
@@ -1061,7 +1044,16 @@
   }
   
   function updateBadgeUI(marker, status, id) {
+	  markerClusterGold.removeMarker(marker);
+	  markerClusterSilver.removeMarker(marker);
+	  markerClusterBronze.removeMarker(marker);
+	  markerClusterBasic.removeMarker(marker);
+	  markerClusterNone.removeMarker(marker);
 	  marker.setIcon(customIcon(status));
+	  cluster = getMarkerCluster(status);
+	  cluster.addMarker(marker);
+	  cluster.resetViewport();
+	  cluster.repaint();
       $("#infoBadge"+id).removeClass("badger-badge-basic badger-badge-bronze badger-badge-silver badger-badge-gold");
       $("#infoBadge"+id).addClass(getBadgeClass(status));
       $("#badgeDropdown"+id+" a").removeClass("badger-dropdownitem-checked");
