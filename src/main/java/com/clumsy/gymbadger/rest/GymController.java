@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.clumsy.gymbadger.data.ChartScopeDao;
+import com.clumsy.gymbadger.data.FavouritesDao;
 import com.clumsy.gymbadger.data.GymHistoryDao;
 import com.clumsy.gymbadger.data.GymSummaryDao;
 import com.clumsy.gymbadger.entities.UserEntity;
@@ -20,6 +22,7 @@ import com.clumsy.gymbadger.services.GymNotFoundException;
 import com.clumsy.gymbadger.services.GymPropsNotFoundException;
 import com.clumsy.gymbadger.services.GymService;
 import com.clumsy.gymbadger.services.PokemonNotFoundException;
+import com.clumsy.gymbadger.services.ReportService;
 import com.clumsy.gymbadger.services.UnknownHistoryTypeException;
 import com.clumsy.gymbadger.services.UserNotFoundException;
 import com.clumsy.gymbadger.services.UserService;
@@ -49,6 +52,9 @@ public class GymController {
 	@Autowired
 	private ExportService exportService;
 
+	@Autowired
+	private ReportService reportService;
+	
     @RequestMapping(value = "/", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public List<GymSummaryDao> getGyms(Principal principal) {
@@ -193,5 +199,17 @@ public class GymController {
 		} catch (GymPropsNotFoundException e) {
 			throw new ObjectNotFoundException(e);
 		}
+    }
+    
+    @RequestMapping(value = "/favourites", method = RequestMethod.GET)
+    @ResponseStatus(HttpStatus.OK)
+    public FavouritesDao favouriteGyms(ChartScopeDao scope, Principal principal) {
+    	try {
+    		// Get the data for the report and return it
+			final UserEntity user = userService.getCurrentUser(principal);
+			return reportService.getFavouriteGyms(user, scope);
+		} catch (UserNotFoundException e) {
+			throw new ObjectNotFoundException(e);
+		} 
     }
 }
