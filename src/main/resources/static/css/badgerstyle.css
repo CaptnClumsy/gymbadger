@@ -523,11 +523,8 @@ body {
     margin-top: 8px;
 }
 .badger-rep-heading {
-	padding-left: 14px;
-	padding-bottom: 4px;
 	font-size: 20px;
     font-weight: 500;
-    border-bottom: 1px solid #dcdcdc;
     margin-bottom: 2px;
 }
 .badger-rep-table-container {
@@ -995,4 +992,28 @@ input[type="file"] {
     margin-right: 0px;
     margin-top: 0px;
     margin-bottom: 8px;
+}
+.badger-chart-div {
+    position: relative;
+    width: 100%;
+    height: 50vh;
+}
+.badger-rep-title {
+    display: flex;
+    padding: 4px;
+    justify-content: space-between;
+}
+.badger-rep-filter-btn {
+    font-size: 18px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+.badger-rep-title-span {
+    text-align: center;
+    width: 100%;
+}
+.badger-rep-filter {
+    padding-left: 10px;
 }

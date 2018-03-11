@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.clumsy.gymbadger.data.ChartScopeDao;
+import com.clumsy.gymbadger.data.ChartTimeInterval;
 import com.clumsy.gymbadger.data.FavouritesDao;
 import com.clumsy.gymbadger.data.GymHistoryDao;
 import com.clumsy.gymbadger.data.GymSummaryDao;
@@ -203,11 +204,16 @@ public class GymController {
     
     @RequestMapping(value = "/favourites", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public FavouritesDao favouriteGyms(ChartScopeDao scope, Principal principal) {
+    public FavouritesDao favouriteGyms(@RequestParam(value = "scope", required = false) String scope, Principal principal) {
     	try {
+    		// Build the scope object
+    		ChartScopeDao scopeDao = new ChartScopeDao();
+    		if (scope!=null && !scope.isEmpty()) {
+    		    scopeDao.setInterval(ChartTimeInterval.fromStringIgnoreCase(scope));
+    		}
     		// Get the data for the report and return it
 			final UserEntity user = userService.getCurrentUser(principal);
-			return reportService.getFavouriteGyms(user, scope);
+			return reportService.getFavouriteGyms(user, scopeDao);
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException(e);
 		} 
