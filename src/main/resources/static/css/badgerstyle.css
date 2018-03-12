@@ -1015,5 +1015,6 @@ input[type="file"] {
     width: 100%;
 }
 .badger-rep-filter {
+	display: flex;
     padding-left: 10px;
 }

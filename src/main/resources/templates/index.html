@@ -208,15 +208,20 @@
                   </span>
                   <span class="badger-rep-title-span"><p class="badger-rep-heading">Gym Raids</p></span>
                 </div>
-                <div id="reportFilterArea" class="collapse badger-rep-filter">
-                  <div>
+                <div id="reportFilterArea" class="collapse">                 
+                  <div class="badger-rep-filter">
                     <select id="scopeMenuButton">
                       <option value="DAY">Day</option>
                       <option value="WEEK" selected="selected">Week</option>
                       <option value="MONTH">Month</option>
                       <option value="YEAR">Year</option>
                       <option value="ALL">All</option>
+                      <option value="CUSTOM">Custom</option>
                     </select>
+                    <div id="badger-rep-start-date" class="input-group date badger-opt-date ml-2" style="display: none;"> 
+                      <input type="text" class="badger-opt-date-text" placeholder="Select start date"/> 
+                      <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
                   </div> 
                 </div>
                 <div class="badger-chart-container">

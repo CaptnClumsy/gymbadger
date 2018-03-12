@@ -5,7 +5,9 @@ public enum ChartTimeInterval {
     WEEK(0x0001),
     MONTH(0x002),
     QUARTER(0x003),
-    YEAR(0x004);
+    YEAR(0x004),
+    ALL(0x005),
+    CUSTOM(0x006);
 
     private final int value;
 

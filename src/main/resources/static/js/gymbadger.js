@@ -1364,17 +1364,31 @@
       $('#favouritesTab').on('shown.bs.tab', showFavouritesTab);
 
       $('#scopeMenuButton').multiselect({
-              buttonClass: "btn btn-success",
-              buttonContainer: '<div id="badger-dropdown-list" class="btn-group" />',
-              enableClickableOptGroups: true,
-              maxHeight: 200,
-              onChange: function(option, checked) {
-                  favReportScope=option.val();
-            	  console.log(option.val());
+          buttonClass: "btn btn-success",
+          buttonContainer: '<div id="badger-dropdown-list" class="btn-group" />',
+          enableClickableOptGroups: true,
+          maxHeight: 200,
+          onChange: function(option, checked) {
+        	  favReportScope=option.val();
+              if (option.val()=="CUSTOM") {
+                  $('#badger-rep-start-date').show();
+              } else {
+                  $('#badger-rep-start-date').hide();
+                  showFavouritesTab();
               }
-            });
-      	    $('#scopeMenuButton').multiselect('updateButtonText');
-      
+          }
+      });
+      $('#scopeMenuButton').multiselect('updateButtonText');
+
+      $('#badger-rep-start-date').datetimepicker({
+          format: 'dd-mm-yyyy',
+      	  autoclose: true,
+      	  todayHighlight: true,
+      	  minView: 2
+      }).on('changeDate', function(ev){
+      	showFavouritesTab();
+      });
+	  
 	  // Show the window
 	  $('#reportsPage').on('shown.bs.modal', function () {
 		  reportTable.columns.adjust().draw();
@@ -2006,10 +2020,15 @@
   }
   
   function showFavouritesTab() {
+	var reportUrl = "api/gyms/favourites?scope="+favReportScope;
+	var date = $('#badger-rep-start-date').data("datetimepicker").getDate();
+	if (date != null) {
+		reportUrl += "&start="+date.toJSON();
+	}
     $.ajax({
       type: "GET",
       contentType: "application/json; charset=utf-8",
-      url: "api/gyms/favourites?scope="+favReportScope,
+      url: reportUrl,
       success: function (data) {
         $('#favChartContainer').html('');
         var parent = document.getElementById('favChartContainer');

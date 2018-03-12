@@ -31,6 +31,7 @@ import com.clumsy.gymbadger.services.UserService;
 import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,12 +205,16 @@ public class GymController {
     
     @RequestMapping(value = "/favourites", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public FavouritesDao favouriteGyms(@RequestParam(value = "scope", required = false) String scope, Principal principal) {
+    public FavouritesDao favouriteGyms(@RequestParam(value = "scope", required = false) String scope,
+    		@RequestParam(value = "start", required = false) String start, Principal principal) {
     	try {
     		// Build the scope object
     		ChartScopeDao scopeDao = new ChartScopeDao();
     		if (scope!=null && !scope.isEmpty()) {
     		    scopeDao.setInterval(ChartTimeInterval.fromStringIgnoreCase(scope));
+    		}
+    		if (start!=null) {
+    			scopeDao.setStart(start);
     		}
     		// Get the data for the report and return it
 			final UserEntity user = userService.getCurrentUser(principal);
