@@ -206,7 +206,7 @@ public class GymController {
     @RequestMapping(value = "/favourites", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public FavouritesDao favouriteGyms(@RequestParam(value = "scope", required = false) String scope,
-    		@RequestParam(value = "start", required = false) String start, Principal principal) {
+    		@RequestParam(value = "start", required = false) Long start, Principal principal) {
     	try {
     		// Build the scope object
     		ChartScopeDao scopeDao = new ChartScopeDao();
@@ -214,13 +214,14 @@ public class GymController {
     		    scopeDao.setInterval(ChartTimeInterval.fromStringIgnoreCase(scope));
     		}
     		if (start!=null) {
-    			scopeDao.setStart(start);
+    			final Date startDate = new Date(start);
+    			scopeDao.setStart(startDate);
     		}
     		// Get the data for the report and return it
 			final UserEntity user = userService.getCurrentUser(principal);
 			return reportService.getFavouriteGyms(user, scopeDao);
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException(e);
-		} 
+		}
     }
 }

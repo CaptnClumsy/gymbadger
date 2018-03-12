@@ -1,5 +1,6 @@
 package com.clumsy.gymbadger.repos;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -30,6 +31,15 @@ public interface UserRaidHistoryRepo extends JpaRepository<UserRaidHistoryEntity
 	 @Query("select g, count(*) AS num from UserRaidHistoryEntity r, UserGymHistoryEntity h, GymEntity g " +
 	  "where r.id=h.historyId and " +
 	  "h.userId=?1 and " +
-	  "g.id=h.gymId GROUP BY g.id ORDER BY num DESC")
-	 List<Object> findRaidGymsByDay(final Long userid);
+	  "g.id=h.gymId " +
+	  "GROUP BY g.id ORDER BY num DESC")
+	 List<Object> countAllGymRaids(final Long userid);
+	 
+	 @Query("select g, count(*) AS num from UserRaidHistoryEntity r, UserGymHistoryEntity h, GymEntity g " +
+	  "where r.id=h.historyId and " +
+	  "h.userId=?1 and " +
+	  "g.id=h.gymId and " +
+	  "r.lastRaid >= ?2 " +
+	  "GROUP BY g.id ORDER BY num DESC")
+	 List<Object> countGymRaidsSince(final Long userid, final Date since);
 }

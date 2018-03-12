@@ -2023,7 +2023,7 @@
 	var reportUrl = "api/gyms/favourites?scope="+favReportScope;
 	var date = $('#badger-rep-start-date').data("datetimepicker").getDate();
 	if (date != null) {
-		reportUrl += "&start="+date.toJSON();
+		reportUrl += "&start="+date.getTime();
 	}
     $.ajax({
       type: "GET",
@@ -2031,82 +2031,101 @@
       url: reportUrl,
       success: function (data) {
         $('#favChartContainer').html('');
-        var parent = document.getElementById('favChartContainer');
-        // Create the canvas
-   	    var canvas = document.createElement('canvas');
-   	    if (typeof(G_vmlCanvasManager) !== 'undefined') {
-		  G_vmlCanvasManager.initElement(canvas);
-	    }
-	    var ctx = canvas.getContext('2d');
-	    parent.appendChild(canvas);
-	    // Process the data
-	    var labels = [];
-        var values = [];	    
-	    var background_colors = [];
-	    var hover_colors = [];
-        for (var i=0; i<data.favourites.length; i++) {
-          labels.push(formatLabel(data.favourites[i].name, 25));
-          values.push(data.favourites[i].count);
-          var col = getRandomColor();
-          var gradientStroke = ctx.createLinearGradient(500, 0, 100, 0);
-          var dark = shadeBlendConvert(-0.1, col);
-          var light = shadeBlendConvert(0.9, col);
-          gradientStroke.addColorStop(0, dark);
-          gradientStroke.addColorStop(1, light);
-          background_colors.push(gradientStroke);
-          var highlightStroke = ctx.createLinearGradient(500, 0, 100, 0);
-          dark = shadeBlendConvert(-0.05, col);
-          light = shadeBlendConvert(0.5, col);
-          highlightStroke.addColorStop(0, dark);
-          highlightStroke.addColorStop(1, light);
-          hover_colors.push(highlightStroke);
+        var subTitle="";
+        if (data.total==null || data.total==0) {
+            subTitle = "no raids ";
+        }  else {
+            subTitle = ""+data.total+" raids ";
         }
-        
-        var myChart = new Chart(ctx, {
-          type: 'horizontalBar',
-          data: {
-            labels: labels,
-            datasets: [
-              {
-                backgroundColor: background_colors,
-                hoverBackgroundColor: hover_colors,
-                label: "raids",
-                data: values
-              }
-            ]
-          },
-          options: {
-            scales: {
-              yAxes: [{
-                stacked: true,
-                ticks: {
-                  fontColor: "#131313",
-                  fontSize: 12
-                }
-              }],
-              xAxes: [{
-                ticks: {
-                  beginAtZero:true
-                }
-              }]
-            },
-            responsive: true,
-            maintainAspectRatio: false,
-            legend: {
-              labels: {
-                fontColor: "#131313",
-                fontSize: 12
-              },
-              display: false,
-            },
-            title: {
-              display: false
-            },
-          }
-        });
+        if (data.since!=null) {
+          var since = new Date(data.since);
+          $('#favouritesSubTitle').html("<p class=\"badger-fav-sub-title\">"+subTitle+"since "+since.toDateString()+"</p>");
+        } else {
+          $('#favouritesSubTitle').html("<p class=\"badger-fav-sub-title\">"+subTitle+"</p>");
+        }
+        if (data.total!=null && data.total!=0) {
+            drawFavouritesChart(data);
+        } else {
+            $('#favChartContainer').html("<div class=\"badger-fav-no-match\"></div>");
+        }
       },
       error: function (result) {
         errorPage("Failed to query favourite gyms", result);
       }
     });
+  }
+  
+  function drawFavouritesChart(data) {
+    var parent = document.getElementById('favChartContainer');
+   	var canvas = document.createElement('canvas');
+   	if (typeof(G_vmlCanvasManager) !== 'undefined') {
+	  G_vmlCanvasManager.initElement(canvas);
+	}
+	var ctx = canvas.getContext('2d');
+     parent.appendChild(canvas);
+	 // Process the data
+	 var labels = [];
+     var values = [];	    
+	 var background_colors = [];
+	 var hover_colors = [];
+     for (var i=0; i<data.favourites.length; i++) {
+       labels.push(formatLabel(data.favourites[i].name, 25));
+       values.push(data.favourites[i].count);
+       var col = getRandomColor();
+       var gradientStroke = ctx.createLinearGradient(500, 0, 100, 0);
+       var dark = shadeBlendConvert(-0.1, col);
+       var light = shadeBlendConvert(0.9, col);
+       gradientStroke.addColorStop(0, dark);
+       gradientStroke.addColorStop(1, light);
+       background_colors.push(gradientStroke);
+       var highlightStroke = ctx.createLinearGradient(500, 0, 100, 0);
+       dark = shadeBlendConvert(-0.05, col);
+       light = shadeBlendConvert(0.5, col);
+       highlightStroke.addColorStop(0, dark);
+       highlightStroke.addColorStop(1, light);
+       hover_colors.push(highlightStroke);
+     }    
+     
+     var myChart = new Chart(ctx, {
+       type: 'horizontalBar',
+       data: {
+         labels: labels,
+         datasets: [
+           {
+             backgroundColor: background_colors,
+             hoverBackgroundColor: hover_colors,
+             label: "raids",
+             data: values
+           }
+         ]
+       },
+       options: {
+         scales: {
+           yAxes: [{
+             stacked: true,
+             ticks: {
+               fontColor: "#131313",
+               fontSize: 12
+             }
+           }],
+           xAxes: [{
+             ticks: {
+               beginAtZero:true
+             }
+           }]
+         },
+         responsive: true,
+         maintainAspectRatio: false,
+         legend: {
+           labels: {
+             fontColor: "#131313",
+             fontSize: 12
+           },
+           display: false,
+         },
+         title: {
+           display: false
+         },
+       }
+     });
   }
