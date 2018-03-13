@@ -1394,6 +1394,11 @@
 		  reportTable.columns.adjust().draw();
 	  });
 	  $('#reportsPage').modal('show');
+	  
+	  // Refresh the tab
+	  if ($('#favouritesTab').hasClass("active")) {
+		  showFavouritesTab();
+	  }
   }
 
   function initRaidBosses() {
@@ -2046,6 +2051,8 @@
         if (data.total!=null && data.total!=0) {
             drawFavouritesChart(data);
         } else {
+        	var parent = document.getElementById('favChartContainer');
+        	parent.style.height = "300px"; 
             $('#favChartContainer').html("<div class=\"badger-fav-no-match\"></div>");
         }
       },
@@ -2058,6 +2065,16 @@
   function drawFavouritesChart(data) {
     var parent = document.getElementById('favChartContainer');
    	var canvas = document.createElement('canvas');
+   	var heightStr = "300px";
+   	if (data.favourites!=null && data.favourites.length!=0) {
+   		if (data.favourites.length==1) {
+   			heightStr = "100px";
+   		} else {
+   		    var height = data.favourites.length*60;
+   		    heightStr = ""+height+"px";
+   		}
+   	}
+   	parent.style.height = heightStr; 
    	if (typeof(G_vmlCanvasManager) !== 'undefined') {
 	  G_vmlCanvasManager.initElement(canvas);
 	}

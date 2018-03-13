@@ -993,10 +993,12 @@ input[type="file"] {
     margin-top: 0px;
     margin-bottom: 8px;
 }
+.badger-chart-container {
+	max-height: 350px;
+    overflow: auto;
+}
 .badger-chart-div {
-    position: relative;
     width: 100%;
-    height: 50vh;
 }
 .badger-rep-title {
     display: flex;
@@ -1019,6 +1021,12 @@ input[type="file"] {
 	display: flex;
     padding-left: 10px;
 }
+.badger-rep-date-text {
+	padding-top: 0px;
+    padding-bottom: 1px;
+    font-size: 14px;
+    width: 85px;
+}
 .badger-fav-title {
     margin-bottom: 0px;
 }
@@ -1028,7 +1036,7 @@ input[type="file"] {
 }
 .badger-fav-no-match {
     width: 100%;
-    height: 100%;
+    height: 250px;
     background: url('../images/Snorlax.png');
     background-size: contain;
     background-repeat: no-repeat;
