@@ -1880,36 +1880,34 @@
   
   function showUploadResults(data) {
       $('#uploadResultDetails').html("");
-      if (data.gyms==null || data.gyms==undefined || data.gyms.length==0) {
+      if (data==null || data==undefined || data.length==0) {
           $('#uploadResultDetails').html("<div class=\"alert alert-warn badger-upload-text-area\" role=\"alert\">" + 
               "<span><p>No gyms or badges detected, try a different screenshot.</p></span></div>");
           return;
       }
       var html="";
-      for (var i=0; i<data.gyms.length; i++) {
+      for (var i=0; i<data.length; i++) {
           html+= "<div id=\"gymResult-" + i + "\" class=\"badger-gym-result\">" + 
               "<div class=\"badger-gym-result-box\">" +
                 "<div class=\"badger-gym-result-div\">" + 
-                  "<span class=\"badger-result-row\">" + getBadgeHtml(data.gyms[i]) + "</span>" + 
+                  "<span class=\"badger-result-row\">" + getBadgeHtml(data[i]) + "</span>" + 
                 "</div>" +
                 "<div id=\"gymClose-" + i + "\" class=\"badger-gym-result-close-btn\"><button type=\"button\" class=\"close\" aria-label=\"Close\">" +
                   "<span class=\"badger-gym-result-close\">×</span></button>" +
                 "</div>" + 
               "</div>" + 
               "<div class=\"badger-gym-result-grid\">" +
-                  "<span class=\"badger-gym-result-label\">" + data.gyms[i].name + "</span>" + 
+                  "<span class=\"badger-gym-result-label\">" + data[i].gyms[0].name + "</span>" + 
               "</div>" +
             "</div>";
       }
       $('#uploadResultDetails').html(html);
-      for (var i=0; i<data.gyms.length; i++) {
+      for (var i=0; i<data.length; i++) {
           $("#gymClose-"+i).click({index: i}, function(event) {
               $("#gymResult-"+event.data.index).remove();
           });
       }
       $('#uploadResultsPage').modal('show');
-      
-      alert("Feature still under development...coming soon");
   }
   
   function getBadgeHtml(data) {

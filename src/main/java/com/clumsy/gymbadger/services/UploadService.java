@@ -104,7 +104,7 @@ public class UploadService {
 					final List<SimpleGymDao> gymDaos = new ArrayList<SimpleGymDao>();
 					for (int i=0; i<result.getGymNames().size(); i++) {
 						String gym = result.getGymNames().get(i);
-						gymDaos.add(new SimpleGymDao(result.gym));
+						gymDaos.add(new SimpleGymDao(result.getGymId(), gym));
 						if (i==0) {
 							log.debug("* " + gym);
 						} else {

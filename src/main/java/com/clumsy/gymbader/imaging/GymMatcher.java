@@ -35,7 +35,7 @@ public class GymMatcher {
 				matches.add(bestMatch);
 			}
 		}
-		if (bestMatch.getName().length() != 0) {
+		if (bestMatch!=null && bestMatch.getName().length() != 0) {
 			// Ensure the best match comes first
 			matches.remove(bestMatch);
 			matches.add(0, bestMatch);
