@@ -22,6 +22,6 @@ public class AreaController {
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	@ResponseStatus(HttpStatus.OK)
 	public List<AreaEntity> getAreas() {
-		return areaRepo.findAll();
+		return areaRepo.findAllByOrderByNameAsc();
 	}
 }

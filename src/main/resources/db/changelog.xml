@@ -15,4 +15,6 @@
     <include file="db/changelogs/gym-updates-19022018.sql"/>
     <include file="db/changelogs/short-names-21022018.sql"/>
     <include file="db/changelogs/pokemon-updates-06032018.sql"/>
+    <include file="db/changelogs/gym-updates-13032018.sql"/>
+    <include file="db/changelogs/gym-updates-16032018.sql"/>
 </databaseChangeLog>
