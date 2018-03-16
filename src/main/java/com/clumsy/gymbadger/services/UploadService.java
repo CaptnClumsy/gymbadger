@@ -1,8 +1,8 @@
 package com.clumsy.gymbadger.services;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -12,24 +12,19 @@ import java.util.List;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import com.clumsy.gymbadger.data.BadgeUploadGymDao;
+import com.clumsy.gymbader.imaging.ImageProcessingException;
+import com.clumsy.gymbader.imaging.ImageRecognitionResult;
+import com.clumsy.gymbader.imaging.ImageRecognitionUtils;
+import com.clumsy.gymbader.imaging.ImageUtils;
+import com.clumsy.gymbader.imaging.InvalidBadgeListException;
+import com.clumsy.gymbadger.data.BadgeUploadResultDao;
 import com.clumsy.gymbadger.data.GymBadgeStatus;
+import com.clumsy.gymbadger.data.SimpleGymDao;
 import com.clumsy.gymbadger.data.UploadDao;
-import com.google.cloud.vision.v1.AnnotateImageRequest;
-import com.google.cloud.vision.v1.AnnotateImageResponse;
-import com.google.cloud.vision.v1.BatchAnnotateImagesResponse;
-import com.google.cloud.vision.v1.Block;
-import com.google.cloud.vision.v1.Feature;
-import com.google.cloud.vision.v1.Feature.Type;
-import com.google.cloud.vision.v1.Image;
-import com.google.cloud.vision.v1.ImageAnnotatorClient;
-import com.google.cloud.vision.v1.Page;
-import com.google.cloud.vision.v1.Paragraph;
-import com.google.cloud.vision.v1.Symbol;
-import com.google.cloud.vision.v1.TextAnnotation;
-import com.google.cloud.vision.v1.Word;
-import com.google.protobuf.ByteString;
+import com.clumsy.gymbadger.entities.GymEntity;
+import com.clumsy.gymbadger.repos.GymRepo;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,6 +35,9 @@ public class UploadService {
 	@Autowired
 	private WorkspaceService workspaceService;
 
+	@Autowired
+	private GymRepo gymRepo;
+	
 	public void add(UploadDao dao, String originalFilename, InputStream inputStream) throws WorkspaceException {
 		final Path filePath = Paths.get(dao.getDirectory(), originalFilename);
 		try {
@@ -59,74 +57,70 @@ public class UploadService {
 	public UploadDao begin(Long id) throws WorkspaceException {
 		UploadDao dao = new UploadDao();
 		dao.setUserId(id);
-		dao.setGyms(new ArrayList<BadgeUploadGymDao>());
 		dao.setDirectory(workspaceService.getWorkspace(id));
 		dao.setFiles(new ArrayList<String>());
 		return dao;
 	}
 
-	public List<BadgeUploadGymDao> process(UploadDao dao) throws WorkspaceException {
+	@Transactional(readOnly = true)
+	public List<BadgeUploadResultDao> process(UploadDao dao) throws WorkspaceException {
 		if (dao==null || dao.getFiles()==null) {
 			throw new IllegalArgumentException("Upload DAO is empty");
 		}
-		final List<AnnotateImageRequest> requests = new ArrayList<>();
-		try {
-			for (int i=0; i<dao.getFiles().size(); i++) {
-				final String filePath = dao.getFiles().get(i);
-				final ByteString imgBytes = ByteString.readFrom(new FileInputStream(filePath));
-				final Image img = Image.newBuilder().setContent(imgBytes).build();
-				final Feature feat = Feature.newBuilder().setType(Type.DOCUMENT_TEXT_DETECTION).build();
-				final AnnotateImageRequest request =
-				    AnnotateImageRequest.newBuilder().addFeatures(feat).setImage(img).build();
-				requests.add(request);
+		// Prepare images for processing
+		final List<String> tmpFiles = new ArrayList<String>();
+		for (int i=0; i<dao.getFiles().size(); i++) {
+			final String filePath = dao.getFiles().get(i);
+			try {
+				Path tmpFile = Files.createTempFile(Paths.get(dao.getDirectory()), null, "png");
+				ImageUtils.convertForOCR(filePath, tmpFile.toString());
+				tmpFiles.add(tmpFile.toString());
+			} catch (ImageProcessingException e) {
+				throw new WorkspaceException("Error converting gym badge screenshot for image processing: "+e);
+			} catch (IOException e) {
+				throw new WorkspaceException("Unable to create temporary file for image processing: "+e);
 			}
-		} catch (IOException e) {
-			throw new WorkspaceException("Unable to read temporary file on server: "+e);
 		}
-		try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
-		    final BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
-		    final List<AnnotateImageResponse> responses = response.getResponsesList();
-		    client.close();
-		    for (AnnotateImageResponse res : responses) {
-		        if (res.hasError()) {
-			        log.error("Error: "+res.getError().getMessage());
-			        continue;
-			    }
-		        TextAnnotation annotation = res.getFullTextAnnotation();
-		        for (Page page: annotation.getPagesList()) {
-		            String pageText = "";
-		            for (Block block : page.getBlocksList()) {
-		                String blockText = "";
-		                for (Paragraph para : block.getParagraphsList()) {
-		                    String paraText = "";
-		                    for (Word word: para.getWordsList()) {
-		                        String wordText = "";
-		                        for (Symbol symbol: word.getSymbolsList()) {
-		                            wordText = wordText + symbol.getText();
-		                        }
-		                        paraText = paraText + " " + wordText;
-		                    }
-		                    // Output Example using Paragraph:
-		                    log.warn("Paragraph: " + paraText);
-		                    //log.warn("Bounds: " + para.getBoundingBox() + "\n");
-		                    blockText = blockText + paraText;
-		                }
-		                pageText = pageText + blockText;
-		            }
-		        }
-		        //log.warn(annotation.getText());
-		    }
-		 } catch (IOException e) {
-			 throw new WorkspaceException("Unable to process temporary file on server: "+e);
-		 } catch (Exception e) {
-			 throw new WorkspaceException("Unable to analyze image: "+e);
+		// Query all gym short names
+		final List<GymEntity> gyms = gymRepo.findAllGyms();
+		final List<SimpleGymDao> gymShortNames = new ArrayList<SimpleGymDao>();
+		for (GymEntity gym : gyms) {
+			if (gym.getShortName()!=null && gym.getShortName().length()!=0) {
+				gymShortNames.add(new SimpleGymDao(gym.getId(), gym.getShortName()));
+			} else {
+				gymShortNames.add(new SimpleGymDao(gym.getId(), gym.getName()));
+			}
 		}
-		// TODO: Return some fake data for now 
-		dao.getGyms().add(new BadgeUploadGymDao(1L, "The Mermaid", GymBadgeStatus.GOLD));
-		dao.getGyms().add(new BadgeUploadGymDao(2L, "Bleak House", GymBadgeStatus.GOLD));
-	    dao.getGyms().add(new BadgeUploadGymDao(3L, "The Castle Inn", GymBadgeStatus.BRONZE));
-		dao.getGyms().add(new BadgeUploadGymDao(4L, "Abbey Theatre", GymBadgeStatus.BASIC));
-		return dao.getGyms();
+		// Analyse the images and display results
+		final List<BadgeUploadResultDao> results = new ArrayList<BadgeUploadResultDao>();
+		try {		
+			List<ImageRecognitionResult> matchingGyms = ImageRecognitionUtils.getGyms(tmpFiles, gymShortNames);
+			//ImageUtils.drawBounds(inFile, outFile, matchingGyms);
+			for (ImageRecognitionResult result : matchingGyms) {
+				log.debug("FOUND GYM AT: "+result.getBounds().toString());
+				if (result.getGymNames()!=null && result.getGymNames().size()>0) {
+					// Need to find the badge colour from the screenshot somehow
+					final BadgeUploadResultDao badgeResult = new BadgeUploadResultDao(GymBadgeStatus.NONE);
+					final List<SimpleGymDao> gymDaos = new ArrayList<SimpleGymDao>();
+					for (int i=0; i<result.getGymNames().size(); i++) {
+						String gym = result.getGymNames().get(i);
+						gymDaos.add(new SimpleGymDao(result.gym));
+						if (i==0) {
+							log.debug("* " + gym);
+						} else {
+							log.debug("  " + gym);
+						}
+					}
+					badgeResult.setGyms(gymDaos);
+					results.add(badgeResult);
+				}
+			}
+		} catch (ImageProcessingException e) {
+		    throw new WorkspaceException("Unable to perform image recognition: "+e);
+		} catch (InvalidBadgeListException e) {
+			throw new WorkspaceException("Invalid badge list: "+e);
+		}
+		return results;
 	}
 
 	public void end(final Long userId) {

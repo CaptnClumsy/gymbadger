@@ -24,6 +24,9 @@ public class GymEntity {
 	@Column(name = "name")
 	private String name;
 	
+	@Column(name = "short_name")
+	private String shortName;
+	
 	@Column(name = "lat")
 	private Double latitude;
 	

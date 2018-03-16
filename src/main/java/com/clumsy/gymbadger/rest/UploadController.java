@@ -1,6 +1,7 @@
 package com.clumsy.gymbadger.rest;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.clumsy.gymbadger.data.BadgeUploadGymDao;
-import com.clumsy.gymbadger.data.BadgeUploadResultsDao;
+import com.clumsy.gymbadger.data.BadgeUploadResultDao;
 import com.clumsy.gymbadger.data.UploadDao;
 import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.services.UploadService;
@@ -29,11 +29,10 @@ public class UploadController {
 	private UserService userService;
 
 	@RequestMapping(value = "/badges", method = RequestMethod.POST)
-	public BadgeUploadResultsDao UploadBadges(@RequestParam("files[]") List<MultipartFile> files,
+	public List<BadgeUploadResultDao> UploadBadges(@RequestParam("files[]") List<MultipartFile> files,
 		Principal principal) throws Exception {
-		BadgeUploadResultsDao results = new BadgeUploadResultsDao();
 		if (files==null || files.isEmpty()) {
-	    	return results;
+	    	return new ArrayList<BadgeUploadResultDao>();
 	    }
 		try {
 			final UserEntity user = userService.getCurrentUser(principal);
@@ -43,10 +42,9 @@ public class UploadController {
 		            uploadService.add(dao, files.get(i).getOriginalFilename(), files.get(i).getInputStream());
 		        }
 		    }
-		    List<BadgeUploadGymDao> gyms = uploadService.process(dao);
-		    results.setGyms(gyms);
+		    List<BadgeUploadResultDao> gyms = uploadService.process(dao);
 		    uploadService.end(user.getId());
-		    return results;
+		    return gyms;
 		} catch (UserNotFoundException e) {
 			throw new ObjectNotFoundException(e);
 		}
