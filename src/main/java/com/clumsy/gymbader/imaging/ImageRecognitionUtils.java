@@ -26,7 +26,7 @@ import com.google.protobuf.ByteString;
 
 public class ImageRecognitionUtils {
 
-	public static List<ImageRecognitionResult> getGyms(final List<String> inputFiles, final List<SimpleGymDao> gymNames) throws ImageProcessingException, InvalidBadgeListException { 
+	public static List<ImageRecognitionResult> getGyms(final List<String> inputFiles, final List<SimpleGymDao> gymList) throws ImageProcessingException, InvalidBadgeListException { 
 		// Setup the requests to send to google vision
 		final List<AnnotateImageRequest> requests = new ArrayList<AnnotateImageRequest>();
 		try {
@@ -79,7 +79,7 @@ public class ImageRecognitionUtils {
 		                if (blockText.equalsIgnoreCase("GYM BADGES")) {
 		                	isImageValid = true;
 		                }
-		                final List<SimpleGymDao> matching = GymMatcher.getBestMatches(blockText, gymNames);
+		                final List<SimpleGymDao> matching = GymMatcher.getBestMatches(blockText, gymList);
 		                if (matching!=null && matching.size()!=0) {
 		                	// Create a rectangle representing the text block bounds
 		                	BoundingPoly box = block.getBoundingBox();
@@ -88,7 +88,7 @@ public class ImageRecognitionUtils {
 		                			vertices.get(1).getX()-vertices.get(0).getX(),
 		                			vertices.get(2).getY()-vertices.get(1).getY());
 		                	// Add this gym to the list
-		                	matchingGyms.add(new ImageRecognitionResult(matching.get(0).getId(), matching, bounds));
+		                	matchingGyms.add(new ImageRecognitionResult(matching, bounds));
 		                }
 		            }
 		        }

@@ -1829,8 +1829,10 @@
           error: function (result) {
             alert("Failed to upload screenshots to server");
             $('#uploadProgress').text("");
+            $('#uploadSpinner').remove();
           },
           complete: function () {
+            $('#uploadSpinner').remove();
             $('#uploadProgressArea').hide();
           },
           cache: false,
@@ -1850,7 +1852,8 @@
       $('#uploadProgressBar').width(percentText);
       if(percentage >= 100) {
         // process completed
-        $('#uploadProgress').text("");  
+        $('#uploadProgress').html("<div class=\"badger-processing-text\">Processing...</div>");
+        $('#uploadPageBottom').prepend("<div id=\"uploadSpinner\" class=\"badger-upload-spinner\">"+getSpinnerHtml()+"</div>");
       }
     }  
   }
@@ -1887,19 +1890,36 @@
       }
       var html="";
       for (var i=0; i<data.length; i++) {
-          html+= "<div id=\"gymResult-" + i + "\" class=\"badger-gym-result\">" + 
-              "<div class=\"badger-gym-result-box\">" +
+          if (data[i].gyms.length>1) {
+              html += "<div id=\"gymResult-" + i + "\" class=\"badger-gym-result badger-gym-unsure\">";
+          } else {
+              html += "<div id=\"gymResult-" + i + "\" class=\"badger-gym-result\">";
+          }
+          var gymdata = {
+              id: data[i].gyms[0].id,
+              status: data[i].status
+          };
+          html += "<div class=\"badger-gym-result-box\">" +
                 "<div class=\"badger-gym-result-div\">" + 
-                  "<span class=\"badger-result-row\">" + getBadgeHtml(data[i]) + "</span>" + 
+                  "<span class=\"badger-result-row\">" + getBadgeHtml(gymdata) + "</span>" + 
                 "</div>" +
                 "<div id=\"gymClose-" + i + "\" class=\"badger-gym-result-close-btn\"><button type=\"button\" class=\"close\" aria-label=\"Close\">" +
                   "<span class=\"badger-gym-result-close\">×</span></button>" +
                 "</div>" + 
               "</div>" + 
-              "<div class=\"badger-gym-result-grid\">" +
-                  "<span class=\"badger-gym-result-label\">" + data[i].gyms[0].name + "</span>" + 
-              "</div>" +
-            "</div>";
+              "<div class=\"badger-gym-result-grid\">";
+          if (data[i].gyms.length>1) {
+             html += "<div class=\"dropdown\">" +
+                 "<button id=\"gymPickBtn-" + i + "\" class=\"btn btn-outline-secondary badger-select-gym dropdown-toggle\" type=\"button\" data-toggle=\"dropdown\">" + data[i].gyms[0].name + "<i class=\"fa fa-caret\"></i></button>" +
+                 "<ul class=\"dropdown-menu badger-gym-dropdown\">";
+              for (var j=0; j<data[i].gyms.length; j++) {
+                  html += "<li><a class=\"gymPick\" href=\"#\" data-index=\"" + i + "\" data-gymid=\"" + data[i].gyms[j].id + "\">"+ data[i].gyms[j].name+"</a></li>";
+              }
+              html += "</ul></div>";
+          } else {
+              html += "<span class=\"badger-gym-result-label\">" + data[i].gyms[0].name + "</span>";
+          }
+          html += "</div></div>";
       }
       $('#uploadResultDetails').html(html);
       for (var i=0; i<data.length; i++) {
@@ -1907,6 +1927,13 @@
               $("#gymResult-"+event.data.index).remove();
           });
       }
+      $('.gymPick').click(function() {
+          var idx = $(this).data("index");
+          var id = $(this).data("gymid");
+          var name = $(this).text();
+          $("#gymPickBtn-"+idx).text(name);
+      });
+      
       $('#uploadResultsPage').modal('show');
   }
   

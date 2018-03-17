@@ -835,7 +835,25 @@ input[type="file"] {
 }
 .badger-upload-results {
     max-height: 250px;
+    display: flex;
+    flex-wrap: wrap;
     overflow: auto;
+    justify-content: space-evenly;
+}
+.badger-upload-spin-area {
+    position: relative;
+}
+.badger-upload-spinner {
+    position: absolute;
+    z-index: 999;
+    overflow: hidden;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .badger-gym-result {
     margin: 4px;
@@ -845,6 +863,28 @@ input[type="file"] {
     vertical-align: top;
     padding-top: 4px;
     padding-bottom: 4px;
+    padding-left: 4px;
+}
+.badger-gym-unsure {
+    border: 1px solid #ffa0a0;
+}
+.badger-select-gym {
+    word-wrap: break-word;
+    white-space: normal;
+    padding: 2px;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    max-width: 81px;
+    text-align: center;
+    font-size: 11px;
+    line-height: 13px;
+    color: black;
+}
+.badger-gym-dropdown {
+    font-size: 11px;
+    padding-top: 2px;
+    padding-bottom: 2px;
     padding-left: 4px;
 }
 .badger-gym-result-box {
@@ -1041,4 +1081,7 @@ input[type="file"] {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
+}
+.badger-processing-text {
+    text-align: center;
 }

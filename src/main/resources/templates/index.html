@@ -22,6 +22,7 @@
     <link rel="stylesheet" href="css/snazzy-info-window.min.css"/>
     <link rel="stylesheet" href="css/bootstrap-switch.min.css"/>
     <link rel="stylesheet" href="css/badgerstyle.css"/>
+    <link rel="stylesheet" href="css/badger-spinner.css"/>
     
       
   </head>
@@ -374,16 +375,18 @@
             <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Upload screenshots of your Pokemon Go Gym Badge list.  
             You may need multiple screenshots scrolling down your gym badge list.  Based on these screenshots Gymbadger will attempt to automatically identify the gyms and your current badge.</p></span>
             </div>
-            <form id="fileUploadData" method="post" enctype="multipart/form-data">
-              <label for="fileToUpload" class="btn btn-secondary badger-file-upload">
-                Select Screenshots...
-              </label>
-              <input id="fileToUpload" type="file" name="fileToUpload" onchange="fileSelected();" accept="image/*" multiple="true"/>
-            </form>
-            <div id="fileDetails"></div>
-            <div id="uploadProgressArea" class="badger-upload-progress">
-              <div id="uploadProgress" class="badger-upload-progress-text"></div>
-              <div id="uploadProgressBar" class="badger-upload-progress-bar"></div>
+            <div id="uploadPageBottom" class="badger-upload-spin-area">
+              <form id="fileUploadData" method="post" enctype="multipart/form-data">
+                <label for="fileToUpload" class="btn btn-secondary badger-file-upload">
+                  Select Screenshots...
+                </label>
+                <input id="fileToUpload" type="file" name="fileToUpload" onchange="fileSelected();" accept="image/*" multiple="true"/>
+              </form>
+              <div id="fileDetails"></div>
+              <div id="uploadProgressArea" class="badger-upload-progress">
+                <div id="uploadProgress" class="badger-upload-progress-text"></div>
+                <div id="uploadProgressBar" class="badger-upload-progress-bar"></div>
+              </div>
             </div>
           </div>
           <div class="modal-footer">

@@ -83,28 +83,28 @@ public class UploadService {
 		}
 		// Query all gym short names
 		final List<GymEntity> gyms = gymRepo.findAllGyms();
-		final List<SimpleGymDao> gymShortNames = new ArrayList<SimpleGymDao>();
+		final List<SimpleGymDao> gymList = new ArrayList<SimpleGymDao>();
 		for (GymEntity gym : gyms) {
 			if (gym.getShortName()!=null && gym.getShortName().length()!=0) {
-				gymShortNames.add(new SimpleGymDao(gym.getId(), gym.getShortName()));
+				gymList.add(new SimpleGymDao(gym.getId(), gym.getName(), gym.getShortName()));
 			} else {
-				gymShortNames.add(new SimpleGymDao(gym.getId(), gym.getName()));
+				gymList.add(new SimpleGymDao(gym.getId(), gym.getName(), gym.getName()));
 			}
 		}
 		// Analyse the images and display results
 		final List<BadgeUploadResultDao> results = new ArrayList<BadgeUploadResultDao>();
 		try {		
-			List<ImageRecognitionResult> matchingGyms = ImageRecognitionUtils.getGyms(tmpFiles, gymShortNames);
+			List<ImageRecognitionResult> matchingGyms = ImageRecognitionUtils.getGyms(tmpFiles, gymList);
 			//ImageUtils.drawBounds(inFile, outFile, matchingGyms);
 			for (ImageRecognitionResult result : matchingGyms) {
 				log.debug("FOUND GYM AT: "+result.getBounds().toString());
-				if (result.getGymNames()!=null && result.getGymNames().size()>0) {
+				if (result.getGyms()!=null && result.getGyms().size()>0) {
 					// Need to find the badge colour from the screenshot somehow
 					final BadgeUploadResultDao badgeResult = new BadgeUploadResultDao(GymBadgeStatus.NONE);
 					final List<SimpleGymDao> gymDaos = new ArrayList<SimpleGymDao>();
-					for (int i=0; i<result.getGymNames().size(); i++) {
-						String gym = result.getGymNames().get(i);
-						gymDaos.add(new SimpleGymDao(result.getGymId(), gym));
+					for (int i=0; i<result.getGyms().size(); i++) {
+						SimpleGymDao gym = result.getGyms().get(i);
+						gymDaos.add(gym);
 						if (i==0) {
 							log.debug("* " + gym);
 						} else {
