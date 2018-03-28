@@ -988,7 +988,14 @@
   	    			  selectedAreaIds.push(gymData[i].area.id);
   	    		  }
   	    		  map.setCenter({ lat: gymData[i].lat, lng: gymData[i].lng});
-  	    		  gymData[i].marker.setVisible(true);
+  	    		  var cluster = getMarkerCluster(gymData[i].status);
+  	    		  if (cluster!=null) {
+	    	         cluster.removeMarker(gymData[i].marker);
+	    	         cluster.resetViewport();
+	    	         cluster.repaint();
+	    	      }
+	    	      gymData[i].marker.setVisible(true);
+  	    		  gymData[i].marker.setMap(map);
                   google.maps.event.trigger(gymData[i].marker, 'click');
                   break;
   	    	  }
