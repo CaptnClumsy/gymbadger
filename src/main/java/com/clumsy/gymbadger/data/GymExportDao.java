@@ -36,6 +36,9 @@ public class GymExportDao {
 	@CsvBindByPosition(position = 9)
 	private Boolean caught;
 
+	@CsvBindByPosition(position = 10)
+	private Boolean shiny;
+	
 	public GymExportDao() {
 	}
 
@@ -59,6 +62,7 @@ public class GymExportDao {
 		}
 		exportDao.setPokemon(pokemon);
 		exportDao.setCaught(gym.getCaught());
+		exportDao.setShiny(gym.getShiny());
 		return exportDao;
 	}
 }

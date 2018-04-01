@@ -16,6 +16,7 @@ public class GymHistoryDao implements Comparable<GymHistoryDao> {
     private HistoryType type;
     private BossDao pokemon;
     private Boolean caught;
+    private Boolean shiny;
     private GymBadgeStatus status;
 
     public GymHistoryDao() {
@@ -37,6 +38,7 @@ public class GymHistoryDao implements Comparable<GymHistoryDao> {
 			    dao.setPokemon(boss);
 			}
 			dao.setCaught(((UserRaidHistoryEntity)historyData).getCaught());
+			dao.setShiny(((UserRaidHistoryEntity)historyData).getShiny());
 			return dao;
 		} else if ((historyData instanceof UserBadgeHistoryEntity)) {
 			dao.setDateTime(((UserGymHistoryEntity)historyEntry).getDateTime());

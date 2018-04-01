@@ -98,7 +98,7 @@ public class GymController {
 		try {
 			final UserEntity user = userService.getCurrentUser(principal);
 			return gymService.updateGym(user, gymId, newGym.getPark(), newGym.getStatus(), newGym.getLastRaid(),
-			    newGym.getPokemonId(), newGym.getCaught());
+			    newGym.getPokemonId(), newGym.getCaught(), newGym.getShiny());
 		} catch (GymNotFoundException e) {
 			throw new ObjectNotFoundException(e);
 		} catch (UserNotFoundException e) {

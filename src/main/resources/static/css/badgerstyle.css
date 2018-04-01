@@ -484,6 +484,9 @@ body {
     position: relative;
 	bottom: 4px;
 }
+.badger-opt-group {
+    display: flex;
+}
 .badger-opt-item {
 	margin-top: 8px;
 }

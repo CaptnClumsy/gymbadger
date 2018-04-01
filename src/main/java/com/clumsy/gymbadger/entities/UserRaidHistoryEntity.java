@@ -32,5 +32,8 @@ public class UserRaidHistoryEntity {
 	
 	@Column(name = "caught")
 	private Boolean caught;
+	
+	@Column(name = "shiny")
+	private Boolean shiny;
 
 }

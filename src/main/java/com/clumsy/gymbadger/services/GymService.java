@@ -171,7 +171,7 @@ public class GymService {
 	@Transactional
 	public GymSummaryDao updateGym(final UserEntity user, final Long gymId, final Boolean isPark,
 			final GymBadgeStatus status, final Date lastRaid,
-			final Long pokemonId, final Boolean caught) throws GymNotFoundException, PokemonNotFoundException {
+			final Long pokemonId, final Boolean caught, final Boolean shiny) throws GymNotFoundException, PokemonNotFoundException {
 		final GymEntity gym = getGym(gymId);
 		if (gym==null) {
 			throw new GymNotFoundException("Unable to query gym for update");
@@ -194,7 +194,7 @@ public class GymService {
 			}
 			if (props.getLastRaid() == null) {
 				// No last recorded raid and now one is specified
-				if (lastRaid!=null || caught!=null || pokemonId!=null) {
+				if (lastRaid!=null || caught!=null || pokemonId!=null || shiny!=null) {
 				    hasRaidChanged=true;
 			    }
 			} else {
@@ -209,6 +209,9 @@ public class GymService {
 				if (caught!=props.getLastRaid().getCaught()) {
 					hasRaidChanged = true;
 				}
+				if (shiny!=props.getLastRaid().getShiny()) {
+					hasRaidChanged = true;
+				}
 			}
 		} catch (GymPropsNotFoundException e) {
 			// Expected if user has never edited this gym before
@@ -219,7 +222,7 @@ public class GymService {
 			if (status!=null && !status.is(GymBadgeStatus.NONE)) {
 				hasBadgeChanged = true;
 			}
-			if (lastRaid!=null || pokemonId!=null || caught!=null) {
+			if (lastRaid!=null || pokemonId!=null || caught!=null || shiny!=null) {
 				hasRaidChanged=true;
 			}
 		}
@@ -233,7 +236,7 @@ public class GymService {
 				}
 			}
 			final UserRaidHistoryEntity raidHistory = writeGymRaidHistory(user.getId(), gymId,
-				lastRaid, pokemon, caught);
+				lastRaid, pokemon, caught, shiny);
 			if (props.getLastRaid()!=null) {
 				if (raidHistory.getLastRaid().after(props.getLastRaid().getLastRaid())) {
 					props.setLastRaid(raidHistory);
@@ -255,12 +258,13 @@ public class GymService {
 	}
 
 	private UserRaidHistoryEntity writeGymRaidHistory(final Long userId, final Long gymId,
-			final Date lastRaid, final PokemonEntity pokemon, final Boolean caught) {
+			final Date lastRaid, final PokemonEntity pokemon, final Boolean caught, final Boolean shiny) {
 		// Write raid history
 		UserRaidHistoryEntity raidHistory = new UserRaidHistoryEntity();
 		raidHistory.setLastRaid(lastRaid);
 		raidHistory.setPokemon(pokemon);
 		raidHistory.setCaught(caught);
+		raidHistory.setShiny(shiny);
 		UserRaidHistoryEntity savedRaidHistory = raidHistoryRepo.save(raidHistory);
 		// Add to the history table
 		UserGymHistoryEntity history = new UserGymHistoryEntity();
@@ -404,7 +408,7 @@ public class GymService {
 			}
 			// Update the raid history record
 			raidHistory.setLastRaid(dao.getDateTime());
-			if (dao.getPokemon()!=null) {
+			if (dao.getPokemon()!=null && dao.getPokemon().getId()!=null) {
 				PokemonEntity pokemon = pokemonRepo.findOne(dao.getPokemon().getId());
 				if (pokemon==null) {
 					throw new PokemonNotFoundException("Pokemon not found");
@@ -414,6 +418,7 @@ public class GymService {
 				raidHistory.setPokemon(null);
 			}
 			raidHistory.setCaught(dao.getCaught());
+			raidHistory.setShiny(dao.getShiny());
 			raidHistoryRepo.save(raidHistory);
 			// Find new latest raid
 			Long newLatest = raidHistoryRepo.findLatestRaid(history.getUserId(), history.getGymId());

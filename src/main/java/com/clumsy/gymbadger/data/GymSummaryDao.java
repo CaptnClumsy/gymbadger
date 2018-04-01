@@ -28,6 +28,8 @@ public class GymSummaryDao {
 	private Long pokemonId;
 	
 	private Boolean caught;
+	
+	private Boolean shiny;
 
 	private String imageUrl;
 
@@ -55,6 +57,7 @@ public class GymSummaryDao {
 			if (props.getLastRaid()!=null) {
 		        dao.setLastRaid(props.getLastRaid().getLastRaid());
 		        dao.setCaught(props.getLastRaid().getCaught());
+		        dao.setShiny(props.getLastRaid().getShiny());
 		        if (props.getLastRaid().getPokemon()!=null) {
 		            dao.setPokemonId(props.getLastRaid().getPokemon().getId());
 		        }

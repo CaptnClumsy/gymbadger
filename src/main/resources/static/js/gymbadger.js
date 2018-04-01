@@ -514,7 +514,8 @@
       	}
       	var pokemonId = parseInt($('#poke-search').val(), 10);
       	var isCaught = $('#caught-switch').bootstrapSwitch('state');
-      	saveAdvanced(lastRaid, pokemonId, isCaught);
+      	var isShiny = $('#shiny-switch').bootstrapSwitch('state');
+      	saveAdvanced(lastRaid, pokemonId, isCaught, isShiny);
     });
   }
 
@@ -601,15 +602,25 @@
       	        }
       	        var pillClass = "badge-info";
       	        var comment = "";
+      	        var shiny = "";
+      	        var shinyClass = "";
+      	        if (data[i].shiny) {
+      	            shiny = "shiny "
+                    shinyClass = " badge-shiny";
+      	        }
       	        if (data[i].caught) {
       	            pillClass = "badge-success";
-      	            comment = pokemonName + " was successfully caught";
+      	            comment = shiny + pokemonName + " was successfully caught";
       	        } else {
       	            pillClass = "badge-danger";
-      	            comment = "Oh no! The wild " + pokemonName + " fled";
+      	            comment = "Oh no! The wild " + shiny + pokemonName + " fled";
       	        }
       	        html += "<td><div class=\"badger-pokemon-container\"><span class=\"badge " + 
-      	            pillClass + " badger-pokemon-badge\">" + pokemonName + "</span></div></td>";
+      	            pillClass + shinyClass + " badger-pokemon-badge\">";
+      	        if (data[i].shiny) {
+      	          html += "<i class=\"fa fa-star\"></i>";
+      	        }
+      	        html += " " + pokemonName + "</span></div></td>";
       	        html += "<td class=\"badger-history-text\">" + comment + "</td>";
       	    }
       	    html+="<td><button class=\"btn btn-primary badger-edit-button\"><i class=\"fa fa-pencil\"></i></button></td>";
@@ -674,6 +685,14 @@
       	onText: 'Yes',
       	offText: 'No'
       });
+      $('#editraid-shiny-switch').bootstrapSwitch({
+      	state: false,
+      	onColor: 'success',
+      	offColor: 'danger',
+      	labelText: 'Shiny',
+      	onText: 'Yes',
+      	offText: 'No'
+      });
       $('#deleteRaid').on('click', function() {
         var histid = $('#editRaidPage').data("historyid");
         var data = currentHistory.get(parseInt(histid,10));
@@ -690,7 +709,8 @@
         		id: currentProps.id,
         		lastRaid: data.dateTime,
         		pokemonId: pokemonId,
-        		caught: data.caught
+        		caught: data.caught,
+        		shiny: data.shiny
         	};
         	updateRaidUI(propsData);
           },
@@ -724,6 +744,7 @@
           }
           data.pokemon=pokemonDao;
           data.caught = $('#editraid-caught-switch').bootstrapSwitch('state');
+          data.shiny = $('#editraid-shiny-switch').bootstrapSwitch('state');
           data.status = currentProps.status;
           $.ajax({
             type: "PUT",
@@ -736,6 +757,7 @@
           	      currentProps.pokemonId=data.pokemon.id;
           	  }
           	  currentProps.caught=data.caught;
+          	  currentProps.shiny=data.shiny;
           	  showHistoryTab();
           	  $('.badger-raid-container').remove();
               $('#badger-area-container').after(getLastRaid(currentProps));
@@ -818,6 +840,7 @@
         	  $("#poke-editraid-search").val(null).trigger('change'); 
           }
           $("#editraid-caught-switch").bootstrapSwitch('state', data.caught);
+          $("#editraid-shiny-switch").bootstrapSwitch('state', data.shiny);
           $('#editRaidPage').modal('show');
       } else if (histype==="BADGE") {
           $('#editInfoBadge').removeClass().addClass("badger-badge "+getBadgeClass(data.status));
@@ -1023,7 +1046,7 @@
         type: "PUT",
         contentType: "application/json; charset=utf-8",
         url: "api/gyms/"+props.id,
-        data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid", "pokemonId", "caught"]),
+        data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid", "pokemonId", "caught", "shiny"]),
         success: function (data) {
           updateBadgeUI(marker, status, data.id);
           var selectedTab = $('#gymTabContent').find('.active');
@@ -1084,8 +1107,14 @@
 	  if (data.pokemonId == null) {
 		  return "";
 	  }
-	  // Set the pill colour to be green for cuaght, red for fled
+	  // Set the pill colour to be green for caught, red for fled
 	  var pillClass = "badge-info";
+	  var shinyClass = "";
+	  if (data.shiny != null) {
+	      if (data.shiny) {
+	          shinyClass = " badge-shiny";
+	      }
+	  }
 	  if (data.caught != null) {
 		  if (data.caught) {
 			  pillClass = "badge-success";
@@ -1103,9 +1132,14 @@
       if (pokemonName == null) {
     	  return "";
       }
-	  return "<div class=\"badger-pokemon-container\"><span class=\"badge " + pillClass + " badger-pokemon-badge\">" +
-          pokemonName +
+	  var html = "<div class=\"badger-pokemon-container\"><span class=\"badge " + pillClass + shinyClass + " badger-pokemon-badge\">";
+	  if (data.shiny) {
+          html += "<i class=\"fa fa-star\"></i>";
+	  }
+	  html +=
+          " " + pokemonName +
           "</span></div>";
+      return html;
   }
 
   function getBadgeColor (status) {
@@ -1301,7 +1335,6 @@
     	      }
     	  }
       }
-
 	  $('time.badger-raid-time').timeago();
 	  
 	  reportTable = $('#reportsTable').DataTable({
@@ -1462,22 +1495,35 @@
       	onText: 'Yes',
       	offText: 'No'
       });
+      var shiny = false;
+      if (currentProps.shiny != null) {
+    	  shiny = currentProps.shiny;
+      }
+      $('#shiny-switch').bootstrapSwitch({
+      	state: shiny,
+      	onColor: 'success',
+      	offColor: 'danger',
+      	labelText: 'Shiny',
+      	onText: 'Yes',
+      	offText: 'No'
+      });
       if (currentProps.pokemonId!=null) {
           $('#poke-search').val(currentProps.pokemonId.toString());
           $('#poke-search').trigger('change');
       }
   }
 
-  function saveAdvanced(lastRaid, pokemonId, caught) {
+  function saveAdvanced(lastRaid, pokemonId, caught, shiny) {
 	  var props = currentProps;
 	  props.lastRaid=lastRaid;
 	  props.pokemonId=pokemonId;
 	  props.caught=caught;
+	  props.shiny=shiny;
       $.ajax({
         type: "PUT",
         contentType: "application/json; charset=utf-8",
         url: "api/gyms/"+props.id,
-        data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid", "pokemonId", "caught"]),
+        data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid", "pokemonId", "caught", "shiny"]),
         success: function (data) {
           currentProps = data;
           // Update the UI by removing old raid time and adding new one
@@ -1501,6 +1547,7 @@
       $('#badger-opt-time').datetimepicker('remove');
       $('.badger-opt-date-text').val("");
       $('#caught-switch').bootstrapSwitch('destroy');
+      $('#shiny-switch').bootstrapSwitch('destroy');
   }
 
   // Load previously selected areas from local storage
