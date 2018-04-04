@@ -372,18 +372,18 @@
         </div>
         
           <div id="uploadPageBody" class="modal-body">
-            <div class="alert alert-danger badger-upload-text-area" role="alert">
-              <span><p>This feature is still under development, it does not work yet but is coming soon.</p></span>
-            </div>
             <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Upload screenshots of your Pokemon Go Gym Badge list.  
             You may need multiple screenshots scrolling down your gym badge list.  Based on these screenshots Gymbadger will attempt to automatically identify the gyms and your current badge.</p></span>
+            </div>
+            <div class="alert alert-danger badger-upload-text-area" role="alert">
+              <span><p>This feature is still under development.  Gym names will be detected but you will have to manually enter the gym badges.</p></span>
             </div>
             <div id="uploadPageBottom" class="badger-upload-spin-area">
               <form id="fileUploadData" method="post" enctype="multipart/form-data">
                 <label for="fileToUpload" class="btn btn-secondary badger-file-upload">
                   Select Screenshots...
                 </label>
-                <input id="fileToUpload" type="file" name="fileToUpload" onchange="fileSelected();" accept="image/*" multiple="true"/>
+                <input id="fileToUpload" type="file" name="fileToUpload[]" onchange="fileSelected();" accept="image/*" multiple="true"/>
               </form>
               <div id="fileDetails"></div>
               <div id="uploadProgressArea" class="badger-upload-progress">
@@ -418,7 +418,7 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button id="saveButton" type="button" class="btn btn-success">Save</button>
+          <button id="saveUploadButton" type="button" class="btn btn-success">Save</button>
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
         </div>
       </div>

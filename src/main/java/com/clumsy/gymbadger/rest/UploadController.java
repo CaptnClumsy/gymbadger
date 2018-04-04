@@ -18,6 +18,9 @@ import com.clumsy.gymbadger.services.UploadService;
 import com.clumsy.gymbadger.services.UserNotFoundException;
 import com.clumsy.gymbadger.services.UserService;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/upload")
 public class UploadController {
@@ -39,6 +42,8 @@ public class UploadController {
 			UploadDao dao = uploadService.begin(user.getId());
 		    for(int i=0; i< files.size(); i++) {
 		        if(!files.get(i).isEmpty()) {
+		        	// TODO: Remove this logging used to see what iPhones send
+		        	log.error("File uploaded: "+files.get(i).getOriginalFilename());
 		            uploadService.add(dao, files.get(i).getOriginalFilename(), files.get(i).getInputStream());
 		        }
 		    }

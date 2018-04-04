@@ -1894,6 +1894,9 @@
           processData: false
         });
       });
+      $('#saveUploadButton').on('click', function() {
+          alert('save');
+      });
   }
 
   function progress(e) {
@@ -1944,13 +1947,13 @@
       }
       var html="";
       for (var i=0; i<data.length; i++) {
+          var thisGymClass = "badger-gym-result";
           if (data[i].gyms.length>1) {
-              html += "<div id=\"gymResult-" + i + "\" class=\"badger-gym-result badger-gym-unsure\">";
-          } else {
-              html += "<div id=\"gymResult-" + i + "\" class=\"badger-gym-result\">";
+              thisGymClass += " badger-gym-unsure";
           }
+          html += "<div id=\"gymResult-" + i + "\" class=\"" + thisGymClass + "\" data-gymid=\"" + data[i].gyms[0].id + "\">";
           var gymdata = {
-              id: data[i].gyms[0].id,
+              id: i,
               status: data[i].status
           };
           html += "<div class=\"badger-gym-result-box\">" +
@@ -1980,12 +1983,22 @@
           $("#gymClose-"+i).click({index: i}, function(event) {
               $("#gymResult-"+event.data.index).remove();
           });
+          $("#badgeDropdown"+i+" .dropdown-item").click({index: i}, function(event) {
+              var i = event.data.index;
+              var status = getStatusFromId($(this).attr("id"));
+              $("#infoBadge"+i).removeClass("badger-badge-none badger-badge-basic badger-badge-bronze badger-badge-silver badger-badge-gold");
+              $("#infoBadge"+i).addClass(getBadgeClass(status));
+              $("#badgeDropdown"+i+" a").removeClass("badger-dropdownitem-checked");
+              $(this).addClass("badger-dropdownitem-checked");
+          });
       }
       $('.gymPick').click(function() {
           var idx = $(this).data("index");
           var id = $(this).data("gymid");
           var name = $(this).text();
           $("#gymPickBtn-"+idx).text(name);
+          $("#gymResult-"+idx).data("gymid", id);
+          $("#gymResult-"+idx).attr("data-gymid", id);
       });
       
       $('#uploadResultsPage').modal('show');
