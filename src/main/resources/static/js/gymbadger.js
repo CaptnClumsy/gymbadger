@@ -86,10 +86,25 @@
             	    initMarkers();
             	    initUpload();
             	    initTeamOptions();
+            	    initLocation();
                 }
     	    });
   		}
     });   
+  }
+  
+  function initLocation() {
+      $('#navLocationButton').on("click", function(){
+          navigator.geolocation.getCurrentPosition(setLocation,failLocation);
+      });
+  }
+  
+  function setLocation(position) {
+      var myLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+      map.panTo(myLatLng);   
+  }
+  
+  function failLocation() {
   }
   
   function showAnnouncements(announcements) {

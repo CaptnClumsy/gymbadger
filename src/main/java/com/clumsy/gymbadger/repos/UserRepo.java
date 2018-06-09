@@ -17,18 +17,18 @@ public interface UserRepo extends JpaRepository<UserEntity, Long> {
 	@Query("SELECT u.id AS id, u.displayName AS displayName, p.badgeStatus AS status, COUNT(*) AS badges " +
 			"FROM UserEntity u, GymPropsEntity p WHERE p.userId=u.id AND " + 
 			"p.badgeStatus=4 AND u.shareData=true " + 
-			"GROUP BY u.id, p.badgeStatus ORDER BY badges DESC")
+			"GROUP BY u.id, p.badgeStatus ORDER BY badges DESC, id ASC")
 	List<LeaderEntity> findLeaders();
 	
 	@Query("SELECT u.id AS id, u.displayName AS displayName, p.badgeStatus AS status, COUNT(*) AS badges " +
 			"FROM UserEntity u, GymPropsEntity p WHERE p.userId=u.id AND " + 
 			"u.shareData=true " + 
-			"GROUP BY u.id, p.badgeStatus ORDER BY badges DESC")
+			"GROUP BY u.id, p.badgeStatus ORDER BY badges DESC, id ASC")
 	List<LeaderEntity> findTotals();
 	
 	@Query("SELECT u.id AS id, u.displayName AS displayName, p.badgeStatus AS status, COUNT(*) AS badges " +
 			"FROM UserEntity u, GymPropsEntity p WHERE p.userId=u.id AND " + 
 			"p.badgeStatus=4 AND u.shareData=true AND u.team=?1 " + 
-			"GROUP BY u.id, p.badgeStatus ORDER BY badges DESC")
+			"GROUP BY u.id, p.badgeStatus ORDER BY badges DESC, id ASC")
 	List<LeaderEntity> findTeamLeaders(Team team);
 }

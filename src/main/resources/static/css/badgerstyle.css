@@ -85,11 +85,22 @@ body {
 	display: inline-flex;
 	vertical-align: top;
 }
+.badger-nav-outer {
+    display: flex;
+    width: 100%;
+}
 .badger-nav-sticky {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
+    justify-content: right;
     vertical-align: middle;
+    width: 100%;
+}
+.badger-nav-topitems {
+    display: flex;
+    align-items: center;
+}
+.badger-big-button {
+    font-size: 32px;
 }
 .badger-area-btn {
   padding-right: 4px;
@@ -141,7 +152,6 @@ body {
     padding-left: 6px;
     line-height: 24px;
     margin-top: 3px;
-    height: 38px;
 }
 .badger-badge-container {
 	display: flex;
@@ -1087,4 +1097,7 @@ input[type="file"] {
 }
 .badger-processing-text {
     text-align: center;
+}
+.badger-location {
+   align-self: center;
 }
