@@ -22,6 +22,8 @@
   var markerClusterBronze = null;
   var markerClusterBasic = null;
   var markerClusterNone = null;
+  
+  var myMarker = null;
 
   function initPage() {
 	// Load snazzy info window and marker cluster scripts
@@ -101,7 +103,16 @@
   
   function setLocation(position) {
       var myLatLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
-      map.panTo(myLatLng);   
+      map.panTo(myLatLng);
+      if (myMarker) {
+          myMarker.setMap(null);
+          myMarker = null;
+      }
+	  myMarker = new google.maps.Marker({
+        position: myLatLng,
+        map: map,
+        zIndex: Math.round(myLatLng.lat()*-100000)<<5
+        });
   }
   
   function failLocation() {
