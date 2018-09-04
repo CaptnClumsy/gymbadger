@@ -16,7 +16,8 @@
   var teamTable = null;
   var currentHistory = null;
   var favReportScope = "WEEK";
-    
+  
+  var clustering = true;
   var markerClusterGold = null;
   var markerClusterSilver = null;
   var markerClusterBronze = null;
@@ -72,6 +73,7 @@
                 contentType: "application/json; charset=utf-8",
                 url: "api/defaults/",
                 success: function (data) {
+                	clustering = data.cluster;
             	    map = new google.maps.Map(document.getElementById('map'), {
                     zoom: data.zoom,
                     center: { lat: data.lat, lng: data.lng },
@@ -238,7 +240,11 @@
 					  gymData[i].marker.setVisible(false);
 				  } else {
 					  gymData[i].marker.setVisible(true);
-					  cluster.addMarker(gymData[i].marker);
+					  if (clustering) {
+						  cluster.addMarker(gymData[i].marker);
+					  } else {
+						  gymData[i].marker.setMap(map);
+					  }
 				  }
 			  }
 		  }
@@ -246,8 +252,10 @@
 		  if (!found) {
 			  gymData[i].marker.setVisible(false);
 		  }
-		  cluster.resetViewport();
-		  cluster.repaint();
+		  if (clustering) {
+		      cluster.resetViewport();
+		      cluster.repaint();
+		  }
 	  }
   }
 
@@ -1000,13 +1008,15 @@
 	  $('#search').on("select2:select", function(e) {
 	      map.setCenter({ lat: e.params.data.lat, lng: e.params.data.lng});
 	      if (e.params.data.marker.map===null) {
-	    	  var cluster = getMarkerCluster(e.params.data.status);
-	    	  if (cluster!=null) {
-	    	      cluster.removeMarker(e.params.data.marker);
-	    	      cluster.repaint();
+	    	  if (clustering) {
+	    	      var cluster = getMarkerCluster(e.params.data.status);
+	    	      if (cluster!=null) {
+	    	          cluster.removeMarker(e.params.data.marker);
+	    	          cluster.repaint();
+	    	      }
+	    	      e.params.data.marker.setVisible(true);
+	    	      e.params.data.marker.setMap(map);
 	    	  }
-	    	  e.params.data.marker.setVisible(true);
-	    	  e.params.data.marker.setMap(map);
 	      }
 	      google.maps.event.trigger(e.params.data.marker, 'click');
       });
@@ -1037,14 +1047,16 @@
   	    			  selectedAreaIds.push(gymData[i].area.id);
   	    		  }
   	    		  map.setCenter({ lat: gymData[i].lat, lng: gymData[i].lng});
-  	    		  var cluster = getMarkerCluster(gymData[i].status);
-  	    		  if (cluster!=null) {
-	    	         cluster.removeMarker(gymData[i].marker);
-	    	         cluster.resetViewport();
-	    	         cluster.repaint();
-	    	      }
-	    	      gymData[i].marker.setVisible(true);
-  	    		  gymData[i].marker.setMap(map);
+  	    		  if (clustering) {
+	  	    		  var cluster = getMarkerCluster(gymData[i].status);
+	  	    		  if (cluster!=null) {
+		    	         cluster.removeMarker(gymData[i].marker);
+		    	         cluster.resetViewport();
+		    	         cluster.repaint();
+		    	      }
+		    	      gymData[i].marker.setVisible(true);
+	  	    		  gymData[i].marker.setMap(map);
+  	    		  }
                   google.maps.event.trigger(gymData[i].marker, 'click');
                   break;
   	    	  }
@@ -1101,16 +1113,20 @@
   }
   
   function updateBadgeUI(marker, status, id) {
-	  markerClusterGold.removeMarker(marker);
-	  markerClusterSilver.removeMarker(marker);
-	  markerClusterBronze.removeMarker(marker);
-	  markerClusterBasic.removeMarker(marker);
-	  markerClusterNone.removeMarker(marker);
+	  if (clustering) {
+		  markerClusterGold.removeMarker(marker);
+		  markerClusterSilver.removeMarker(marker);
+		  markerClusterBronze.removeMarker(marker);
+		  markerClusterBasic.removeMarker(marker);
+		  markerClusterNone.removeMarker(marker);
+	  }
 	  marker.setIcon(customIcon(status));
-	  cluster = getMarkerCluster(status);
-	  cluster.addMarker(marker);
-	  cluster.resetViewport();
-	  cluster.repaint();
+	  if (clustering) {
+	      cluster = getMarkerCluster(status);
+	      cluster.addMarker(marker);
+	      cluster.resetViewport();
+	      cluster.repaint();
+	  }
       $("#infoBadge"+id).removeClass("badger-badge-basic badger-badge-bronze badger-badge-silver badger-badge-gold");
       $("#infoBadge"+id).addClass(getBadgeClass(status));
       $("#badgeDropdown"+id+" a").removeClass("badger-dropdownitem-checked");
@@ -2043,6 +2059,14 @@
   }
   
   function initTeamOptions() {
+	  $('#cluster-switch').bootstrapSwitch({
+	      	state: clustering,
+	      	onColor: 'success',
+	      	offColor: 'danger',
+	      	labelText: 'Cluster',
+	      	onText: 'Yes',
+	      	offText: 'No'
+	  });
       $('#saveTeam').on('click', function() {
         var team = $('#teamButtons label.active input').val();
         var updatedUser = currentUser;
@@ -2057,11 +2081,28 @@
             $('#teamPage').modal('hide');
             updateColors(data.team);
             resetPercentage();
+            var isCluster = $('#cluster-switch').bootstrapSwitch('state');
+            if (isCluster!=clustering) {
+            	var defaultsDao = { user: currentUser, cluster: isCluster, zoom: null, lat: null, lng: null };
+            	$.ajax({
+                    type: "PUT",
+                    contentType: "application/json; charset=utf-8",
+                    url: "api/defaults/",
+                    data: JSON.stringify(defaultsDao),
+                    success: function (defaultsData) {
+                    	clustering=defaultsData.cluster;
+                    	updateVisibleGyms();
+                    },
+                    error: function() {
+                    	alert("Failed to update map options");
+                    }
+            	});
+            }
           },
           error: function () {
             alert("Failed to update team selection");
           }
-	    }); 	  
+	    });
       });
   }
   

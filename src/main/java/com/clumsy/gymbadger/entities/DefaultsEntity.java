@@ -25,4 +25,6 @@ public class DefaultsEntity {
 	@Column(name = "init_pos_long")
 	private Double longitude;
 
+	@Column(name = "cluster")
+	private Boolean cluster;
 }

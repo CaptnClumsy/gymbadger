@@ -20,4 +20,5 @@
     <include file="db/changelogs/pokemon-updates-16032018.sql"/>
     <include file="db/changelogs/gym-updates-28032018.sql"/>
     <include file="db/changelogs/schema-update-01042018.sql"/>
+    <include file="db/changelogs/schema-update-04092018.sql"/>
 </databaseChangeLog>

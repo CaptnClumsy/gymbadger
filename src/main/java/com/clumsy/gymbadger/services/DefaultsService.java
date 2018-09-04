@@ -40,10 +40,8 @@ public class DefaultsService {
 		this.announcementRepo = announcementRepo;
 	}
 
-	@Transactional(readOnly = true) 
-	public DefaultsDao getDefaults(final UserEntity user) {
-		DefaultsEntity defaults = defaultsRepo.findOneByUserid(user.getId());
-		DefaultsDao dao = new DefaultsDao(defaults.getZoom(), defaults.getLatitude(), defaults.getLongitude());
+	private DefaultsDao getDaoFromEntity(final UserEntity user, final DefaultsEntity defaults) {
+		DefaultsDao dao = new DefaultsDao(defaults.getZoom(), defaults.getLatitude(), defaults.getLongitude(), defaults.getCluster());
 		dao.setUser(UserDao.fromEntity(user));
 		List<UserAnnouncementEntity> announcementEntities = userAnnouncementRepo.findAllByUserId(user.getId());
 		if (announcementEntities!=null) {
@@ -56,6 +54,13 @@ public class DefaultsService {
 		
 		return dao;
 	}
+
+	@Transactional(readOnly = true) 
+	public DefaultsDao getDefaults(final UserEntity user) {
+		DefaultsEntity defaults = defaultsRepo.findOneByUserid(user.getId());
+		return getDaoFromEntity(user, defaults);
+	}
+
 	@Transactional
 	public DefaultsEntity insertDefaults(final Long userId) {
 		// If there are any system wide announcements this new user needs to see them
@@ -74,6 +79,29 @@ public class DefaultsService {
 		defaults.setZoom(DEFAULT_ZOOM);
 		defaults.setLatitude(DEFAULT_LATITUDE);
 		defaults.setLongitude(DEFAULT_LONGITUDE);
+		defaults.setCluster(true);
 		return defaultsRepo.save(defaults);
+	}
+
+	@Transactional 
+	public DefaultsDao updateDefaults(final UserEntity user, final DefaultsDao updatedDefaults) throws UserNotFoundException {
+		DefaultsEntity defaults = defaultsRepo.findOneByUserid(user.getId());
+		if (defaults==null) {
+			throw new UserNotFoundException("Defaults for user " + user.getDisplayName() + " not found");
+		}
+		if (updatedDefaults.getCluster()!=null) {
+		    defaults.setCluster(updatedDefaults.getCluster());
+		}
+		if (updatedDefaults.getLat()!=null) {
+			defaults.setLatitude(updatedDefaults.getLat());
+		}
+		if (updatedDefaults.getLng()!=null) {
+			defaults.setLongitude(updatedDefaults.getLng());
+		}
+		if (updatedDefaults.getZoom()!=null) {
+			defaults.setZoom(updatedDefaults.getZoom());
+		}
+		DefaultsEntity newDefaults = defaultsRepo.save(defaults);
+		return getDaoFromEntity(user, newDefaults);
 	}
 }
