@@ -2083,7 +2083,7 @@
             resetPercentage();
             var isCluster = $('#cluster-switch').bootstrapSwitch('state');
             if (isCluster!=clustering) {
-            	var defaultsDao = { user: currentUser, cluster: isCluster, zoom: null, lat: null, lng: null };
+            	var defaultsDao = { user: currentUser, cluster: isCluster };
             	$.ajax({
                     type: "PUT",
                     contentType: "application/json; charset=utf-8",
