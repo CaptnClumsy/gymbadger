@@ -28,4 +28,6 @@ insert into gyms (id, name, lat, long, park, areaid, image_url) values (nextval(
 insert into gyms (id, name, lat, long, park, areaid, image_url) values (nextval('gymids'), 'St Albans Spiritualist Church', 51.750750, -0.325334, false, (SELECT id FROM areas WHERE name='Hatfield Road'), null);
 insert into gyms (id, name, short_name, lat, long, park, areaid, image_url) values (nextval('gymids'), 'A Long History of Cricket', 'A Long History of Cricket', 51.808449, -0.352935, false, (SELECT id FROM areas WHERE name='Harpenden'), 'https://lh5.ggpht.com/4aFZb33VbojG54tJdQO6MF7mskwnN0nYpkpMb1G7Bnnaq0CFHco7uYHRPRrLJWwkfItwrRbSiB6s2rH3z67s=s130');
 
+insert into gyms (id, name, short_name, lat, long, park, areaid, image_url) values (nextval('gymids'), 'Roman Kiln Potters Bar', 'Roman Kiln Potters Bar', 51.697499,-0.179353, true, (SELECT id FROM areas WHERE name='Potters Bar'), 'https://lh5.ggpht.com/7OX0--S1jNJjCWyooXzTFPGocsGdOkWuTq6L3RVvoliGQle66xI4H7enekrgABnfGCNDsw4_1oJj-feuM9A=s130');
+
 commit;
