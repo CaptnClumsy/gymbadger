@@ -21,4 +21,7 @@
     <include file="db/changelogs/gym-updates-28032018.sql"/>
     <include file="db/changelogs/schema-update-01042018.sql"/>
     <include file="db/changelogs/schema-update-04092018.sql"/>
+    <include file="db/changelogs/potters-bar-update-02032019.sql"/>
+    <include file="db/changelogs/pokemon-updates-02032019.sql"/>
+    <include file="db/changelogs/schema-update-02032019.sql"/>
 </databaseChangeLog>

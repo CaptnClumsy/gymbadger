@@ -9,12 +9,18 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "defaults")
-public class DefaultsEntity {
+@Table(name = "regions")
+public class RegionEntity {
 
 	@Id
-	@Column(name = "userid")
-	private Long userid;
+	@Column(name = "id")
+	private Long id;
+		
+	@Column(name = "name")
+	private String name;
+
+	@Column(name = "displayname")
+	private String displayName;
 	
 	@Column(name = "init_pos_zoom")
 	private Integer zoom;
@@ -25,10 +31,5 @@ public class DefaultsEntity {
 	@Column(name = "init_pos_long")
 	private Double longitude;
 
-	@Column(name = "cluster")
-	private Boolean cluster;
-	
-	@Column(name = "region")
-	private Long region;
-
 }
+

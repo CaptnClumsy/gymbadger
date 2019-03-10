@@ -1105,3 +1105,17 @@ input[type="file"] {
 .badger-location {
    align-self: center;
 }
+.badger-map-options {
+    margin-bottom: 10px;
+}
+.badger-options-text-area {
+	font-size: 11px;
+    padding-top: 0px;
+    margin-bottom: 6px;
+    padding-bottom: 0px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+.badger-options-text-area p {
+	margin: 0px;
+}

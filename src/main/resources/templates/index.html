@@ -458,8 +458,24 @@
                 </label>
             </div>
             <h3>Map</h3>
-            <div class="alert alert-info badger-upload-text-area" role="alert"><span><p>Select if you want map markers to be clustered/grouped together</p></span></div>
-            <span class="badger-share-switch"><input type="checkbox" id="cluster-switch" name="cluster"/></span>
+            <div>
+              <div class="badger-map-options">
+                <span>
+                  <div class="alert alert-info badger-options-text-area" role="alert">
+                    <span>
+                      <p>Select if you want map markers to be clustered/grouped together</p>
+                    </span>
+                  </div>
+                  <span class="badger-share-switch"><input type="checkbox" id="cluster-switch" name="cluster"/></span>
+                </span>
+              </div>
+              <span>
+                <div class="alert alert-info badger-options-text-area" role="alert"><span><p>Choose your region</p></span></div>
+                <span>
+                 <select id="region-select" name="region" class="form-control"><option></option></select>
+                </span>
+              </span>
+            </div>
         </div>
         <div class="modal-footer">
           <button id="saveTeam" type="button" class="btn btn-info">Save</button>

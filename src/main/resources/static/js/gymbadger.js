@@ -16,6 +16,7 @@
   var teamTable = null;
   var currentHistory = null;
   var favReportScope = "WEEK";
+  var region = 0;
   
   var clustering = true;
   var markerClusterGold = null;
@@ -74,6 +75,7 @@
                 url: "api/defaults/",
                 success: function (data) {
                 	clustering = data.cluster;
+                	region = data.region;
             	    map = new google.maps.Map(document.getElementById('map'), {
                     zoom: data.zoom,
                     center: { lat: data.lat, lng: data.lng },
@@ -89,8 +91,20 @@
                     initAdvancedPage();
             	    initMarkers();
             	    initUpload();
-            	    initTeamOptions();
-            	    initLocation();
+            	    $.ajax({
+                      type: "GET",
+                      contentType: "application/json; charset=utf-8",
+                      url: "api/regions/",
+                      success: function (data) {
+            	        initTeamOptions(data);
+            	      },
+            	      error: function (result) {
+            	        errorPage("Failed to query region data", result);
+            	      },
+            	      complete: function (res) {
+            	        initLocation();
+            	      }
+            	    });
                 }
     	    });
   		}
@@ -153,7 +167,7 @@
 	  $.ajax({
           type: "GET",
           contentType: "application/json; charset=utf-8",
-          url: "api/areas/",
+          url: "api/areas/"+region,
           success: function (data) {
         	  var anyLoaded = loadAreaSelection();
         	  $('#filterButton').append($('<option>', {
@@ -223,6 +237,62 @@
   	});
   }
   
+  function resetAreas() {
+    resetAreaSelection();
+    $.ajax({
+      type: "GET",
+      contentType: "application/json; charset=utf-8",
+      url: "api/areas/"+region,
+      success: function (data) {
+        $('#area-group').empty();
+        for (var i = 0; i < data.length; i++) {
+          $('#area-group').append($('<option>', {
+        	  value: data[i].id,
+        	  text: data[i].name,
+        	  selected: true
+          }));
+          selectedAreaIds.push(data[i].id);
+        }
+      },
+      error: function (result) {
+     	errorPage("Failed to query area data", result);
+      },
+      complete: function (res) {
+    	var btnClass = "btn " + getButtonClass()+ " badger-select";
+    	$('#filterButton').multiselect('destroy');
+        $('#filterButton').multiselect({
+          buttonClass: btnClass,
+          buttonContainer: '<div id="badger-dropdown-list" class="btn-group" />',
+          enableClickableOptGroups: true,
+          nonSelectedText: 'No areas',
+          allSelectedText: 'All areas',
+          maxHeight: 200,
+          optionClass: function(element) {
+        	  var value = $(element).val();
+        	  if (parseInt(value,10)===PARKS_ONLY_OPTION) {
+        		  return 'badger-filter-option badger-dropdown-list-split';
+        	  }
+              return 'badger-filter-option';
+          },
+          onChange: function(option, checked) {
+        	  if (option.length === 1) {
+        		  var id = parseInt($(option).val(),10);
+        		  if (id===PARKS_ONLY_OPTION) {
+        			  onChangeParkOption(checked);
+        			  return;
+        		  }
+        	  }
+        	  onChangeArea(option, checked);
+          }
+        });
+  	    $('#filterButton').multiselect('updateButtonText');
+  	    resetSearch();
+        resetPercentage();
+        updateVisibleGyms();
+      }
+    });
+  }
+  
   // Make sure gyms in all selected areas are visible
   function updateVisibleGyms() {
 	  markerClusterGold.clearMarkers();
@@ -289,7 +359,7 @@
   	$.ajax({
         type: "GET",
           contentType: "application/json; charset=utf-8",
-          url: "api/gyms/",
+          url: "api/gyms/"+region,
           success: function (data) {
         	  gymData = data;
               for (var i = 0; i < gymData.length; i++) {
@@ -324,6 +394,57 @@
   	});
   }
 
+function resetMarkers() {
+    // remove all markers
+    for (var i = 0; i < gymData.length; i++) {
+       gymData[i].marker.setMap(null);
+       gymData[i].marker=null;
+    }
+    // remove all clusters
+    markerClusterGold.clearMarkers();
+    markerClusterSilver.clearMarkers();
+    markerClusterBronze.clearMarkers();
+    markerClusterBasic.clearMarkers();
+    markerClusterNone.clearMarkers();
+	// Get all the gym positions and create markers for them
+  	$.ajax({
+        type: "GET",
+          contentType: "application/json; charset=utf-8",
+          url: "api/gyms/"+region,
+          success: function (data) {
+        	  gymData = data;
+              for (var i = 0; i < gymData.length; i++) {
+            	  // Add the marker
+                  var marker = new google.maps.Marker({
+                	title: gymData[i].name,
+                    position: { lat: gymData[i].lat, lng: gymData[i].lng },
+                    icon: customIcon(gymData[i].status),
+                    map: map
+                  });
+            	  gymData[i].marker = marker;
+                  // Add a callback to create an info window for each marker if clicked
+                  (function (marker, i) {
+                    google.maps.event.addListener(marker, 'click', function () {
+                    	history.replaceState({}, "GymBadger", "/?gymid="+gymData[i].id);
+                        createInfoWindow(gymData[i], marker);
+                    });
+                  })(marker, i);
+              }
+              markerClusterGold = new MarkerClusterer(map, null, {maxZoom: 15, imagePath: 'images/goldmarkers/m'});   
+              markerClusterSilver = new MarkerClusterer(map, null, {maxZoom: 15, imagePath: 'images/silvermarkers/m'});
+              markerClusterBronze = new MarkerClusterer(map, null, {maxZoom: 15, imagePath: 'images/bronzemarkers/m'});
+              markerClusterBasic = new MarkerClusterer(map, null, {maxZoom: 15, imagePath: 'images/basicmarkers/m'});
+              markerClusterNone = new MarkerClusterer(map, null, {maxZoom: 15, imagePath: 'images/nomarkers/m'});
+          },
+          complete: function (result) {
+              resetAreas();
+          },
+          error: function (result) {
+          	errorPage("Failed to query gym data", result);
+          }
+  	});
+  }
+  
   function getMarkerCluster(status) {
 	  if (status=="GOLD") {
 	      return markerClusterGold;
@@ -1600,7 +1721,9 @@
 		  var selectedAreaJson = localStorage.getItem("selectedAreaIds");
 		  if (selectedAreaJson !== null) {
 	          selectedAreaIds = JSON.parse(localStorage.getItem("selectedAreaIds"));
-	          anyLoaded = true;
+	          if (selectedAreaIds !== null) {
+	              anyLoaded = true;
+	          }
 		  }
 		  var parksOnlyStorage = localStorage.getItem("parksOnly");
 		  if (parksOnlyStorage !== null) {
@@ -1619,6 +1742,14 @@
 	  }
   }
   
+  function resetAreaSelection() {
+      selectedAreaIds = [];
+	  if (typeof(Storage) !== "undefined") {
+	      localStorage.removeItem("selectedAreaIds");
+	      localStorage.removeItem("parksOnly");
+	  }
+  }
+
   function showLeaderboard() {
 	  closeAnyInfoWindows();
 	  $('#leadersTableBody').html("Loading...");
@@ -2058,7 +2189,7 @@
       return html;
   }
   
-  function initTeamOptions() {
+  function initTeamOptions(regionData) {
 	  $('#cluster-switch').bootstrapSwitch({
 	      	state: clustering,
 	      	onColor: 'success',
@@ -2067,6 +2198,14 @@
 	      	onText: 'Yes',
 	      	offText: 'No'
 	  });
+	  $('#region-select').select2({
+	      minimumResultsForSearch: Infinity,
+		  placeholder: "Region",
+		  width: '100%',
+		  data: regionData
+	  });
+	  $('#region-select').val(region);
+      $('#region-select').trigger('change');
       $('#saveTeam').on('click', function() {
         var team = $('#teamButtons label.active input').val();
         var updatedUser = currentUser;
@@ -2082,16 +2221,24 @@
             updateColors(data.team);
             resetPercentage();
             var isCluster = $('#cluster-switch').bootstrapSwitch('state');
-            if (isCluster!=clustering) {
-            	var defaultsDao = { user: currentUser, cluster: isCluster };
+            var regionSelected = $('#region-select').select2('data');
+            var newRegion = regionSelected[0].id;
+            if (isCluster!=clustering || newRegion!=region) {
+            	var defaultsDao = { user: currentUser, cluster: isCluster, region: newRegion };
             	$.ajax({
                     type: "PUT",
                     contentType: "application/json; charset=utf-8",
                     url: "api/defaults/",
                     data: JSON.stringify(defaultsDao),
                     success: function (defaultsData) {
-                    	clustering=defaultsData.cluster;
-                    	updateVisibleGyms();
+                        if (newRegion!=region) {
+                          map.setCenter(new google.maps.LatLng(defaultsData.lat, defaultsData.lng));
+                          region=newRegion;
+                          resetMarkers();
+                        } else {
+                          clustering=defaultsData.cluster;
+                          updateVisibleGyms();
+                    	}
                     },
                     error: function() {
                     	alert("Failed to update map options");

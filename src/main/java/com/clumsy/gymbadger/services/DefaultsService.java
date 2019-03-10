@@ -13,35 +13,34 @@ import com.clumsy.gymbadger.data.DefaultsDao;
 import com.clumsy.gymbadger.data.UserDao;
 import com.clumsy.gymbadger.entities.AnnouncementEntity;
 import com.clumsy.gymbadger.entities.DefaultsEntity;
+import com.clumsy.gymbadger.entities.RegionEntity;
 import com.clumsy.gymbadger.entities.UserAnnouncementEntity;
 import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.repos.AnnouncementRepo;
 import com.clumsy.gymbadger.repos.DefaultsRepo;
+import com.clumsy.gymbadger.repos.RegionRepo;
 import com.clumsy.gymbadger.repos.UserAnnouncementRepo;
 
 @Service
 public class DefaultsService {
 
-	private static final Long DEFAULT_USERID = 0L;
-
-	private static final Integer DEFAULT_ZOOM = 15;
-	private static final Double DEFAULT_LATITUDE = 51.7519741;
-	private static final Double DEFAULT_LONGITUDE = -0.3370427;
-
 	private final DefaultsRepo defaultsRepo;
 	private final UserAnnouncementRepo userAnnouncementRepo;
 	private final AnnouncementRepo announcementRepo;
+	private final RegionRepo regionRepo;
 
 	@Autowired
 	DefaultsService(final DefaultsRepo defaultsRepo, final UserAnnouncementRepo userAnnouncementRepo,
-			final AnnouncementRepo announcementRepo) {
+			final AnnouncementRepo announcementRepo, final RegionRepo regionRepo) {
 		this.defaultsRepo = defaultsRepo;
 		this.userAnnouncementRepo = userAnnouncementRepo;
 		this.announcementRepo = announcementRepo;
+		this.regionRepo = regionRepo;
 	}
 
 	private DefaultsDao getDaoFromEntity(final UserEntity user, final DefaultsEntity defaults) {
-		DefaultsDao dao = new DefaultsDao(defaults.getZoom(), defaults.getLatitude(), defaults.getLongitude(), defaults.getCluster());
+		DefaultsDao dao = new DefaultsDao(defaults.getZoom(), defaults.getLatitude(), defaults.getLongitude(),
+				defaults.getCluster(), defaults.getRegion());
 		dao.setUser(UserDao.fromEntity(user));
 		List<UserAnnouncementEntity> announcementEntities = userAnnouncementRepo.findAllByUserId(user.getId());
 		if (announcementEntities!=null) {
@@ -64,7 +63,7 @@ public class DefaultsService {
 	@Transactional
 	public DefaultsEntity insertDefaults(final Long userId) {
 		// If there are any system wide announcements this new user needs to see them
-		List<AnnouncementEntity> announcementEntities = announcementRepo.findAllByUserId(DEFAULT_USERID);
+		List<AnnouncementEntity> announcementEntities = announcementRepo.findAllByUserId(Constants.DEFAULT_USERID);
 		if (announcementEntities!=null) {
 			for (AnnouncementEntity entity : announcementEntities) {
 				UserAnnouncementEntity newAnnounce = new UserAnnouncementEntity();
@@ -76,15 +75,17 @@ public class DefaultsService {
 		// Insert the default values
 		DefaultsEntity defaults = new DefaultsEntity();
 		defaults.setUserid(userId);
-		defaults.setZoom(DEFAULT_ZOOM);
-		defaults.setLatitude(DEFAULT_LATITUDE);
-		defaults.setLongitude(DEFAULT_LONGITUDE);
+		defaults.setZoom(Constants.DEFAULT_ZOOM);
+		defaults.setLatitude(Constants.DEFAULT_LATITUDE);
+		defaults.setLongitude(Constants.DEFAULT_LONGITUDE);
 		defaults.setCluster(true);
+		defaults.setRegion(Constants.DEFAULT_REGION);
 		return defaultsRepo.save(defaults);
 	}
 
 	@Transactional 
-	public DefaultsDao updateDefaults(final UserEntity user, final DefaultsDao updatedDefaults) throws UserNotFoundException {
+	public DefaultsDao updateDefaults(final UserEntity user, final DefaultsDao updatedDefaults)
+			throws UserNotFoundException, RegionNotFoundException {
 		DefaultsEntity defaults = defaultsRepo.findOneByUserid(user.getId());
 		if (defaults==null) {
 			throw new UserNotFoundException("Defaults for user " + user.getDisplayName() + " not found");
@@ -100,6 +101,16 @@ public class DefaultsService {
 		}
 		if (updatedDefaults.getZoom()!=null) {
 			defaults.setZoom(updatedDefaults.getZoom());
+		}
+		if (updatedDefaults.getRegion()!=null) {
+			RegionEntity regionEntity = regionRepo.findOne(updatedDefaults.getRegion());
+			if (regionEntity==null) {
+				throw new RegionNotFoundException("Region does not exist");
+			}
+			defaults.setLatitude(regionEntity.getLatitude());
+			defaults.setLongitude(regionEntity.getLongitude());
+			defaults.setZoom(regionEntity.getZoom());
+			defaults.setRegion(updatedDefaults.getRegion());
 		}
 		DefaultsEntity newDefaults = defaultsRepo.save(defaults);
 		return getDaoFromEntity(user, newDefaults);

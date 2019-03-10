@@ -60,6 +60,15 @@ public class GymService {
 	}
 	
 	@Transactional(readOnly = true)
+	public List<GymEntity> getAllGymsByRegion(Long region) throws GymNotFoundException {
+		final List<GymEntity> gyms = gymRepo.findAllGymsByRegion(region);
+		if (gyms == null) {
+			throw new GymNotFoundException("Unable to query gym list");
+		}
+		return gyms;
+	}
+	
+	@Transactional(readOnly = true)
 	public List<GymEntity> getAllGyms() throws GymNotFoundException {
 		final List<GymEntity> gyms = gymRepo.findAllGyms();
 		if (gyms == null) {
@@ -119,20 +128,20 @@ public class GymService {
 		return GymSummaryDao.fromGymEntity(gym, props);
 	}
 
-	public List<GymSummaryDao> getAllGymSummaries(final Long userId) throws GymNotFoundException {
-		return getGymSummariesInternal(userId, null, null);
+	public List<GymSummaryDao> getAllGymSummaries(final Long userId, final Long region) throws GymNotFoundException {
+		return getGymSummariesInternal(userId, region, null, null);
 	}
 	
 	public List<GymSummaryDao> getGymSummariesByArea(final Long userId, final List<Long> areas) throws GymNotFoundException {
-		return getGymSummariesInternal(userId, null, areas);
+		return getGymSummariesInternal(userId, null, null, areas);
 	}
 	
 	public List<GymSummaryDao> getGymSummariesById(final Long userId, final List<Long> ids) throws GymNotFoundException {
-		return getGymSummariesInternal(userId, ids, null);
+		return getGymSummariesInternal(userId, null, ids, null);
 	}
 	
 	@Transactional(readOnly = true)
-	private List<GymSummaryDao> getGymSummariesInternal(final Long userId, final List<Long> ids, final List<Long> areas) throws GymNotFoundException {
+	private List<GymSummaryDao> getGymSummariesInternal(final Long userId, final Long region, final List<Long> ids, final List<Long> areas) throws GymNotFoundException {
 		// Get the list of gyms
 		List<GymEntity> gyms = null;
 		if (ids != null && ids.size() != 0) {
@@ -143,7 +152,11 @@ public class GymService {
 			gyms = getGymsByArea(areas);
 		} else {
 			// Get all the gyms
-			gyms = getAllGyms();
+			if (region == null || region == Constants.DEFAULT_REGION) {
+				gyms = getAllGyms();
+			} else {
+				gyms = getAllGymsByRegion(region);
+			}
 		}
 		
 		// Get any user specific properties for the gyms and put them in a hash map

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.clumsy.gymbadger.data.DefaultsDao;
 import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.services.DefaultsService;
+import com.clumsy.gymbadger.services.RegionNotFoundException;
 import com.clumsy.gymbadger.services.UserNotFoundException;
 import com.clumsy.gymbadger.services.UserService;
 
@@ -54,6 +55,8 @@ public class DefaultsController {
     		return savedDefaults;
     	} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");
+    	} catch (RegionNotFoundException e) {
+    		throw new ObjectNotFoundException("Region not found");
     	}
     }
 }

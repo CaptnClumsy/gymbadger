@@ -23,12 +23,17 @@ public class App extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+
+      // Force SSL
+      http.requiresChannel().anyRequest().requiresSecure();
+    	
+      // Allow some URLs without authentication and enable CSRF
       http
         .antMatcher("/**")
         .authorizeRequests()
           .antMatchers("/", "/login**", "/api/areas/**", "/api/defaults/**", 
         		  "/api/users/leaderboard/**", "/api/gyms/**", "/api/bosses/**", "/api/comments/**", 
-        		  "/tos**", "/api/upload/**")
+        		  "/tos**", "/api/upload/**", "/api/regions/**")
           .permitAll()
         .anyRequest()
           .authenticated()

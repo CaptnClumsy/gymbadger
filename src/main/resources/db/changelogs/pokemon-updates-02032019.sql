@@ -1,0 +1,16 @@
+begin;
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Palkia',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Feebas',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Ponyta',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Krabby',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Snubbull',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Luvdisc',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Electrode',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Miltank',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Flaaffy',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Chansey',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Typhlosion',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Dragonite',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Monferno',true);
+insert into pokemon (id, name, raidboss) values (nextval('pokemonids'), 'Dialga',true);
+commit;

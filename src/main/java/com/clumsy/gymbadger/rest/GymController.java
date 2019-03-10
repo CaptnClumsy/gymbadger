@@ -57,12 +57,12 @@ public class GymController {
 	@Autowired
 	private ReportService reportService;
 	
-    @RequestMapping(value = "/", method = RequestMethod.GET)
+    @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
-    public List<GymSummaryDao> getGyms(Principal principal) {
+    public List<GymSummaryDao> getGyms(@PathVariable("id") Long region, Principal principal) {
 		try {
 			final UserEntity user = userService.getCurrentUser(principal);
-			final List<GymSummaryDao> gyms = gymService.getAllGymSummaries(user.getId());
+			final List<GymSummaryDao> gyms = gymService.getAllGymSummaries(user.getId(), region);
 			return gyms;
 		} catch (GymNotFoundException e) {
 			throw new ObjectNotFoundException(e);
