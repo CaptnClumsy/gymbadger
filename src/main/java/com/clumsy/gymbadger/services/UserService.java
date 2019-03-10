@@ -89,9 +89,13 @@ public class UserService {
 	}
 
 	@Transactional(readOnly = true)
-	public LeadersDao getGoldLeaderboard(final UserEntity user) {
+	public LeadersDao getGoldLeaderboard(final Long region, final UserEntity user) {
 		List<LeaderEntity> leaderEntities = null;
-		leaderEntities = userRepo.findLeaders();
+		if (region==Constants.DEFAULT_REGION) {
+			leaderEntities = userRepo.findLeaders();
+		} else {
+			leaderEntities = userRepo.findLeadersByRegion(region);
+		}
 		LeadersDao leaders = new LeadersDao();
 		leaders.setShare(user.getShareData());
 		int rank = 1;
@@ -103,10 +107,14 @@ public class UserService {
 	}
 	
 	@Transactional(readOnly = true)
-	public LeadersDao getTotalLeaderboard(final UserEntity user) {
+	public LeadersDao getTotalLeaderboard(final Long region, final UserEntity user) {
 		// Query the number of badges by type for the users participating in the leaderboard
 		List<LeaderEntity> leaderEntities = null;
-		leaderEntities = userRepo.findTotals();
+		if (region == Constants.DEFAULT_REGION) {
+			leaderEntities = userRepo.findTotals();
+		} else {
+			leaderEntities = userRepo.findTotalsByRegion(region);
+		}
 		LeadersDao leaders = new LeadersDao();
 		leaders.setShare(user.getShareData());
 		// Work out their total score by multiplying number of badges at each state by some constants
@@ -243,13 +251,17 @@ public class UserService {
 		return userRepo.save(user);
 	}
 
-	public LeadersDao getTeamLeaderboard(final UserEntity user, final String teamName) throws TeamNotFoundException {
+	public LeadersDao getTeamLeaderboard(final Long region, final UserEntity user, final String teamName) throws TeamNotFoundException {
 		List<LeaderEntity> leaderEntities = null;
 		Team team = Team.fromStringIgnoreCase(teamName);
 		if (team==null) {
 			throw new TeamNotFoundException("Cannot find team "+teamName);
 		}
-		leaderEntities = userRepo.findTeamLeaders(team);
+		if (region == Constants.DEFAULT_REGION) {
+			leaderEntities = userRepo.findTeamLeaders(team);
+		} else {
+			leaderEntities = userRepo.findTeamLeadersByRegion(region, team);
+		}
 		LeadersDao leaders = new LeadersDao();
 		leaders.setShare(user.getShareData());
 		int rank = 1;

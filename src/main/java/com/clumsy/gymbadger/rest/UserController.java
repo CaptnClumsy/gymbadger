@@ -74,40 +74,40 @@ public class UserController {
     	}
     }
 
-    @RequestMapping(value = "/leaderboard", method = RequestMethod.GET)
-    public LeadersDao getLeaderboard(Principal principal) {
+    @RequestMapping(value = "/leaderboard/{id}", method = RequestMethod.GET)
+    public LeadersDao getLeaderboard(Principal principal, @PathVariable("id") Long region) {
     	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
     		throw new NotLoggedInException();
     	}
     	try {
     	    UserEntity user = userService.getCurrentUser(principal);
-		    return userService.getGoldLeaderboard(user);
+		    return userService.getGoldLeaderboard(region, user);
     	} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");
     	}
 	}
     
-    @RequestMapping(value = "/leaderboard/totals", method = RequestMethod.GET)
-    public LeadersDao getTotalsLeaderboard(Principal principal) {
+    @RequestMapping(value = "/leaderboard/totals/{id}", method = RequestMethod.GET)
+    public LeadersDao getTotalsLeaderboard(Principal principal, @PathVariable("id") Long region) {
     	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
     		throw new NotLoggedInException();
     	}
     	try {
     	    UserEntity user = userService.getCurrentUser(principal);
-		    return userService.getTotalLeaderboard(user);
+		    return userService.getTotalLeaderboard(region, user);
     	} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");
     	}
 	}
     
-    @RequestMapping(value = "/leaderboard/team/{team}", method = RequestMethod.GET)
-    public LeadersDao getTeamLeaderboard(Principal principal, @PathVariable("team") String team) {
+    @RequestMapping(value = "/leaderboard/team/{team}/{id}", method = RequestMethod.GET)
+    public LeadersDao getTeamLeaderboard(Principal principal, @PathVariable("team") String team, @PathVariable("id") Long region) {
     	if (!SecurityContextHolder.getContext().getAuthentication().isAuthenticated() || principal == null) {
     		throw new NotLoggedInException();
     	}
     	try {
     	    UserEntity user = userService.getCurrentUser(principal);
-		    return userService.getTeamLeaderboard(user, team);
+		    return userService.getTeamLeaderboard(region, user, team);
     	} catch (UserNotFoundException e) {
     		throw new ObjectNotFoundException("Current user not found");
     	}  catch (TeamNotFoundException e) {

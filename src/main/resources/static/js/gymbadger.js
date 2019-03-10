@@ -1785,7 +1785,7 @@ function resetMarkers() {
 	    $.ajax({
             type: "PUT",
             contentType: "application/json; charset=utf-8",
-            url: "api/users/leaderboard/",
+            url: "api/users/leaderboard",
             data: JSON.stringify(e.target.checked),
             success: function (data) {
               // Update the UI by removing table and requerying everything
@@ -1813,7 +1813,7 @@ function resetMarkers() {
 	  $.ajax({
           type: "GET",
           contentType: "application/json; charset=utf-8",
-          url: "api/users/leaderboard",
+          url: "api/users/leaderboard/"+region,
           success: function (data) {
         	  resetLeadersTable();
         	  $('#leadersTableBody').html("");
@@ -1860,7 +1860,7 @@ function resetMarkers() {
     $.ajax({
       type: "GET",
       contentType: "application/json; charset=utf-8",
-      url: "api/users/leaderboard/totals",
+      url: "api/users/leaderboard/totals/"+region,
       success: function (data) {
     	  resetTotalTable();
     	  $('#totalTableBody').html("");
@@ -1911,7 +1911,7 @@ function resetMarkers() {
 	  $.ajax({
           type: "GET",
           contentType: "application/json; charset=utf-8",
-          url: "api/users/leaderboard/team/"+currentUser.team,
+          url: "api/users/leaderboard/team/"+currentUser.team+"/"+region,
           success: function (data) {
         	  resetTeamTable();
         	  $('#teamTableBody').html("");
