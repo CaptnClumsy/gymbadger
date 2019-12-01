@@ -1119,3 +1119,35 @@ input[type="file"] {
 .badger-options-text-area p {
 	margin: 0px;
 }
+.badger-mapblock {
+	background-color: white;
+	margin-top: 10px;
+}
+.badger-mapbutton {
+	direction: ltr;
+    overflow: hidden;
+    text-align: center;
+    height: 40px;
+    display: table-cell;
+    vertical-align: middle;
+    position: relative;
+    color: rgb(223, 223, 223);
+    font-family: Roboto, Arial, sans-serif;
+    user-select: none;
+    font-size: 18px;
+    background-color: rgb(255, 255, 255);
+    padding: 0px 17px;
+    border-bottom-right-radius: 2px;
+    border-top-right-radius: 2px;
+    background-clip: padding-box;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+    border-left: 0px none;
+    outline: currentcolor none medium;
+}
+.badger-mapbutton.active {
+	color: rgb(83, 83, 83);
+}
+.badger-small-drop {
+    padding-left: 2px;
+    padding-right: 5px;
+}

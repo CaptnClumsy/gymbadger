@@ -83,6 +83,12 @@
       <version>1.16.0</version>
     </dependency>
 
+    <dependency>
+      <groupId>io.sgr</groupId>
+      <artifactId>s2-geometry-library-java</artifactId>
+      <version>1.0.1</version>
+    </dependency>
+    
   </dependencies>
   
   <build>
