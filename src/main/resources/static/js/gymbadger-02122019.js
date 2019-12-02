@@ -2477,58 +2477,29 @@ function resetMarkers() {
 		  }
 	  }
   }
-
-  function s2Button(){
-	  var block = $('<div class="badger-mapblock gmnoprint"></div>');
-	  var group = $('<div class="btn-group">');
-	  var btn = $('<button id="s2-map-button" type="button" class="btn badger-mapbutton"><i class="fa fa-th"></button>');
-	  var drop = $('<button type="button" class="btn badger-mapbutton dropdown-toggle badger-small-drop" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">' +
-	      '<span class="sr-only">Toggle Dropdown</span>' +
-	    '</button>');
-	  var menu = $('<ul id="leveldrop" class="dropdown-menu" role="menu"></ul>');
-	  var lvl17 = $('<li id="lvl17" value="17" class="dropdown-item" href="#" onclick="selectLevel(17, true)">Level 17</li>');
-	  var lvl14 = $('<li id="lvl14" value="14" class="dropdown-item" href="#" onclick="selectLevel(14, true)">Level 14</li>');
-      menu.append(lvl17);
-      menu.append(lvl14);
-
-      if (cellLevel==14) {
-    	  lvl14.addClass("active");
-      } else if (cellLevel==17) {
-    	  lvl17.addClass("active");
-      }
-      
-      if (showCells==true) {
-    	  btn.addClass("active");
-      }
-
-	  btn.bind('click', function(){
-	      if (showCells==true) {
-	    	  showCells=false;
-	    	  $('#s2-map-button').removeClass("active");
-	    	  queryS2Cells();
-	    	  if (typeof(Storage) !== "undefined") {
-	    	      localStorage.setItem("showCells", showCells);
-	    	  }
-	      } else {
-	    	  if (cellLevel==0) {
-	    		  cellLevel=17;
-	    	  }
-	    	  showCells=true;
-	    	  $('#s2-map-button').addClass("active");
-	    	  queryS2Cells();
-	    	  if (typeof(Storage) !== "undefined") {
-	    	      localStorage.setItem("showCells", showCells);
-	    	      localStorage.setItem("cellLevel", cellLevel);
-	    	  }
-	      }
-	  });
-	  block.append(group);
-	  group.append(btn);
-	  group.append(drop);
-	  group.append(menu);
-	  return block[0];
-  }
   
+  function onShowCells() {
+	  if (showCells==true) {
+    	  showCells=false;
+    	  $('#s2-map-button').removeClass("active");
+    	  queryS2Cells();
+    	  if (typeof(Storage) !== "undefined") {
+    	      localStorage.setItem("showCells", showCells);
+    	  }
+      } else {
+    	  if (cellLevel==0) {
+    		  cellLevel=17;
+    	  }
+    	  showCells=true;
+    	  $('#s2-map-button').addClass("active");
+    	  queryS2Cells();
+    	  if (typeof(Storage) !== "undefined") {
+    	      localStorage.setItem("showCells", showCells);
+    	      localStorage.setItem("cellLevel", cellLevel);
+    	  }
+      }
+  }
+
   function selectLevel(level, show) {
 	  clearS2Cells();
 	  $('#leveldrop li').removeClass('active');
@@ -2555,7 +2526,9 @@ function resetMarkers() {
   }
 
   function initS2Cells() {
-      map.controls[google.maps.ControlPosition.TOP_LEFT].push(s2Button());
+	  var customControl = document.getElementById('customControl');
+	  map.controls[google.maps.ControlPosition.TOP_LEFT].push(customControl);
+	  
       map.addListener('dragend', function() {
           // half a second after the center of the map has changed move the grid
     	  window.setTimeout(function() {

@@ -24,9 +24,8 @@ public class App extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-      // XXXXXXXXXXXX
       // Force SSL
-      // http.requiresChannel().anyRequest().requiresSecure();
+      http.requiresChannel().anyRequest().requiresSecure();
     	
       // Allow some URLs without authentication and enable CSRF
       http
