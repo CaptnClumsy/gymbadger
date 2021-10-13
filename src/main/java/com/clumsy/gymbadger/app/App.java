@@ -33,7 +33,7 @@ public class App extends WebSecurityConfigurerAdapter {
         .authorizeRequests()
           .antMatchers("/", "/login**", "/api/areas/**", "/api/defaults/**", 
         		  "/api/users/leaderboard/**", "/api/gyms/**", "/api/bosses/**", "/api/comments/**", 
-        		  "/tos**", "/api/upload/**", "/api/regions/**", "/api/cells/**")
+        		  "/tos.html", "/api/upload/**", "/api/regions/**", "/api/cells/**")
           .permitAll()
         .anyRequest()
           .authenticated()
