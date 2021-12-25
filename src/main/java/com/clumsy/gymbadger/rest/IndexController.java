@@ -3,6 +3,7 @@ package com.clumsy.gymbadger.rest;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,8 +26,12 @@ public class IndexController {
 	@Autowired
 	private RegionService regionService;
 
+    @Value("${google.api.key}")
+    private String apiKey;
+
+	 
     private String getIndexWithGym(Model model, HttpServletRequest request, Long gymId) {
-    	model.addAttribute("googleMapsAPIKey", "AIzaSyA9OSRLuuH3o7YhJ6bRUVtD9TxhlSDqSDU");
+    	model.addAttribute("googleMapsAPIKey", apiKey);
     	try {
     		if (gymId!=null) {
 				GymEntity gym = gymService.getGym(gymId);
