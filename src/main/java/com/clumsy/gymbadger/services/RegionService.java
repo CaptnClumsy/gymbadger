@@ -39,4 +39,13 @@ public class RegionService {
 		return entity;
 	}
 
+	@Transactional(readOnly = true)
+	public RegionEntity getRegion(String regionname) throws RegionNotFoundException {
+		final RegionEntity entity = regionRepo.findOneByName(regionname);
+		if (entity == null) {
+			throw new RegionNotFoundException("Unable to query region");
+		}
+		return entity;
+	}
+
 }

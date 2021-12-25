@@ -579,6 +579,7 @@
       </div>
     </div>
 
+    
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
@@ -592,8 +593,20 @@
     <script src="js/Chart.min.js" type="text/javascript"></script>
     <script src="js/gymbadger-utils.js" type="text/javascript"></script>
     <script src="js/gymbadger-percentage.js" type="text/javascript"></script>
-    <script src="js/gymbadger-02122019.js"></script>
-    <script async="async" defer="defer" th:src="@{https://maps.googleapis.com/maps/api/js(key=${googleMapsAPIKey},callback=initPage)}"></script>
+    <script src="js/gymbadger-25122021.js"></script>
+    <script th:inline="javascript">
+        function mapsCallback() {
+        	var regionInfo = {
+       			id: [[${regionId}]],
+       		    name: [[${regionName}]],
+        		lat: [[${regionLat}]],
+        	    lng: [[${regionLong}]],
+        	    zoom: [[${regionZoom}]]
+        	};
+        	initPage(regionInfo);
+        }
+    </script>
+    <script async="async" defer="defer" th:src="@{https://maps.googleapis.com/maps/api/js(key=${googleMapsAPIKey},callback=mapsCallback)}"></script>
 
   </body>
 </html>

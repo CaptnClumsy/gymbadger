@@ -24,4 +24,5 @@
     <include file="db/changelogs/potters-bar-update-02032019.sql"/>
     <include file="db/changelogs/pokemon-updates-02032019.sql"/>
     <include file="db/changelogs/schema-update-02032019.sql"/>
+    <include file="db/changelogs/user-update-25122021.sql"/>
 </databaseChangeLog>

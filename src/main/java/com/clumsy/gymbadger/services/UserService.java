@@ -3,6 +3,7 @@ package com.clumsy.gymbadger.services;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -73,6 +74,7 @@ public class UserService {
 			newUser.setName(principal.getName());
 			newUser.setAdmin(false);
 			newUser.setShareData(false);
+			newUser.setLastlogin(new Date());
 			if (principal instanceof OAuth2Authentication) {
 	        	OAuth2Authentication auth = (OAuth2Authentication)principal;
 	        	@SuppressWarnings("unchecked")
@@ -270,5 +272,12 @@ public class UserService {
 			leaders.add(leader);
 		}
 		return leaders;
+	}
+
+	@Transactional
+	public UserEntity setLastLogin(final UserEntity user) {
+		user.setLastlogin(new Date());
+		UserEntity savedUser = userRepo.save(user);
+		return savedUser;
 	}
 }

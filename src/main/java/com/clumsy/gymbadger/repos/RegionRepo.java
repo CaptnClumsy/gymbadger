@@ -10,4 +10,5 @@ import com.clumsy.gymbadger.entities.RegionEntity;
 @Repository
 public interface RegionRepo extends JpaRepository<RegionEntity, Long> {
 	List<RegionEntity> findAllByOrderByDisplayNameAsc();
+	RegionEntity findOneByName(String name);
 }

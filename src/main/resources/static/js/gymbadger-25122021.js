@@ -17,6 +17,8 @@
   var currentHistory = null;
   var favReportScope = "WEEK";
   var region = 0;
+  var lastRegion = null;
+  var urlRegion = null;
   
   var clustering = true;
   var markerClusterGold = null;
@@ -31,7 +33,10 @@
   var cellLevel = 17;
   var cells = [];
 
-  function initPage() {
+  function initPage(regionInfo) {
+	// Save any region specified in the URL
+	urlRegion = regionInfo;
+	loadLastRegion();
 	// Load snazzy info window and marker cluster scripts
 	var script = document.createElement('script');
 	script.type = 'text/javascript';
@@ -80,6 +85,16 @@
                 success: function (data) {
                 	clustering = data.cluster;
                 	region = data.region;
+                	if (urlRegion.name!='none') {
+                		region = urlRegion.id;
+                		data.zoom = urlRegion.zoom;
+                		data.lat = urlRegion.lat;
+                		data.lng = urlRegion.lng;
+                		if (lastRegion!=null && region!=lastRegion) {
+                			resetAreaSelection();
+                			setLastRegion(region);
+                		}
+                	}                	
             	    map = new google.maps.Map(document.getElementById('map'), {
                     zoom: data.zoom,
                     center: { lat: data.lat, lng: data.lng },
@@ -443,6 +458,7 @@ function resetMarkers() {
           },
           complete: function (result) {
               resetAreas();
+              setLastRegion(region);
           },
           error: function (result) {
           	errorPage("Failed to query gym data", result);
@@ -1440,6 +1456,9 @@ function resetMarkers() {
 
   function getPercent(includeAll, status) {
 	  var results = { total: 0, amount: 0 };
+	  if (gymData == null) {
+	      return results;
+	  }
 	  for (var i = 0; i < gymData.length; i++) {
 		  for (var j = 0; j < selectedAreaIds.length; j++) {
 			  if (gymData[i].area.id === selectedAreaIds[j]) {
@@ -1729,14 +1748,13 @@ function resetMarkers() {
 		  var selectedAreaJson = localStorage.getItem("selectedAreaIds");
 		  if (selectedAreaJson !== null) {
 	          selectedAreaIds = JSON.parse(localStorage.getItem("selectedAreaIds"));
-	          if (selectedAreaIds !== null) {
+	          if (selectedAreaIds !== null && selectedAreaIds.length !== 0) {
 	              anyLoaded = true;
 	          }
 		  }
 		  var parksOnlyStorage = localStorage.getItem("parksOnly");
 		  if (parksOnlyStorage !== null) {
 			  parksOnly = (parksOnlyStorage == 'true');
-			  anyLoaded = true;
 		  }
 	  }
       return anyLoaded;
@@ -1748,8 +1766,24 @@ function resetMarkers() {
 	      localStorage.setItem("selectedAreaIds", JSON.stringify(selectedAreaIds));
 	      localStorage.setItem("parksOnly", parksOnly);
 	  }
+	  setLastRegion(region);
   }
-  
+
+  function loadLastRegion() {
+	  if (typeof(Storage) !== "undefined") {
+		  var regionStorage = localStorage.getItem("region");
+		  if (regionStorage !== null) {
+			  lastRegion = parseInt(regionStorage);
+		  }
+	  }
+  }
+
+  function setLastRegion(currentRegion) {
+	  if (typeof(Storage) !== "undefined") {
+		  localStorage.setItem("region", currentRegion.toString());
+	  }
+  }
+
   function resetAreaSelection() {
       selectedAreaIds = [];
 	  if (typeof(Storage) !== "undefined") {

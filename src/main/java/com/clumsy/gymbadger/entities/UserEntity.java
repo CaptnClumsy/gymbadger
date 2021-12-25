@@ -8,8 +8,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import com.clumsy.gymbadger.data.Team;
+import java.util.Date;
 
 import lombok.Data;
 
@@ -38,4 +41,8 @@ public class UserEntity {
 	@Column(name = "team")
 	@Enumerated(EnumType.ORDINAL)
 	private Team team;
+	
+	@Column(name = "lastlogin")
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date lastlogin;
 }
