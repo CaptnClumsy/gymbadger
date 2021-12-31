@@ -1,6 +1,7 @@
 package com.clumsy.gymbadger.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -32,11 +33,11 @@ public class RegionService {
 
 	@Transactional(readOnly = true)
 	public RegionEntity getRegion(final Long id) throws RegionNotFoundException {
-		final RegionEntity entity = regionRepo.findOne(id);
-		if (entity == null) {
+		final Optional<RegionEntity> entity = regionRepo.findById(id);
+		if (!entity.isPresent()) {
 			throw new RegionNotFoundException("Unable to query region");
 		}
-		return entity;
+		return entity.get();
 	}
 
 	@Transactional(readOnly = true)

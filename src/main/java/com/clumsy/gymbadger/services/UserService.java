@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.provider.OAuth2Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +28,7 @@ import com.clumsy.gymbadger.entities.UserEntity;
 import com.clumsy.gymbadger.repos.AnnouncementRepo;
 import com.clumsy.gymbadger.repos.UserAnnouncementRepo;
 import com.clumsy.gymbadger.repos.UserRepo;
+import com.clumsy.gymbadger.security.AppUser;
 
 @Service
 public class UserService {
@@ -55,11 +55,11 @@ public class UserService {
 	
 	@Transactional(readOnly = true)
 	public UserEntity getDefaultAccount() throws UserNotFoundException {
-		UserEntity user = userRepo.findOne(DEFAULT_USERID);
-		if (user == null) {
+		Optional<UserEntity> user = userRepo.findById(DEFAULT_USERID);
+		if (!user.isPresent()) {
 			throw new UserNotFoundException("Default account does not exist");
 		}
-		return user;
+		return user.get();
 	}
 
 	@Transactional
@@ -75,11 +75,9 @@ public class UserService {
 			newUser.setAdmin(false);
 			newUser.setShareData(false);
 			newUser.setLastlogin(new Date());
-			if (principal instanceof OAuth2Authentication) {
-	        	OAuth2Authentication auth = (OAuth2Authentication)principal;
-	        	@SuppressWarnings("unchecked")
-				LinkedHashMap<String,String> details = (LinkedHashMap<String, String>) auth.getUserAuthentication().getDetails();
-	        	newUser.setDisplayName(details.get("name"));
+			if (principal instanceof AppUser) {
+				AppUser oauthUser = (AppUser) (AppUser)principal;
+	        	newUser.setDisplayName(oauthUser.getDisplayName());
 	        } else {
 	        	newUser.setDisplayName("none");
 	        }
@@ -224,7 +222,7 @@ public class UserService {
 			throw new AnnouncementNotFoundException("Announcement not found.");
 		}
 		for (UserAnnouncementEntity entity : userAnnounce) {
-		    userAnnouncementRepo.delete(entity.getId());
+		    userAnnouncementRepo.deleteById(entity.getId());
 		}
 	}
 	
@@ -233,13 +231,13 @@ public class UserService {
 		if (!user.getAdmin()) {
 			throw new AccessControlException("Only admin users can delete announcements");
 		}
-		AnnouncementEntity announcement = announcementRepo.findOne(id);
-		if (id==null) {
+		Optional<AnnouncementEntity> announcement = announcementRepo.findById(id);
+		if (!announcement.isPresent()) {
 			throw new AnnouncementNotFoundException("Announcement "+id+" not found.");
 		}
 		List<UserAnnouncementEntity> userAnnouncements = userAnnouncementRepo.findAllByAnnouncementId(id);
 		userAnnouncementRepo.deleteInBatch(userAnnouncements);
-		announcementRepo.delete(announcement);
+		announcementRepo.delete(announcement.get());
 	}
 
 	@Transactional

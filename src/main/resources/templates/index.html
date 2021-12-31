@@ -13,16 +13,16 @@
     <meta property="og:description" th:content="${gymDescription}" />
     <meta property="fb:app_id" content="141005800009242" />
 
-    <link rel="stylesheet" href="css/font-awesome.min.css" />
+    <link rel="stylesheet" href="/css/font-awesome.min.css" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="css/bootstrap-multiselect.css"/>
-    <link rel="stylesheet" href="css/select2.min.css"/>
-    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css"/>
-    <link rel="stylesheet" href="css/datatables.min.css"/>
-    <link rel="stylesheet" href="css/snazzy-info-window.min.css"/>
-    <link rel="stylesheet" href="css/bootstrap-switch.min.css"/>
-    <link rel="stylesheet" href="css/badgerstyle-02122019.css"/>
-    <link rel="stylesheet" href="css/badger-spinner.css"/>
+    <link rel="stylesheet" href="/css/bootstrap-multiselect.css"/>
+    <link rel="stylesheet" href="/css/select2.min.css"/>
+    <link rel="stylesheet" href="/css/bootstrap-datetimepicker.min.css"/>
+    <link rel="stylesheet" href="/css/datatables.min.css"/>
+    <link rel="stylesheet" href="/css/snazzy-info-window.min.css"/>
+    <link rel="stylesheet" href="/css/bootstrap-switch.min.css"/>
+    <link rel="stylesheet" href="/css/badgerstyle-02122019.css"/>
+    <link rel="stylesheet" href="/css/badger-spinner.css"/>
     
       
   </head>
@@ -71,7 +71,7 @@
                 <span><button id="navLeaderButton" class="btn btn-primary badger-btn-item badger-authenticated" style="display: none;"><i class="fa fa-trophy"></i></button></span>
                 <span><button id="navTeamButton" class="btn btn-primary badger-btn-item badger-authenticated" style="display: none;"><i class="fa fa-cog"></i></button></span>
                 <span class="badger-unauthenticated">
-                  <a href="/login" class="btn btn-primary badger-login-button"><i class="fa fa-facebook badger-login-icon"></i>Sign In</a>
+                  <a th:href="@{'/oauth2/authorization/facebook?regionName=' + ${regionName} + '&gymId=' + ${gymId}}" class="btn btn-primary badger-login-button"><i class="fa fa-facebook badger-login-icon"></i>Sign In</a>
                 </span>
                 <span class="badger-authenticated" style="display: none;">
                   <div class="badger-nav-dropdown">
@@ -583,17 +583,17 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
-    <script src="js/bootstrap-multiselect.js" type="text/javascript"></script>
-    <script src="js/select2.full.min.js" type="text/javascript"></script>
-    <script src="js/jquery.timeago.js" type="text/javascript"></script>
-    <script src="js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
-    <script src="js/bootstrap-switch.min.js" type="text/javascript"></script>
-    <script src="js/js.cookie.js" type="text/javascript"></script>
-    <script src="js/datatables.min.js" type="text/javascript"></script>
-    <script src="js/Chart.min.js" type="text/javascript"></script>
-    <script src="js/gymbadger-utils.js" type="text/javascript"></script>
-    <script src="js/gymbadger-percentage.js" type="text/javascript"></script>
-    <script src="js/gymbadger-25122021.js"></script>
+    <script src="/js/bootstrap-multiselect.js" type="text/javascript"></script>
+    <script src="/js/select2.full.min.js" type="text/javascript"></script>
+    <script src="/js/jquery.timeago.js" type="text/javascript"></script>
+    <script src="/js/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+    <script src="/js/bootstrap-switch.min.js" type="text/javascript"></script>
+    <script src="/js/js.cookie.js" type="text/javascript"></script>
+    <script src="/js/datatables.min.js" type="text/javascript"></script>
+    <script src="/js/Chart.min.js" type="text/javascript"></script>
+    <script src="/js/gymbadger-utils.js" type="text/javascript"></script>
+    <script src="/js/gymbadger-percentage.js" type="text/javascript"></script>
+    <script src="/js/gymbadger-25122021.js"></script>
     <script th:inline="javascript">
         function mapsCallback() {
         	var regionInfo = {

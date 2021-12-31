@@ -4,6 +4,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -103,13 +104,13 @@ public class DefaultsService {
 			defaults.setZoom(updatedDefaults.getZoom());
 		}
 		if (updatedDefaults.getRegion()!=null) {
-			RegionEntity regionEntity = regionRepo.findOne(updatedDefaults.getRegion());
-			if (regionEntity==null) {
+			Optional<RegionEntity> regionEntity = regionRepo.findById(updatedDefaults.getRegion());
+			if (!regionEntity.isPresent()) {
 				throw new RegionNotFoundException("Region does not exist");
 			}
-			defaults.setLatitude(regionEntity.getLatitude());
-			defaults.setLongitude(regionEntity.getLongitude());
-			defaults.setZoom(regionEntity.getZoom());
+			defaults.setLatitude(regionEntity.get().getLatitude());
+			defaults.setLongitude(regionEntity.get().getLongitude());
+			defaults.setZoom(regionEntity.get().getZoom());
 			defaults.setRegion(updatedDefaults.getRegion());
 		}
 		DefaultsEntity newDefaults = defaultsRepo.save(defaults);

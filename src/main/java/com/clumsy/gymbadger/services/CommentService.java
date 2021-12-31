@@ -2,6 +2,7 @@ package com.clumsy.gymbadger.services;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,13 +48,13 @@ public class CommentService {
 
 	@Transactional
 	public void deleteComment(final UserEntity user, final Long commentId) throws CommentNotFoundException, AccessControlException {
-		CommentEntity comment = commentRepo.findOne(commentId);
-		if (comment == null) {
+		Optional<CommentEntity> comment = commentRepo.findById(commentId);
+		if (!comment.isPresent()) {
 			throw new CommentNotFoundException("Unable to find specified comment");
 		}
-		if (comment.getUser().getId()!=user.getId()) {
+		if (comment.get().getUser().getId()!=user.getId()) {
 			throw new AccessControlException("User was not author of the comment");
 		}
-		commentRepo.delete(commentId);
+		commentRepo.deleteById(commentId);
 	}	
 }

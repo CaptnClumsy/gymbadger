@@ -21,6 +21,7 @@ import com.clumsy.gymbadger.services.UserService;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,11 +50,11 @@ public class UserController {
     @RequestMapping(value = "/{id}", method = RequestMethod.GET)
     @ResponseStatus(HttpStatus.OK)
     public UserDao getUser(@PathVariable("id") Long id) {
-        final UserEntity user = userRepo.findOne(id);
-        if (user == null) {
+        final Optional<UserEntity> user = userRepo.findById(id);
+        if (!user.isPresent()) {
         	throw new ObjectNotFoundException("User "+id+" not found");
         }
-        return UserDao.fromEntity(user);
+        return UserDao.fromEntity(user.get());
     }
     
     @RequestMapping(value = "/me", method = RequestMethod.PUT)

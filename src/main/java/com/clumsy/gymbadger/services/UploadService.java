@@ -72,7 +72,7 @@ public class UploadService {
 		for (int i=0; i<dao.getFiles().size(); i++) {
 			final String filePath = dao.getFiles().get(i);
 			try {
-				Path tmpFile = Files.createTempFile(Paths.get(dao.getDirectory()), null, "png");
+				Path tmpFile = Files.createTempFile(Paths.get(dao.getDirectory()), null, ".png");
 				ImageUtils.convertForOCR(filePath, tmpFile.toString());
 				tmpFiles.add(tmpFile.toString());
 			} catch (ImageProcessingException e) {
@@ -95,7 +95,7 @@ public class UploadService {
 		final List<BadgeUploadResultDao> results = new ArrayList<BadgeUploadResultDao>();
 		try {		
 			List<ImageRecognitionResult> matchingGyms = ImageRecognitionUtils.getGyms(tmpFiles, gymList);
-			//ImageUtils.drawBounds(inFile, outFile, matchingGyms);
+			ImageUtils.drawBounds(tmpFiles.get(0), tmpFiles.get(0)+".bounds.png", matchingGyms);
 			for (ImageRecognitionResult result : matchingGyms) {
 				log.debug("FOUND GYM AT: "+result.getBounds().toString());
 				if (result.getGyms()!=null && result.getGyms().size()>0) {

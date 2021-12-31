@@ -30,7 +30,7 @@ public class IndexController {
     private String apiKey;
 
 	 
-    private String getIndexWithGym(Model model, HttpServletRequest request, Long gymId) {
+    private String getIndexWithGym(Model model, HttpServletRequest request, String regionName, Long gymId) {
     	model.addAttribute("googleMapsAPIKey", apiKey);
     	try {
     		if (gymId!=null) {
@@ -39,12 +39,15 @@ public class IndexController {
 				model.addAttribute("gymDescription", "Gym in the "+gym.getArea().getName()+" area.");
 				model.addAttribute("gymUrl", request.getRequestURL().toString() + "?" + request.getQueryString());
 				model.addAttribute("gymImageUrl", gym.getImageUrl());
-				model.addAttribute("regionName", "all");
+				model.addAttribute("gymId", gym.getId());
+				addRegionInfo(model, "all");
     		} else {
     			model.addAttribute("gymName", "Gymbadger");
 				model.addAttribute("gymDescription", "");
 				model.addAttribute("gymUrl", request.getRequestURL().toString());
 				model.addAttribute("gymImageUrl", "https://www.gymbadger.com/images/badger.png");
+				model.addAttribute("gymId", 0L);
+				addRegionInfo(model, regionName);
     		}
 		} catch (GymNotFoundException e) {
 			throw new ObjectNotFoundException(e);
@@ -75,16 +78,19 @@ public class IndexController {
 
     @RequestMapping("/")
     public String getIndex(Model model, HttpServletRequest request, @RequestParam(value="gymid", required=false) Long gymId) {
-    	addRegionInfo(model, "none");
-    	return getIndexWithGym(model, request, gymId);
+    	return getIndexWithGym(model, request, "none", gymId);
     }
 
     @RequestMapping("/{regionName}")
     public String getIndex(Model model, HttpServletRequest request, @PathVariable String regionName,
     		@RequestParam(value="gymid", required=false) Long gymId) {
-
-    	addRegionInfo(model, regionName);
-    	return getIndexWithGym(model, request, gymId);
+    	return getIndexWithGym(model, request, regionName, gymId);
+    }
+    
+    @RequestMapping("/{regionName}/login")
+    public String getLoginIndex(Model model, HttpServletRequest request, @PathVariable String regionName,
+    		@RequestParam(value="gymid", required=false) Long gymId) {
+    	return getIndexWithGym(model, request, regionName, gymId);
     }
 
 }

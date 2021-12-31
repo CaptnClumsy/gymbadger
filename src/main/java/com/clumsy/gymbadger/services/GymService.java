@@ -6,6 +6,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -106,11 +107,11 @@ public class GymService {
 	
 	@Transactional(readOnly = true)
 	public GymEntity getGym(final Long gymId) throws GymNotFoundException {
-		final GymEntity gym = gymRepo.findOne(gymId);
-		if (gym == null) {
+		final Optional<GymEntity> gym = gymRepo.findById(gymId);
+		if (!gym.isPresent()) {
 			throw new GymNotFoundException("Unable to query gym");
 		}
-		return gym;
+		return gym.get();
 	}
 	
 	@Transactional(readOnly = true)
@@ -241,15 +242,15 @@ public class GymService {
 		}
 		// Write history records
 		if (hasRaidChanged) {
-			PokemonEntity pokemon = null;
+			Optional<PokemonEntity> pokemon = null;
 			if (pokemonId!=null) {
-				pokemon = pokemonRepo.findOne(pokemonId);
-				if (pokemon==null) {
+				pokemon = pokemonRepo.findById(pokemonId);
+				if (!pokemon.isPresent()) {
 					throw new PokemonNotFoundException("Pokemon "+pokemonId+" not found");
 				}
 			}
 			final UserRaidHistoryEntity raidHistory = writeGymRaidHistory(user.getId(), gymId,
-				lastRaid, pokemon, caught, shiny);
+				lastRaid, pokemon.get(), caught, shiny);
 			if (props.getLastRaid()!=null) {
 				if (raidHistory.getLastRaid().after(props.getLastRaid().getLastRaid())) {
 					props.setLastRaid(raidHistory);
@@ -311,15 +312,15 @@ public class GymService {
 		if (!user.getAdmin()) {
 			throw new AccessControlException("Only admin users can create new gyms");
 		}
-		final AreaEntity area = areaRepo.findOne(areaId);
-		if (area == null) {
+		final Optional<AreaEntity> area = areaRepo.findById(areaId);
+		if (!area.isPresent()) {
 			throw new AreaNotFoundException("Specified area does not exist");
 		}
 		final GymEntity newGym = new GymEntity();
 		newGym.setName(name);
 		newGym.setLatitude(lat);
 		newGym.setLongitude(lng);
-		newGym.setArea(area);
+		newGym.setArea(area.get());
 		newGym.setPark(park);
 		final GymEntity savedGym = gymRepo.save(newGym);
 		return GymSummaryDao.fromGymEntity(savedGym, null);
@@ -330,11 +331,11 @@ public class GymService {
 		if (!user.getAdmin()) {
 			throw new AccessControlException("Only admin users can delete gyms");
 		}
-		final GymEntity gym = gymRepo.findOne(gymId);
-		if (gym == null) {
+		final Optional<GymEntity> gym = gymRepo.findById(gymId);
+		if (!gym.isPresent()) {
 			throw new GymNotFoundException("Specified gym does not exist");
 		}
-		gymRepo.delete(gym);
+		gymRepo.delete(gym.get());
 	}
 	
 	@Transactional(readOnly = true)
@@ -377,8 +378,8 @@ public class GymService {
 	public GymHistoryDao updateGymHistory(final Long gymId, final UserEntity user, final GymHistoryDao dao)
 		throws GymHistoryNotFoundException, GymNotFoundException, PokemonNotFoundException,
 		UnknownHistoryTypeException, AccessControlException, GymPropsNotFoundException {
-		final GymEntity gym = gymRepo.findOne(gymId);
-		if (gym==null) {
+		final Optional<GymEntity> gym = gymRepo.findById(gymId);
+		if (!gym.isPresent()) {
 			throw new GymNotFoundException("Gym not found");
 		}
 		final UserGymHistoryEntity history = gymHistoryRepo.findOneById(dao.getId());
@@ -394,56 +395,56 @@ public class GymService {
 			throw new GymPropsNotFoundException("No properites found for this gym and user");
 		}
 		if (history.getType().equals(HistoryType.BADGE)) {
-			final UserBadgeHistoryEntity badgeHistory = badgeHistoryRepo.findOne(history.getHistoryId());
-			if (badgeHistory==null) {
+			final Optional<UserBadgeHistoryEntity> badgeHistory = badgeHistoryRepo.findById(history.getHistoryId());
+			if (!badgeHistory.isPresent()) {
 				throw new GymHistoryNotFoundException("Badge history entry not found");
 			}
-			badgeHistory.setBadgeStatus(dao.getStatus());
-			badgeHistoryRepo.save(badgeHistory);
+			badgeHistory.get().setBadgeStatus(dao.getStatus());
+			badgeHistoryRepo.save(badgeHistory.get());
 			history.setDateTime(dao.getDateTime());
 			gymHistoryRepo.save(history);
 			final Long latestHistoryId = badgeHistoryRepo.findLatestBadge(history.getUserId(), history.getGymId());
-			final UserBadgeHistoryEntity latestBadgeHistory = badgeHistoryRepo.findOne(latestHistoryId);
-			if (latestBadgeHistory==null) {
+			final Optional<UserBadgeHistoryEntity> latestBadgeHistory = badgeHistoryRepo.findById(latestHistoryId);
+			if (!latestBadgeHistory.isPresent()) {
 				throw new GymHistoryNotFoundException("Latest badge history entry not found");
 			}
-			props.setBadgeStatus(latestBadgeHistory.getBadgeStatus());
+			props.setBadgeStatus(latestBadgeHistory.get().getBadgeStatus());
 		    gymPropsRepo.save(props);
-		    final UserGymHistoryEntity latestHistory = gymHistoryRepo.findOneByHistoryId(latestBadgeHistory.getId());
+		    final UserGymHistoryEntity latestHistory = gymHistoryRepo.findOneByHistoryId(latestBadgeHistory.get().getId());
 		    if (latestHistory==null) {
 		    	throw new GymHistoryNotFoundException("Latest history entry not found");
 		    }
 			return GymHistoryDao.fromEntities(latestHistory, latestBadgeHistory);
 		} else if (history.getType().equals(HistoryType.RAID)) {
-			final UserRaidHistoryEntity raidHistory = raidHistoryRepo.findOne(history.getHistoryId());
-			if (raidHistory==null) {
+			final Optional<UserRaidHistoryEntity> raidHistory = raidHistoryRepo.findById(history.getHistoryId());
+			if (!raidHistory.isPresent()) {
 				throw new GymHistoryNotFoundException("Raid history entry not found");
 			}
 			// Update the raid history record
-			raidHistory.setLastRaid(dao.getDateTime());
+			raidHistory.get().setLastRaid(dao.getDateTime());
 			if (dao.getPokemon()!=null && dao.getPokemon().getId()!=null) {
-				PokemonEntity pokemon = pokemonRepo.findOne(dao.getPokemon().getId());
-				if (pokemon==null) {
+				Optional<PokemonEntity> pokemon = pokemonRepo.findById(dao.getPokemon().getId());
+				if (!pokemon.isPresent()) {
 					throw new PokemonNotFoundException("Pokemon not found");
 				}
-				raidHistory.setPokemon(pokemon);
+				raidHistory.get().setPokemon(pokemon.get());
 			} else {
-				raidHistory.setPokemon(null);
+				raidHistory.get().setPokemon(null);
 			}
-			raidHistory.setCaught(dao.getCaught());
-			raidHistory.setShiny(dao.getShiny());
-			raidHistoryRepo.save(raidHistory);
+			raidHistory.get().setCaught(dao.getCaught());
+			raidHistory.get().setShiny(dao.getShiny());
+			raidHistoryRepo.save(raidHistory.get());
 			// Find new latest raid
 			Long newLatest = raidHistoryRepo.findLatestRaid(history.getUserId(), history.getGymId());
 			// Set latest raid to the new one
 			if (newLatest==null) {
 				throw new GymHistoryNotFoundException("Latest raid history not found");
 			}
-			final UserRaidHistoryEntity newLatestRaid = raidHistoryRepo.findOne(newLatest);
-			if (newLatestRaid==null) {
+			final Optional<UserRaidHistoryEntity> newLatestRaid = raidHistoryRepo.findById(newLatest);
+			if (!newLatestRaid.isPresent()) {
 				throw new GymHistoryNotFoundException("Latest raid history entry not found");
 			}
-			props.setLastRaid(newLatestRaid);
+			props.setLastRaid(newLatestRaid.get());
 			gymPropsRepo.save(props);
 			return GymHistoryDao.fromEntities(history, newLatestRaid);
 		}
@@ -454,8 +455,8 @@ public class GymService {
 	public GymHistoryDao deleteGymHistory(final Long gymId, final UserEntity user, final Long historyId)
 		throws GymHistoryNotFoundException, GymNotFoundException,
 		UnknownHistoryTypeException, AccessControlException, GymPropsNotFoundException {
-		final GymEntity gym = gymRepo.findOne(gymId);
-		if (gym==null) {
+		final Optional<GymEntity> gym = gymRepo.findById(gymId);
+		if (!gym.isPresent()) {
 			throw new GymNotFoundException("Gym not found");
 		}
 		final UserGymHistoryEntity history = gymHistoryRepo.findOneById(historyId);
@@ -467,8 +468,8 @@ public class GymService {
 		}
 		gymHistoryRepo.delete(history);
 		if (history.getType().equals(HistoryType.BADGE)) {
-			final UserBadgeHistoryEntity badgeHistory = badgeHistoryRepo.findOne(history.getHistoryId());
-			if (badgeHistory==null) {
+			final Optional<UserBadgeHistoryEntity> badgeHistory = badgeHistoryRepo.findById(history.getHistoryId());
+			if (!badgeHistory.isPresent()) {
 				throw new GymHistoryNotFoundException("Badge history entry not found");
 			}
 			// Update the latest badge status
@@ -477,15 +478,15 @@ public class GymService {
 				throw new GymPropsNotFoundException("No properites found for this gym and user");
 			}
 			// Delete the badge history
-			badgeHistoryRepo.delete(badgeHistory);
+			badgeHistoryRepo.delete(badgeHistory.get());
 			Long newLatest = badgeHistoryRepo.findLatestBadge(history.getUserId(), history.getGymId());
 			// Set latest badge status to the new one
 			if (newLatest!=null) {
-				final UserBadgeHistoryEntity newLatestBadge = badgeHistoryRepo.findOne(newLatest);
-				if (newLatestBadge==null) {
+				final Optional<UserBadgeHistoryEntity> newLatestBadge = badgeHistoryRepo.findById(newLatest);
+				if (!newLatestBadge.isPresent()) {
 					throw new GymHistoryNotFoundException("Latest badge history entry not found");
 				}
-			    props.setBadgeStatus(newLatestBadge.getBadgeStatus());
+			    props.setBadgeStatus(newLatestBadge.get().getBadgeStatus());
 				gymPropsRepo.save(props);
 				return GymHistoryDao.fromEntities(history, newLatestBadge);
 			}
@@ -494,8 +495,8 @@ public class GymService {
 			gymPropsRepo.save(props);
 			return GymHistoryDao.fromEntities(history, GymBadgeStatus.NONE);
 		} else if (history.getType().equals(HistoryType.RAID)) {
-			final UserRaidHistoryEntity raidHistory = raidHistoryRepo.findOne(history.getHistoryId());
-			if (raidHistory==null) {
+			final Optional<UserRaidHistoryEntity> raidHistory = raidHistoryRepo.findById(history.getHistoryId());
+			if (!raidHistory.isPresent()) {
 				throw new GymHistoryNotFoundException("Raid history entry not found");
 			}
 			// Set latestRaid to null in user_gym_props
@@ -506,15 +507,15 @@ public class GymService {
 			props.setLastRaid(null);
 			final GymPropsEntity savedProps = gymPropsRepo.save(props);
 			// Delete the raid data
-			raidHistoryRepo.delete(raidHistory);
+			raidHistoryRepo.delete(raidHistory.get());
 			Long newLatest = raidHistoryRepo.findLatestRaid(history.getUserId(), history.getGymId());
 			// Set latestRaid to the new one
 			if (newLatest!=null) {
-				final UserRaidHistoryEntity newLatestRaid = raidHistoryRepo.findOne(newLatest);
-				if (newLatestRaid==null) {
+				final Optional<UserRaidHistoryEntity> newLatestRaid = raidHistoryRepo.findById(newLatest);
+				if (!newLatestRaid.isPresent()) {
 					throw new GymHistoryNotFoundException("Latest raid history entry not found");
 				}
-				savedProps.setLastRaid(newLatestRaid);
+				savedProps.setLastRaid(newLatestRaid.get());
 				gymPropsRepo.save(savedProps);
 				return GymHistoryDao.fromEntities(history, newLatestRaid);
 			}

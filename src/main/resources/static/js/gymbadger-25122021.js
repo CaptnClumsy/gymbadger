@@ -81,7 +81,7 @@
     	    $.ajax({
                 type: "GET",
                 contentType: "application/json; charset=utf-8",
-                url: "api/defaults/",
+                url: "/api/defaults/",
                 success: function (data) {
                 	clustering = data.cluster;
                 	region = data.region;
@@ -94,7 +94,7 @@
                 			resetAreaSelection();
                 			setLastRegion(region);
                 		}
-                	}                	
+                	}
             	    map = new google.maps.Map(document.getElementById('map'), {
                     zoom: data.zoom,
                     center: { lat: data.lat, lng: data.lng },
@@ -114,7 +114,7 @@
             	    $.ajax({
                       type: "GET",
                       contentType: "application/json; charset=utf-8",
-                      url: "api/regions/",
+                      url: "/api/regions/",
                       success: function (data) {
             	        initTeamOptions(data);
             	      },
@@ -166,7 +166,7 @@
               $.ajax({
                   type: "DELETE",
                   contentType: "application/json; charset=utf-8",
-                  url: "api/users/announcements/"
+                  url: "/api/users/announcements/"
 	          });
           });
       }
@@ -187,7 +187,7 @@
 	  $.ajax({
           type: "GET",
           contentType: "application/json; charset=utf-8",
-          url: "api/areas/"+region,
+          url: "/api/areas/"+region,
           success: function (data) {
         	  var anyLoaded = loadAreaSelection();
         	  $('#filterButton').append($('<option>', {
@@ -262,7 +262,7 @@
     $.ajax({
       type: "GET",
       contentType: "application/json; charset=utf-8",
-      url: "api/areas/"+region,
+      url: "/api/areas/"+region,
       success: function (data) {
         $('#area-group').empty();
         for (var i = 0; i < data.length; i++) {
@@ -379,7 +379,7 @@
   	$.ajax({
         type: "GET",
           contentType: "application/json; charset=utf-8",
-          url: "api/gyms/"+region,
+          url: "/api/gyms/"+region,
           success: function (data) {
         	  gymData = data;
               for (var i = 0; i < gymData.length; i++) {
@@ -430,7 +430,7 @@ function resetMarkers() {
   	$.ajax({
         type: "GET",
           contentType: "application/json; charset=utf-8",
-          url: "api/gyms/"+region,
+          url: "/api/gyms/"+region,
           success: function (data) {
         	  gymData = data;
               for (var i = 0; i < gymData.length; i++) {
@@ -484,7 +484,7 @@ function resetMarkers() {
       $.ajax({
         type: "GET",
         contentType: "application/json; charset=utf-8",
-        url: "api/comments/"+thisGym.id,
+        url: "/api/comments/"+thisGym.id,
         success: function (data) {
             var htmlContent="";
             if (data.comments.length==0 && !data.loggedin) {
@@ -516,7 +516,7 @@ function resetMarkers() {
                 $.ajax({
                     type: "DELETE",
                     contentType: "application/json; charset=utf-8",
-                    url: "api/comments/"+idtodelete,
+                    url: "/api/comments/"+idtodelete,
                     success: function (data) {
                         // Update the UI by removing old raid time and adding new one
                         $('#comments').html('Loading...');
@@ -551,7 +551,7 @@ function resetMarkers() {
                 $.ajax({
                     type: "POST",
                     contentType: "application/json; charset=utf-8",
-                    url: "api/comments/",
+                    url: "/api/comments/",
                     data: JSON.stringify(postData),
                     success: function (data) {
                         // Update the UI by removing old raid time and adding new one
@@ -750,7 +750,7 @@ function resetMarkers() {
 	$.ajax({
       type: "GET",
       contentType: "application/json; charset=utf-8",
-      url: "api/gyms/"+currentProps.id+"/history/",
+      url: "/api/gyms/"+currentProps.id+"/history/",
       success: function (data) {
         var html = "<table id=\"historyTable\" class=\"table table-striped table-bordered badger-history-table scrollable\" style=\"width: 100%\">";
         html += "<thead style=\"display:none;\"><tr><th style=\"display:none;\">Id</th>" +
@@ -875,7 +875,7 @@ function resetMarkers() {
         $.ajax({
           type: "DELETE",
           contentType: "application/json; charset=utf-8",
-          url: "api/gyms/"+currentProps.id+"/history/"+histid,
+          url: "/api/gyms/"+currentProps.id+"/history/"+histid,
           success: function (data) {
         	var pokemonId = null;
         	if (data.pokemon!=null) {
@@ -925,7 +925,7 @@ function resetMarkers() {
           $.ajax({
             type: "PUT",
             contentType: "application/json; charset=utf-8",
-            url: "api/gyms/"+currentProps.id+"/history/"+histid,
+            url: "/api/gyms/"+currentProps.id+"/history/"+histid,
             data: JSON.stringify(data),
             success: function (data) {
           	  currentProps.lastRaid=data.dateTime;
@@ -953,7 +953,7 @@ function resetMarkers() {
         $.ajax({
           type: "DELETE",
           contentType: "application/json; charset=utf-8",
-          url: "api/gyms/"+currentProps.id+"/history/"+histid,
+          url: "/api/gyms/"+currentProps.id+"/history/"+histid,
           success: function (data) {
         	showHistoryTab();
         	updateBadgeUI(currentMarker, data.status, currentProps.id);
@@ -979,7 +979,7 @@ function resetMarkers() {
           $.ajax({
             type: "PUT",
             contentType: "application/json; charset=utf-8",
-            url: "api/gyms/"+currentProps.id+"/history/"+histid,
+            url: "/api/gyms/"+currentProps.id+"/history/"+histid,
             data: JSON.stringify(data),
             success: function (data) {
           	  showHistoryTab();
@@ -1099,7 +1099,7 @@ function resetMarkers() {
       $.ajax({
         type: "PUT",
         contentType: "application/json; charset=utf-8",
-        url: "api/gyms/"+props.id,
+        url: "/api/gyms/"+props.id,
         data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid"]),
         success: function (data) {
           currentProps = data;
@@ -1226,7 +1226,7 @@ function resetMarkers() {
 	  $.ajax({
         type: "PUT",
         contentType: "application/json; charset=utf-8",
-        url: "api/gyms/"+props.id,
+        url: "/api/gyms/"+props.id,
         data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid", "pokemonId", "caught", "shiny"]),
         success: function (data) {
           updateBadgeUI(marker, status, data.id);
@@ -1633,7 +1633,7 @@ function resetMarkers() {
 	  $.ajax({
           type: "GET",
           contentType: "application/json; charset=utf-8",
-          url: "api/bosses/",
+          url: "/api/bosses/",
           success: function (data) {
       	    raidBossData = data;
       	    initS2Cells();
@@ -1712,7 +1712,7 @@ function resetMarkers() {
       $.ajax({
         type: "PUT",
         contentType: "application/json; charset=utf-8",
-        url: "api/gyms/"+props.id,
+        url: "/api/gyms/"+props.id,
         data: JSON.stringify(props, ["id", "name", "lat", "lng", "park", "status", "lastRaid", "pokemonId", "caught", "shiny"]),
         success: function (data) {
           currentProps = data;
@@ -1827,7 +1827,7 @@ function resetMarkers() {
 	    $.ajax({
             type: "PUT",
             contentType: "application/json; charset=utf-8",
-            url: "api/users/leaderboard",
+            url: "/api/users/leaderboard",
             data: JSON.stringify(e.target.checked),
             success: function (data) {
               // Update the UI by removing table and requerying everything
@@ -1855,7 +1855,7 @@ function resetMarkers() {
 	  $.ajax({
           type: "GET",
           contentType: "application/json; charset=utf-8",
-          url: "api/users/leaderboard/"+region,
+          url: "/api/users/leaderboard/"+region,
           success: function (data) {
         	  resetLeadersTable();
         	  $('#leadersTableBody').html("");
@@ -1902,7 +1902,7 @@ function resetMarkers() {
     $.ajax({
       type: "GET",
       contentType: "application/json; charset=utf-8",
-      url: "api/users/leaderboard/totals/"+region,
+      url: "/api/users/leaderboard/totals/"+region,
       success: function (data) {
     	  resetTotalTable();
     	  $('#totalTableBody').html("");
@@ -1953,7 +1953,7 @@ function resetMarkers() {
 	  $.ajax({
           type: "GET",
           contentType: "application/json; charset=utf-8",
-          url: "api/users/leaderboard/team/"+currentUser.team+"/"+region,
+          url: "/api/users/leaderboard/team/"+currentUser.team+"/"+region,
           success: function (data) {
         	  resetTeamTable();
         	  $('#teamTableBody').html("");
@@ -2052,7 +2052,7 @@ function resetMarkers() {
 	    $.ajax({
             type: "PUT",
             contentType: "application/json; charset=utf-8",
-            url: "api/users/announcements/1/",
+            url: "/api/users/announcements/1/",
             data: messageVal,
             success: function (data) {
                 $('#announcementAdminPage').modal('hide');  
@@ -2255,7 +2255,7 @@ function resetMarkers() {
         $.ajax({
           type: "PUT",
           contentType: "application/json; charset=utf-8",
-          url: "api/users/me",
+          url: "/api/users/me",
           data: JSON.stringify(updatedUser),
           success: function (data) {
             currentUser = data;
@@ -2270,7 +2270,7 @@ function resetMarkers() {
             	$.ajax({
                     type: "PUT",
                     contentType: "application/json; charset=utf-8",
-                    url: "api/defaults/",
+                    url: "/api/defaults/",
                     data: JSON.stringify(defaultsDao),
                     success: function (defaultsData) {
                         if (newRegion!=region) {
@@ -2373,7 +2373,7 @@ function resetMarkers() {
   }
   
   function showFavouritesTab() {
-	var reportUrl = "api/gyms/favourites?scope="+favReportScope;
+	var reportUrl = "/api/gyms/favourites?scope="+favReportScope;
 	var date = $('#badger-rep-start-date').data("datetimepicker").getDate();
 	if (date != null) {
 		reportUrl += "&start="+date.getTime();
